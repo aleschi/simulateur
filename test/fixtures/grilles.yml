@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  type_emploi: MyString
+  corps: MyString
+  grade: 1
+  echelon: 1
+  duree: 1.5
+  indice: 1
+
+two:
+  type_emploi: MyString
+  corps: MyString
+  grade: 1
+  echelon: 1
+  duree: 1.5
+  indice: 1

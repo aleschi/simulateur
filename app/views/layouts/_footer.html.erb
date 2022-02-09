@@ -1,0 +1,20 @@
+<div class="footer">
+    <div class="footer_top">
+        <div className="footer_logo">
+          <%= image_tag 'logo_ministere2.svg', alt:"DB", class:"image_logo" %>
+        </div>
+        <div class="footer_text">
+          
+        <div class="footer_links"><a href="https://budget.gouv.fr" target="_blank">budget.gouv.fr</a> <a href="https://gouvernement.fr" target="_blank">gouvernement.fr</a> <a href="https://economie.gouv.fr" target="_blank">economie.gouv.fr</a> <a href="https://data.gouv.fr" target="_blank">data.gouv.fr</a></div>
+        </div>
+      </div>
+      <div class="footer_bottom"> 
+        <%= link_to mentions_legales_path, class:"tu" do%>Mentions légales<% end%>
+        <span>|</span>
+        <%= link_to donnees_personnelles_path, class:"tu" do%>Données personnelles<%end%>
+        <span>|</span>
+        <%= link_to accessibilite_path, class:"tu" do%>Accessibilité:non conforme<%end%>
+        <span>|</span>
+
+      </div>
+</div>
