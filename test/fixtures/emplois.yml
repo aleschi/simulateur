@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  duree: 1.5
+  echelon: 1
+  indice: 1
+  nom: MyString
+
+two:
+  duree: 1.5
+  echelon: 1
+  indice: 1
+  nom: MyString

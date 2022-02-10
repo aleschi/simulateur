@@ -12,6 +12,13 @@ Rails.application.routes.draw do
      
     end
   end
+
+  resources :emplois do 
+    collection do 
+      post 'import' => 'emplois#import'
+     
+    end
+  end
   
   post 'search_grilles', to: 'grilles#search_grilles'
 

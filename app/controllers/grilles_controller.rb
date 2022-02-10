@@ -13,10 +13,10 @@ class GrillesController < ApplicationController
   	#liste indice corps de l'agent 
   	@liste_indices = Grille.where(corps: params[:corps], grade: params[:grade],type_emploi: "non fonctionnel").where("echelon > ? OR (echelon = ? AND duree >= ?)",params[:echelon],params[:echelon],params[:duree]).order('echelon ASC, duree ASC').pluck(:indice)
   	@liste_indices = @liste_indices[0..@duree_carriere-1]
-  	@liste_indices= @liste_indices.collect { |n| (n * 56.2323).round(2) }
+  	
 
   	#calcul indice de base si est dans emploi fonctionnel
-  	if params[:type_emploi] != "non fonctionnel"
+  	if !params[:type_emploi].nil? && params[:type_emploi] != "non fonctionnel"
  		@fin_emploi = params[:fin_emploif].to_i
   		@indice_emploi = Grille.where(corps: params[:corps], grade: params[:grade], echelon: params[:echelon_emploif], duree: params[:duree_emploif], type_emploi: params[:type_emploi]).first.indice
   		@liste_indices_emploi = Grille.where(corps: params[:corps], grade: params[:grade],type_emploi: params[:type_emploi]).where("echelon > ? OR (echelon = ? AND duree >= ?)",params[:echelon],params[:echelon],params[:duree]).order('echelon ASC, duree ASC').pluck(:indice)
@@ -38,6 +38,7 @@ class GrillesController < ApplicationController
   		@liste_indices_nouveau_grade = Grille.where(corps: params[:corps], grade: 2, type_emploi: "non fonctionnel").where("indice >= ?",@indice_anciengrade).order('indice ASC').pluck(:indice)
   		@liste_indices = @liste_indices[0..@annee_grade2-1]+@liste_indices_nouveau_grade[0..@duree_carriere-@annee_grade2-1]
   	end
+
   	if !params[:grade3].nil?
   		@annee_grade3 = params[:grade3].to_i
   		#prendre indice du corps de base au moment de la promotion et aller chercher le mm indice par valeur sup dans le grade au dessus 
@@ -53,8 +54,8 @@ class GrillesController < ApplicationController
   		@liste_indices = @liste_indices[0..@annee_grade4-1]+@liste_indices_nouveau_grade[0..@duree_carriere-@annee_grade4-1]
   	end
 
-  	#calcul si ajout emploi fonctionnel 
-
+  	@liste_indices= @liste_indices.collect { |n| (n * 56.2323).round(2) }
+    @liste_indices = @liste_indices[0..@duree_carriere-1]
 
   	respond_to do |format|
           format.turbo_stream do 

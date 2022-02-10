@@ -236,6 +236,10 @@ text-align:right;
   color:#fff;
   }
 }
+.bouton_inactive {
+  background-color:#F8F8F8;
+  color: #fff;
+}
 .form {
   position:relative;
   input, textarea {
@@ -335,4 +339,7 @@ text-align:right;
   i{
     color:#169B62 !important;
   }
+}
+.select_inactive{
+  color: #F0F0F0;
 }
