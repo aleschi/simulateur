@@ -68,6 +68,10 @@ input[type="checkbox"]:focus, input[type="radio"]:focus {
 //box-shadow: 0 0 0 0.05em #fff, 0 0 0.15em 0.1em #000091;
   outline:none;
 }
+.page_header{
+  width:100%;
+  border-bottom:1px solid rgba(231, 231, 231, 1);
+}
 .logo_header{
   width:100%;
   padding:12px;
@@ -169,6 +173,9 @@ text-align:right;
   font-size:36px;
   font-weight:500;
 }
+.titre_2{
+  font-size:24px;
+}
 .titre_etiquette{
   font-size:15px;
   font-weight:bold;
@@ -239,6 +246,10 @@ text-align:right;
 .bouton_inactive {
   background-color:#F8F8F8;
   color: #fff;
+}
+.bouton_i{
+  text-decoration:none;
+  color:#000091;
 }
 .form {
   position:relative;
@@ -342,4 +353,25 @@ text-align:right;
 }
 .select_inactive{
   color: #F0F0F0;
+}
+.highcharts-credits{
+  color:#fff !important;
+  fill: #fff !important;
+}
+
+.texte_b{
+  background-color: #000091;
+  color:#fff;
+  border-radius:50px;
+  padding:2px 6px;
+}
+
+.texte_error{
+  font-size:12px;
+  color: #E1000F;
+}
+
+.graphe{
+  position:sticky;
+  top:12px;
 }
