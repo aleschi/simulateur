@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 
 export default class extends Controller {
-    static targets = [ 'form','submitBouton'];
+    static targets = [ 'form','submitBouton', 'emploif','emploifEchelon','dureefEchelon','finfEchelon'];
 
   	connect() {
   	 this.validateForm();
@@ -25,6 +25,13 @@ export default class extends Controller {
 
           }
         });
+
+        if (this.emploifTarget.value != "Aucun" && this.emploifTarget.value != ""){
+      
+          if (this.emploifEchelonTarget.value == "" || this.dureefEchelonTarget.value == "" ||  this.finfEchelonTarget.value == ""){
+            isValid = false;
+          }
+        }
 
         if (isValid==true){
             this.submitBoutonTarget.classList.remove("bouton_inactive")

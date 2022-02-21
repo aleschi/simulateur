@@ -152,17 +152,17 @@ export default class extends Controller {
         this.dureeIdTarget.innerHTML = "";
         this.echelonIdTarget.innerHTML = "";
         const option = document.createElement("option");
-        option.value = null;
+        option.value = "";
         option.innerHTML = "- Selectionner -";
         this.gradeIdTarget.appendChild(option);
 
         const option2 = document.createElement("option");
-        option2.value = null;
+        option2.value = "";
         option2.innerHTML = "- Selectionner -";
         this.echelonIdTarget.appendChild(option2);
 
         const option3 = document.createElement("option");
-        option3.value = null;
+        option3.value = "";
         option3.innerHTML = "- Selectionner -";
         this.dureeIdTarget.appendChild(option3);
 
@@ -179,12 +179,12 @@ export default class extends Controller {
         this.echelonIdTarget.innerHTML = "";
         this.dureeIdTarget.innerHTML = "";
         const option = document.createElement("option");
-        option.value = null;
+        option.value = "";
         option.innerHTML = "- Selectionner -";
         this.echelonIdTarget.appendChild(option);
 
         const option2 = document.createElement("option");
-        option2.value = null;
+        option2.value = "";
         option2.innerHTML = "- Selectionner -";
         this.dureeIdTarget.appendChild(option2);
 
@@ -199,7 +199,7 @@ export default class extends Controller {
     updateDurees(data){
         this.dureeIdTarget.innerHTML = "";
         const option = document.createElement("option");
-            option.value = null;
+            option.value = "";
             option.innerHTML = "- Selectionner -";
             this.dureeIdTarget.appendChild(option);
         data.durees.forEach((duree) => {
@@ -222,7 +222,7 @@ export default class extends Controller {
             grades_title[indice-1].classList.add("select_inactive");
             if (grade == indice && max_grade > grade){
                 const option = document.createElement("option");
-                option.value = null;
+                option.value = "";
                 option.innerHTML = "- Selectionner -";
                 grades[indice-1].appendChild(option);
                 data.array.forEach((ar) => {
@@ -246,7 +246,7 @@ export default class extends Controller {
         this.grade4Target.innerHTML = "";
         if (max_grade > 2){
             const option = document.createElement("option");
-            option.value = null;
+            option.value = "";
             option.innerHTML = "- Selectionner -";
             this.grade3Target.appendChild(option);
             
@@ -264,7 +264,7 @@ export default class extends Controller {
         this.grade4Target.innerHTML = "";
         if (max_grade > 3){
             const option = document.createElement("option");
-            option.value = null;
+            option.value = "";
             option.innerHTML = "- Selectionner -";
             this.grade4Target.appendChild(option);
             
@@ -380,19 +380,19 @@ export default class extends Controller {
     updateEf(data){
         this.emploifEchelonTarget.innerHTML = "";
         const option = document.createElement("option");
-            option.value = null;
+            option.value = "";
             option.innerHTML = "- Selectionner -";
             this.emploifEchelonTarget.appendChild(option);
 
         this.dureefEchelonTarget.innerHTML = "";
         const option2 = document.createElement("option");
-            option2.value = null;
+            option2.value = "";
             option2.innerHTML = "- Selectionner -";
             this.dureefEchelonTarget.appendChild(option2);
 
         this.finfEchelonTarget.innerHTML = "";
         const option3 = document.createElement("option");
-            option3.value = null;
+            option3.value = "";
             option3.innerHTML = "- Selectionner -";
             this.finfEchelonTarget.appendChild(option3);
 
@@ -407,13 +407,13 @@ export default class extends Controller {
     updateDatesf(data){
         this.dureefEchelonTarget.innerHTML = "";
         const option = document.createElement("option");
-            option.value = null;
+            option.value = "";
             option.innerHTML = "- Selectionner -";
             this.dureefEchelonTarget.appendChild(option);
 
         this.finfEchelonTarget.innerHTML = "";
         const option2 = document.createElement("option");
-            option2.value = null;
+            option2.value = "";
             option2.innerHTML = "- Selectionner -";
             this.finfEchelonTarget.appendChild(option2);
 
@@ -428,7 +428,7 @@ export default class extends Controller {
     updateFinf(data){
         this.finfEchelonTarget.innerHTML = "";
         const option = document.createElement("option");
-            option.value = null;
+            option.value = "";
             option.innerHTML = "- Selectionner -";
             this.finfEchelonTarget.appendChild(option);
         data.finf.forEach((duree) => {
@@ -447,7 +447,7 @@ export default class extends Controller {
         const dates_arr = Array.from({length:42},(v,k)=>k+2023);
       
         const option = document.createElement("option");
-        option.value = null;
+        option.value = "";
         option.innerHTML = "- Selectionner -";
 
         var target ,target2 ;

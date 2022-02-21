@@ -33,7 +33,7 @@ class PagesController < ApplicationController
   	array = (2023..2082).to_a
 
 	#grade selectionne
-  	if !params[:grades].nil? && !params[:grades][0].nil?
+  	if !params[:grades].nil? && !params[:grades][0].nil? && !params[:grades][0] != ""
 	  	grades = params[:grades][0]	  	
 	
 
@@ -41,18 +41,18 @@ class PagesController < ApplicationController
 	  	echelons = Grille.where(corps: @corps, grade: grades).order('echelon ASC').pluck(:echelon).uniq
 
 	  	#si echelon selectionne
-	  	if !params[:echelons].nil? && !params[:echelons][0].nil?
+	  	if !params[:echelons].nil? && !params[:echelons][0].nil? && !params[:echelons][0] != ""
 	  		echelons = params[:echelons][0]
 	  	end	  	
 
-	  	if !params[:grade2].nil? && !params[:grade2][0].nil?
+	  	if !params[:grade2].nil? && !params[:grade2][0].nil? && !params[:grade2][0] != ""
 	  		@start = params[:grade2][0].to_i + 2022 + 1 #ne peut démarrer au min qu'un an apres promo du grade 2
 	  		array_grade3 = (@start..2082).to_a
 	  	else
 	  		array_grade3 = array
 	  	end 
 
-	  	if !params[:grade3].nil? && !params[:grade3][0].nil?
+	  	if !params[:grade3].nil? && !params[:grade3][0].nil? && !params[:grade3][0] != ""
 	  		@start = params[:grade3][0].to_i + 2022 + 1 #ne peut démarrer au min qu'un an apres promo du grade 2
 	  		array_grade4 = (@start..2082).to_a
 	  	else
@@ -60,20 +60,20 @@ class PagesController < ApplicationController
 	  	end
   	end
 
-  	if !params[:emploif].nil? && !params[:emploif][0].nil? && !params[:emploif][0] != "Aucun"
+  	if !params[:emploif].nil? && !params[:emploif][0].nil? && !params[:emploif][0] != "Aucun" && !params[:emploif][0] != ""
   		echelonsf = Emploi.where(nom: params[:emploif][0]).pluck(:echelon).uniq
   	else
   		echelonsf = nil
   	end
 
-  	if !params[:echelonf].nil? && !params[:echelonf][0].nil?
+  	if !params[:echelonf].nil? && !params[:echelonf][0].nil? && !params[:echelonf][0] != ""
   		@max_duree = Emploi.where(nom: params[:emploif][0], echelon: params[:echelonf][0].to_i).order('duree ASC').last.duree.to_i
   		dureef = (1..@max_duree).to_a
   	else
   		dureef = nil
   	end
 
-  	if !params[:dureef].nil? && !params[:dureef][0].nil?
+  	if !params[:dureef].nil? && !params[:dureef][0].nil? && !params[:dureef][0] != ""
   		@max_duree = Emploi.where(nom: params[:emploif], echelon: params[:echelonf][0].to_i).order('duree ASC').last.duree.to_i
   		finf = (2023..2023+@max_duree).to_a
   	else

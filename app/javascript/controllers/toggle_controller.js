@@ -52,7 +52,7 @@ export default class extends Controller {
 
 		        debut_targets[indice-1].innerHTML = ""
 		        const option = document.createElement("option");
-	            option.value = null;
+	            option.value = "";
 	            option.innerHTML = "- Selectionner -";
 	            debut_targets[indice-1].appendChild(option);
 
@@ -108,7 +108,7 @@ export default class extends Controller {
   	const result_debut_targets = [this.resultDebutf1Target,this.resultDebutf2Target,this.resultDebutf3Target,this.resultDebutf4Target,this.resultDebutf5Target,this.resultDebutf6Target];
   	const result_duree_targets = [this.resultDureef1Target,this.resultDureef2Target,this.resultDureef3Target,this.resultDureef4Target,this.resultDureef5Target,this.resultDureef6Target];
 
-
+    this.errorTarget.classList.add('visually-hidden');
   	if (this.content2Target.classList.contains('visually-hidden') && (this.content1Target.classList.contains('visually-hidden')==false)){
   		  this.content1Target.classList.add('visually-hidden');
   		  this.emploif1Target.selectedIndex = 0;
