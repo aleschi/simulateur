@@ -489,16 +489,25 @@ export default class extends Controller {
                 }
             })
             const nouvelles_dates2 = dates_arr.filter(date => !data_non_dispo.includes(date));   */       
-            
+            if ( id == 1 ){
+                console.log(this.finfEchelonTarget.value);
+                //on prend fin emploi fonctionnel actuel si existe 
+                if (this.finfEchelonTarget.value != null && this.finfEchelonTarget.value != ""){
+                    nouvelles_dates = dates_arr.filter(date => date > parseInt(this.finfEchelonTarget.value));
+                   
+                }else {
+                    nouvelles_dates = dates_arr;
+                }
+            }
             if ( id > 1 ){
                 if (debut_targets[id-2].value != null && debut_targets[id-2].value != "" && duree_targets[id-2].value != null && duree_targets[id-2].value != ""){
                 nouvelles_dates = dates_arr.filter(date => date > parseInt(debut_targets[id-2].value)+parseInt(duree_targets[id-2].value));
                 }
                 
-            } else {
-                nouvelles_dates = dates_arr;
-            }
-            
+            } 
+            target.innerHTML = "";
+            target.appendChild(option);
+            target2.selectedIndex = 0;
             nouvelles_dates.forEach((date) => {
                 const option3 = document.createElement("option");
                 option3.value = date;

@@ -47,37 +47,42 @@
 	</div>
 	<div class="d24"></div>
 
-	<div class="titre_2">Emploi fonctionnel :</div>
-	<div class="d12"></div>
-	<div class="texte_etiquette">Vous avez ici la possibilité de renseigner votre emploi fonctionnel actuel et/ou simuler la prise d’emploi fonctionnel dans les années à venir. Vous pouvez simuler jusqu’à 6 emplois fonctionnels.</div>
-	<div class="d12"></div>
-	<div class="titre_etiquette">Emploi fonctionnel actuel :</div>
-	<div class="d12"></div>
-	<div>
-		<div class="texte_etiquette">Nature de l'emploi fonctionnel actuel éventuellement exercé</div>
-		<div class="form"><%= f.select :type_emploi, @emplois_f.map {|e| [e,e]},{prompt: "- Selectionner -"},{data:{action: 'change->filter#emploifChange'}}%></div>
-	</div>
-	<div class="d12"></div>
-	<div class="align_flex w100">
-		<div class="w3">
-			<div class="texte_etiquette">Echelon emploi</div>
-			<div class="form"><%= f.select :echelon_emploif, [["- Selectionner -",nil]],{},{data: {action: 'change->filter#echelonfChange', 'filter-target': 'emploifEchelon'}}%></div>
-		</div>
-		<div class="w3 pcenter">
-			<div class="texte_etiquette" >Durée déjà passée</div>
-			<div class="form"><%= f.select :duree_emploif, [["- Selectionner -",nil]], {},{data: {action: 'change->filter#dureefChange','filter-target': 'dureefEchelon'}}%></div>
-		</div>
-		<div class="w3">
-			<div class="texte_etiquette">Fin prévue</div>
-			<div class="form"><%= f.select :fin_emploif, [["- Selectionner -",nil]],{},{data: {'filter-target': 'finfEchelon'}}%></div>
-		</div>
-	</div>
-	<div class="d24"></div>
-	<div class="titre_etiquette">Projections futures d'emplois fonctionnels :</div>
-	<div class="d12"></div>
-	
-	
 	<div data-controller="toggle">
+		<div class="titre_2">Emploi fonctionnel :</div>
+		<div class="d12"></div>
+		<div class="texte_etiquette">Vous avez ici la possibilité de renseigner votre emploi fonctionnel actuel et/ou simuler la prise d’emploi fonctionnel dans les années à venir. Vous pouvez simuler jusqu’à 6 emplois fonctionnels.</div>
+		<div class="d12"></div>
+		<div class="titre_etiquette">Emploi fonctionnel actuel : <span data-toggle-target="boutonEdit" class="visually-hidden"><button  data-action="toggle#reset"> <i class="fa-solid fa-pen-to-square bouton_i"></i></button></span></div>
+		<div class="d12"></div>
+		<div>
+			<div class="texte_etiquette">Nature de l'emploi fonctionnel actuel exercé</div>
+			<div class="form"><%= f.select :type_emploi, @emplois_f.map {|e| [e,e]},{prompt: "- Selectionner -"},{data:{action: 'change->filter#emploifChange','toggle-target': 'emploif'}}%></div>
+			<div class="texte_etiquette" data-toggle-target='resultEmploif'></div>
+		</div>
+		<div class="d12"></div>
+		<div class="align_flex w100">
+			<div class="w3">
+				<div class="texte_etiquette">Echelon emploi</div>
+				<div class="form"><%= f.select :echelon_emploif, [["- Selectionner -",nil]],{},{data: {action: 'change->filter#echelonfChange', 'filter-target': 'emploifEchelon','toggle-target': 'emploifEchelon'}}%></div>
+				<div class="texte_etiquette" data-toggle-target='resultEchelonf'></div>
+			</div>
+			<div class="w3 pcenter">
+				<div class="texte_etiquette" >Durée déjà passée</div>
+				<div class="form"><%= f.select :duree_emploif, [["- Selectionner -",nil]], {},{data: {action: 'change->filter#dureefChange','filter-target': 'dureefEchelon','toggle-target': 'dureefEchelon'}}%></div>
+				<div class="texte_etiquette" data-toggle-target='resultDureef'></div>
+			</div>
+			<div class="w3">
+				<div class="texte_etiquette">Fin prévue</div>
+				<div class="form"><%= f.select :fin_emploif, [["- Selectionner -",nil]],{},{data: {'filter-target': 'finfEchelon','toggle-target': 'finfEchelon'}}%></div>
+				<div class="texte_etiquette" data-toggle-target='resultFinf'></div>
+			</div>
+		</div>
+		<div class="d24"></div>
+		<div class="titre_etiquette">Projections futures d'emplois fonctionnels :</div>
+		<div class="d12"></div>
+	
+	
+	
 		<% (1..6).each do |i|%>
 		<div class="visually-hidden" data-toggle-target="content<%=i%>">
 			<div class="texte_etiquette"><span class="texte_b">Simulation <%=i %></span> <button data-action="toggle#toggle2"><i data-toggle-target="trash<%=i%>" class="fas fa-trash-alt bouton_i"></i></button></div>

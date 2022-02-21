@@ -26,7 +26,7 @@ class PagesController < ApplicationController
   	@corps = params[:corps][0]
 
   	#liste grades
-  	grades = Grille.where(corps: @corps).pluck(:grade).uniq
+  	grades = Grille.where(corps: @corps).order('grade ASC').pluck(:grade).uniq
   	max_grade = grades.last
 
   	array = (2022..2082).to_a
@@ -37,7 +37,7 @@ class PagesController < ApplicationController
 	
 
 		#liste echelons
-	  	echelons = Grille.where(corps: @corps, grade: grades).pluck(:echelon).uniq
+	  	echelons = Grille.where(corps: @corps, grade: grades).order('echelon ASC').pluck(:echelon).uniq
 
 	  	#si echelon selectionne
 	  	if !params[:echelons].nil? && !params[:echelons][0].nil?

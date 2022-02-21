@@ -8,7 +8,10 @@ export default class extends Controller {
   "dureef1","dureef2","dureef3","dureef4","dureef5","dureef6",
   "resultEmploif1","resultEmploif2","resultEmploif3","resultEmploif4","resultEmploif5","resultEmploif6",
   "resultDebutf1","resultDebutf2","resultDebutf3","resultDebutf4","resultDebutf5","resultDebutf6",
-  "resultDureef1","resultDureef2","resultDureef3","resultDureef4","resultDureef5","resultDureef6",];
+  "resultDureef1","resultDureef2","resultDureef3","resultDureef4","resultDureef5","resultDureef6",
+  "resultEmploif","resultEchelonf","resultDureef","resultFinf",
+  "emploif","emploifEchelon","dureefEchelon","finfEchelon",
+  "boutonEdit"];
 
   connect() { 
   }
@@ -20,7 +23,7 @@ export default class extends Controller {
 	
   toggle1(e){
   	const content_targets = [this.content1Target,this.content2Target,this.content3Target,this.content4Target,this.content5Target,this.content6Target];
- 	const trash_targets = [this.trash1Target,this.trash2Target,this.trash3Target,this.trash4Target,this.trash5Target,this.trash6Target];
+ 	  const trash_targets = [this.trash1Target,this.trash2Target,this.trash3Target,this.trash4Target,this.trash5Target,this.trash6Target];
   	const emploif_targets = [this.emploif1Target,this.emploif2Target,this.emploif3Target,this.emploif4Target,this.emploif5Target,this.emploif6Target];
   	const debut_targets = [this.debutf1Target,this.debutf2Target,this.debutf3Target,this.debutf4Target,this.debutf5Target,this.debutf6Target];
   	const duree_targets = [this.dureef1Target,this.dureef2Target,this.dureef3Target,this.dureef4Target,this.dureef5Target,this.dureef6Target];
@@ -28,8 +31,10 @@ export default class extends Controller {
   	const result_debut_targets = [this.resultDebutf1Target,this.resultDebutf2Target,this.resultDebutf3Target,this.resultDebutf4Target,this.resultDebutf5Target,this.resultDebutf6Target];
   	const result_duree_targets = [this.resultDureef1Target,this.resultDureef2Target,this.resultDureef3Target,this.resultDureef4Target,this.resultDureef5Target,this.resultDureef6Target];
 
+    const result_emploi_f = [this.resultEmploifTarget, this.resultEchelonfTarget,this.resultDureefTarget,this.resultFinfTarget]
+  	const emploi_f = [this.emploifTarget,this.emploifEchelonTarget, this.dureefEchelonTarget, this.finfEchelonTarget];
 
-  	[6,5,4,3,2].forEach((indice) => {
+    [6,5,4,3,2].forEach((indice) => {
   		if (content_targets[indice-1].classList.contains('visually-hidden') && (content_targets[indice-2].classList.contains('visually-hidden')==false)){
 	  		if (emploif_targets[indice-2].value != "" && emploif_targets[indice-2].value != null && debut_targets[indice-2].value != "" && debut_targets[indice-2].value != "null" && duree_targets[indice-2].value != "" && duree_targets[indice-2].value != null ){
 	  			content_targets[indice-1].classList.remove('visually-hidden');
@@ -62,14 +67,26 @@ export default class extends Controller {
   		}
   	})
   	if (this.content1Target.classList.contains('visually-hidden')){
+      // on ne peut plus modifier emploi f actuel 
+      [0,1,2,3].forEach((indice) => {
+        result_emploi_f[indice].classList.remove('visually-hidden');
+        if (result_emploi_f[indice].value == undefined ){
+        result_emploi_f[indice].innerHTML = "-";
+        }else{
+        result_emploi_f[indice].innerHTML = result_emploi_f[indice].value;
+        }
+        emploi_f[indice].classList.add('visually-hidden');
+      });
+
   		this.content1Target.classList.remove('visually-hidden');
+      this.boutonEditTarget.classList.remove('visually-hidden');
   	}
   	e.preventDefault();
   }
 
   toggle2(e){
   	const content_targets = [this.content1Target,this.content2Target,this.content3Target,this.content4Target,this.content5Target,this.content6Target];
- 	const trash_targets = [this.trash1Target,this.trash2Target,this.trash3Target,this.trash4Target,this.trash5Target,this.trash6Target];
+ 	  const trash_targets = [this.trash1Target,this.trash2Target,this.trash3Target,this.trash4Target,this.trash5Target,this.trash6Target];
   	const emploif_targets = [this.emploif1Target,this.emploif2Target,this.emploif3Target,this.emploif4Target,this.emploif5Target,this.emploif6Target];
   	const debut_targets = [this.debutf1Target,this.debutf2Target,this.debutf3Target,this.debutf4Target,this.debutf5Target,this.debutf6Target];
   	const duree_targets = [this.dureef1Target,this.dureef2Target,this.dureef3Target,this.dureef4Target,this.dureef5Target,this.dureef6Target];
@@ -79,14 +96,15 @@ export default class extends Controller {
 
 
   	if (this.content2Target.classList.contains('visually-hidden') && (this.content1Target.classList.contains('visually-hidden')==false)){
-  		this.content1Target.classList.add('visually-hidden');
-  		this.emploif1Target.selectedIndex = 0;
+  		  this.content1Target.classList.add('visually-hidden');
+  		  this.emploif1Target.selectedIndex = 0;
         this.debutf1Target.selectedIndex = 0;
         this.dureef1Target.selectedIndex = 0;
   	}
   	[2,3,4,5].forEach((indice) => {
   		if (content_targets[indice].classList.contains('visually-hidden') && (content_targets[indice-1].classList.contains('visually-hidden')==false)){
-  			content_targets[indice-1].classList.add('visually-hidden');
+  			
+        content_targets[indice-1].classList.add('visually-hidden');
 	  		trash_targets[indice-2].classList.remove('visually-hidden');
 
 	  		emploif_targets[indice-2].classList.remove('visually-hidden');
@@ -97,7 +115,7 @@ export default class extends Controller {
 	  		result_duree_targets[indice-2].classList.add('visually-hidden');
 
 	  		emploif_targets[indice-1].selectedIndex = 0;
-	        duree_targets[indice-1].selectedIndex = 0;
+	      duree_targets[indice-1].selectedIndex = 0;
 
   		}
   	})
@@ -120,6 +138,43 @@ export default class extends Controller {
   	}
   	
   	e.preventDefault();
+  }
+
+  reset(e){
+    const content_targets = [this.content1Target,this.content2Target,this.content3Target,this.content4Target,this.content5Target,this.content6Target];
+    const trash_targets = [this.trash1Target,this.trash2Target,this.trash3Target,this.trash4Target,this.trash5Target,this.trash6Target];
+    const emploif_targets = [this.emploif1Target,this.emploif2Target,this.emploif3Target,this.emploif4Target,this.emploif5Target,this.emploif6Target];
+    const debut_targets = [this.debutf1Target,this.debutf2Target,this.debutf3Target,this.debutf4Target,this.debutf5Target,this.debutf6Target];
+    const duree_targets = [this.dureef1Target,this.dureef2Target,this.dureef3Target,this.dureef4Target,this.dureef5Target,this.dureef6Target];
+    const result_emploif_targets = [this.resultEmploif1Target,this.resultEmploif2Target,this.resultEmploif3Target,this.resultEmploif4Target,this.resultEmploif5Target,this.resultEmploif6Target];
+    const result_debut_targets = [this.resultDebutf1Target,this.resultDebutf2Target,this.resultDebutf3Target,this.resultDebutf4Target,this.resultDebutf5Target,this.resultDebutf6Target];
+    const result_duree_targets = [this.resultDureef1Target,this.resultDureef2Target,this.resultDureef3Target,this.resultDureef4Target,this.resultDureef5Target,this.resultDureef6Target];
+
+    const result_emploi_f = [this.resultEmploifTarget, this.resultEchelonfTarget,this.resultDureefTarget,this.resultFinfTarget]
+    const emploi_f = [this.emploifTarget,this.emploifEchelonTarget, this.dureefEchelonTarget, this.finfEchelonTarget];
+
+
+    this.boutonEditTarget.classList.add('visually-hidden');
+    [0,1,2,3].forEach((indice) => {
+        emploi_f[indice].classList.remove('visually-hidden');
+        result_emploi_f[indice].classList.add('visually-hidden');
+      });
+
+    [0,1,2,3,4,5].forEach((indice) => {
+        content_targets[indice].classList.add('visually-hidden');
+
+        emploif_targets[indice].classList.remove('visually-hidden');
+        debut_targets[indice].classList.remove('visually-hidden');
+        duree_targets[indice].classList.remove('visually-hidden');
+        result_emploif_targets[indice].classList.add('visually-hidden');
+        result_debut_targets[indice].classList.add('visually-hidden');
+        result_duree_targets[indice].classList.add('visually-hidden');
+
+        emploif_targets[indice].selectedIndex = 0;
+        duree_targets[indice].selectedIndex = 0;
+        debut_targets[indice].selectedIndex = 0;
+    })
+    e.preventDefault();
   }
 
 }
