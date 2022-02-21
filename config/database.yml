@@ -81,6 +81,11 @@ test:
 #
 production:
   <<: *default
-  database: simulateur_production
-  username: simulateur
-  password: <%= ENV["SIMULATEUR_DATABASE_PASSWORD"] %>
+  #database: simulateur_production
+  #username: simulateur
+  #password: <%= ENV["SIMULATEUR_DATABASE_PASSWORD"] %>
+
+  database: <%= ENV["PRODUCTION_DB_NAME"] %>
+  username: <%= ENV["PRODUCTION_DB_USERNAME"] %>
+  password: <%= Rails.application.credentials.gcp[:db_password] %>
+  host:   "/cloudsql/<%= ENV["CLOUD_SQL_CONNECTION_NAME"] %>"

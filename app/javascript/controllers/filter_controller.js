@@ -5,7 +5,8 @@ export default class extends Controller {
     static targets = [ "gradeId", "echelonId", "dureeId", "grade2", "grade3", "grade4",'grade2Title','grade3Title','grade4Title',
      'emploifEchelon','dureefEchelon','finfEchelon',
      'debutfEmploi1','debutfEmploi2','debutfEmploi3','debutfEmploi4','debutfEmploi5','debutfEmploi6',
-     'dureefEmploi1','dureefEmploi2','dureefEmploi3','dureefEmploi4','dureefEmploi5','dureefEmploi6'];
+     'dureefEmploi1','dureefEmploi2','dureefEmploi3','dureefEmploi4','dureefEmploi5','dureefEmploi6',
+     'resultEchelonf','resultDureef','resultFinf',"error1"];
 
   	connect() {    
         this.filters =  { corps: [], grades: [], echelons: [],grade2: [],grade3: [],
@@ -210,67 +211,33 @@ export default class extends Controller {
     }
 
     updatePromotions(data){
-        const grade = data.grades;
-        const max_grade = data.max_grade
-        this.grade2Target.innerHTML = "";
-        this.grade3Target.innerHTML = "";
-        this.grade4Target.innerHTML = "";
-        if (grade == 1){
-            this.grade2TitleTarget.classList.remove("select_inactive")
-            this.grade3TitleTarget.classList.add("select_inactive")
-            this.grade4TitleTarget.classList.add("select_inactive")
-            const option = document.createElement("option");
-            option.value = null;
-            option.innerHTML = "- Selectionner -";
-            this.grade2Target.appendChild(option);
+        var grade = parseInt(data.grades);
+        var max_grade = parseInt(data.max_grade);
+        const grades = [this.grade2Target,this.grade3Target,this.grade4Target];
+        const grades_title = [this.grade2TitleTarget, this.grade3TitleTarget,this.grade4TitleTarget]
+        const max_arr = Array.from({length:(max_grade-grade)},(v,k)=>k+grade+1);  
 
-            data.array.forEach((ar) => {
-            const option = document.createElement("option");
-            option.value = ar-2022;
-            option.innerHTML = ar;
-            this.grade2Target.appendChild(option);
+        [1,2,3].forEach((indice)=> {
+            grades[indice-1].innerHTML = "";
+            grades_title[indice-1].classList.add("select_inactive");
+            if (grade == indice && max_grade > grade){
+                const option = document.createElement("option");
+                option.value = null;
+                option.innerHTML = "- Selectionner -";
+                grades[indice-1].appendChild(option);
+                data.array.forEach((ar) => {
+                    const option = document.createElement("option");
+                    option.value = ar-2022;
+                    option.innerHTML = ar;
+                    grades[indice-1].appendChild(option);
+                })
+            }
         })
-        }
-        if (grade == 2){
-            this.grade2TitleTarget.classList.add("select_inactive")
-            this.grade4TitleTarget.classList.add("select_inactive")
-            if (max_grade > 2){
-            this.grade3TitleTarget.classList.remove("select_inactive")
-            
-            
-            const option = document.createElement("option");
-            option.value = null;
-            option.innerHTML = "- Selectionner -";
-            this.grade3Target.appendChild(option);
-            
-            data.array_grade3.forEach((ar) => {
-            const option = document.createElement("option");
-            option.value = ar-2022;
-            option.innerHTML = ar;
-            this.grade3Target.appendChild(option);
 
-            })
-            }
-        }
-        if (grade == 3){
-            this.grade3TitleTarget.classList.add("select_inactive")
-            this.grade2TitleTarget.classList.add("select_inactive")
-            if (max_grade > 3){
-            this.grade4TitleTarget.classList.remove("select_inactive")
-            const option = document.createElement("option");
-            option.value = null;
-            option.innerHTML = "- Selectionner -";
-            this.grade4Target.appendChild(option);
-            
-            data.array.forEach((ar) => {
-            const option = document.createElement("option");
-            option.value = ar-2022;
-            option.innerHTML = ar;
-            this.grade4Target.appendChild(option);
-            })
-            }
-
-        }
+        max_arr.forEach((indice) => {
+            grades_title[indice-2].classList.remove("select_inactive");
+        });
+        
     }
 
     updatePromoGrades2(data){
@@ -278,7 +245,6 @@ export default class extends Controller {
         this.grade3Target.innerHTML = "";
         this.grade4Target.innerHTML = "";
         if (max_grade > 2){
-            this.grade3TitleTarget.classList.remove("select_inactive")
             const option = document.createElement("option");
             option.value = null;
             option.innerHTML = "- Selectionner -";
@@ -297,7 +263,6 @@ export default class extends Controller {
         const max_grade = data.max_grade;
         this.grade4Target.innerHTML = "";
         if (max_grade > 3){
-            this.grade4TitleTarget.classList.remove("select_inactive")
             const option = document.createElement("option");
             option.value = null;
             option.innerHTML = "- Selectionner -";
@@ -315,16 +280,37 @@ export default class extends Controller {
     // emplois fonctionnels
 
     emploifChange(event){
-        this.filters.emploif = getSelectedValues(event)
-        this.filters.echelonf = []
-        this.filters.dureef = []
-        this.changeEchelon()
+        this.filters.emploif = getSelectedValues(event);
+        this.filters.echelonf = [];
+        this.filters.dureef = [];
+        const form_targets = [this.emploifEchelonTarget,this.dureefEchelonTarget, this.finfEchelonTarget];
+        const result_targets = [this.resultEchelonfTarget, this.resultDureefTarget, this.resultFinfTarget];
+        this.error1Target.classList.add('visually-hidden');
+        if (this.filters.emploif == "Aucun") {
+            // on supp les formulaires dapres
+            [0,1,2].forEach((indice) => {
+                form_targets[indice].classList.add('visually-hidden');
+                result_targets[indice].classList.remove('visually-hidden');
+                result_targets[indice].innerHTML = "-";
+            });
+
+
+        } else {
+            [0,1,2].forEach((indice) => {
+                form_targets[indice].classList.remove('visually-hidden');
+                result_targets[indice].classList.add('visually-hidden');
+            });
+            this.changeEchelon()
+        }
+        
     }
 
     echelonfChange(event){
         this.filters.echelonf = getSelectedValues(event)  
-        this.filters.dureef = []  
+        this.filters.dureef = [] 
+
         this.changeDatesf()
+
     }
 
     dureefChange(event){
@@ -456,7 +442,7 @@ export default class extends Controller {
     
     emploifChange2(event){
         
-        const id = event.target.dataset.value;
+        var id = event.target.dataset.value;
         const emploi = getSelectedValues(event);
         const dates_arr = Array.from({length:42},(v,k)=>k+2023);
       
@@ -490,13 +476,12 @@ export default class extends Controller {
             })
             const nouvelles_dates2 = dates_arr.filter(date => !data_non_dispo.includes(date));   */       
             if ( id == 1 ){
-                console.log(this.finfEchelonTarget.value);
                 //on prend fin emploi fonctionnel actuel si existe 
-                if (this.finfEchelonTarget.value != null && this.finfEchelonTarget.value != ""){
+                if (this.finfEchelonTarget.value != null && this.finfEchelonTarget.value != "" && this.finfEchelonTarget.value != undefined){
                     nouvelles_dates = dates_arr.filter(date => date > parseInt(this.finfEchelonTarget.value));
                    
-                }else {
-                    nouvelles_dates = dates_arr;
+                } else {
+                    nouvelles_dates = dates_arr; 
                 }
             }
             if ( id > 1 ){

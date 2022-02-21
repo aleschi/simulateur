@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["error","bouton","content","content1","content2","content3","content4","content5","content6",
+  static targets = ["error","error1","error2","bouton","content","content1","content2","content3","content4","content5","content6",
   "trash1","trash2","trash3","trash4","trash5","trash6",
   "emploif1","emploif2","emploif3","emploif4","emploif5","emploif6",
   "debutf1","debutf2","debutf3","debutf4","debutf5","debutf6",
@@ -67,19 +67,33 @@ export default class extends Controller {
   		}
   	})
   	if (this.content1Target.classList.contains('visually-hidden')){
-      // on ne peut plus modifier emploi f actuel 
-      [0,1,2,3].forEach((indice) => {
-        result_emploi_f[indice].classList.remove('visually-hidden');
-        if (result_emploi_f[indice].value == undefined ){
-        result_emploi_f[indice].innerHTML = "-";
+  
+      // verifie qua bien ajouté un emploi 
+      if (this.emploifTarget.selectedIndex == 0){
+        this.error1Target.classList.remove('visually-hidden');
+        this.error1Target.innerHTML = "Veuillez sélectionner un champ ci-dessous";
+      }else{
+        // si ef select mais pas les dates 
+        if (this.emploifEchelonTarget.selectedIndex == 0 || this.dureefEchelonTarget.selectedIndex == 0 || this.finfEchelonTarget.selectedIndex == 0){
+          this.error2Target.classList.remove('visually-hidden');
+          this.error2Target.innerHTML = "Veuillez sélectionner tous les champs ci-dessus";
         }else{
-        result_emploi_f[indice].innerHTML = result_emploi_f[indice].value;
+        // on ne peut plus modifier emploi f actuel 
+        [0,1,2,3].forEach((indice) => {
+          result_emploi_f[indice].classList.remove('visually-hidden');
+          if (emploi_f[indice].value == undefined || emploi_f[indice].value == "" ){
+          result_emploi_f[indice].innerHTML = "-";
+          }else{
+          result_emploi_f[indice].innerHTML = emploi_f[indice].value;
+          }
+          emploi_f[indice].classList.add('visually-hidden');
+        });
+        this.error1Target.classList.add('visually-hidden');
+        this.error2Target.classList.add('visually-hidden');
+    		this.content1Target.classList.remove('visually-hidden');
+        this.boutonEditTarget.classList.remove('visually-hidden');
         }
-        emploi_f[indice].classList.add('visually-hidden');
-      });
-
-  		this.content1Target.classList.remove('visually-hidden');
-      this.boutonEditTarget.classList.remove('visually-hidden');
+      }
   	}
   	e.preventDefault();
   }
@@ -155,6 +169,7 @@ export default class extends Controller {
 
 
     this.boutonEditTarget.classList.add('visually-hidden');
+    this.errorTarget.classList.add('visually-hidden');
     [0,1,2,3].forEach((indice) => {
         emploi_f[indice].classList.remove('visually-hidden');
         result_emploi_f[indice].classList.add('visually-hidden');

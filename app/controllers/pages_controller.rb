@@ -8,7 +8,8 @@ class PagesController < ApplicationController
   		@grades = Grille.where(corps: @corps[0]).pluck(:grade).uniq
   	end
   	if Emploi.all.count > 0 
-  		@emplois_f = ["Aucun"] + Emploi.all.pluck(:nom).uniq 
+  		@emplois_f = ["Aucun"] + Emploi.all.pluck(:nom).uniq
+  		@emplois_f2 = Emploi.all.pluck(:nom).uniq 
   	end
   end
 
@@ -29,7 +30,7 @@ class PagesController < ApplicationController
   	grades = Grille.where(corps: @corps).order('grade ASC').pluck(:grade).uniq
   	max_grade = grades.last
 
-  	array = (2022..2082).to_a
+  	array = (2023..2082).to_a
 
 	#grade selectionne
   	if !params[:grades].nil? && !params[:grades][0].nil?

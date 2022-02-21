@@ -22,10 +22,12 @@ Rails.application.routes.draw do
   
   post 'search_grilles', to: 'grilles#search_grilles'
 
-  get '/*path', to: 'pages#index'
+  
 
-  get 'mentions-legales', to: 'pages#mentions_legales'
-  get 'donnees-personnelles', to: 'pages#donnees_personnelles'
-  get 'accessibilite', to: 'pages#accessibilite'
+  get '/mentions-legales', to: 'pages#mentions_legales'
+  get '/donnees-personnelles', to: 'pages#donnees_personnelles'
+  get '/accessibilite', to: 'pages#accessibilite'
   post 'select_filter' => 'pages#select_filter'
+
+  get '/*path', to: 'pages#index'
 end

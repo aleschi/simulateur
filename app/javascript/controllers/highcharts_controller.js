@@ -1,15 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
-import Highcharts from "highcharts";
+import Highcharts from "highcharts"
 
 export default class extends Controller {
 	static targets = [ "canvasElement" ];
 
   	connect() {
-        Highcharts.setOptions({
-            lang: {
-                noData: "Les courbes s'afficheront une fois les informations sur votre simulation actuelle renseignées"
-            }
-        })
+        
   		const data = JSON.parse(this.data.get("donnees"));
         const data2 = JSON.parse(this.data.get("donnees2"));
   		const options = {
@@ -67,8 +63,9 @@ export default class extends Controller {
   		//let contex = this.canvasElementTarget.getContext("2d");
         
     	this.chart = new Highcharts.chart(this.canvasElementTarget, options);
-    	//this.chart.data = JSON.parse(this.data.get("donnees"));
-    	//this.chart.update();
+
+    
+    	
 
 
   	}
