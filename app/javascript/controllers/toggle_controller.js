@@ -11,7 +11,7 @@ export default class extends Controller {
   "resultDureef1","resultDureef2","resultDureef3","resultDureef4","resultDureef5","resultDureef6",
   "resultEmploif","resultEchelonf","resultDureef","resultFinf",
   "emploif","emploifEchelon","dureefEchelon","finfEchelon",
-  "boutonEdit"];
+  "boutonEdit","errorCorps"];
 
   connect() { 
   }
@@ -36,7 +36,7 @@ export default class extends Controller {
 
     [6,5,4,3,2].forEach((indice) => {
   		if (content_targets[indice-1].classList.contains('visually-hidden') && (content_targets[indice-2].classList.contains('visually-hidden')==false)){
-	  		if (emploif_targets[indice-2].value != "" && emploif_targets[indice-2].value != null && debut_targets[indice-2].value != "" && debut_targets[indice-2].value != "null" && duree_targets[indice-2].value != "" && duree_targets[indice-2].value != null ){
+	  		if (emploif_targets[indice-2].selectedIndex != 0 && debut_targets[indice-2].selectedIndex != 0 && duree_targets[indice-2].selectedIndex != 0 ){
 	  			content_targets[indice-1].classList.remove('visually-hidden');
 	  			trash_targets[indice-2].classList.add('visually-hidden');
 
@@ -62,6 +62,7 @@ export default class extends Controller {
 	  			}
 	  		}
 	  		else{
+          this.errorTarget.classList.remove('visually-hidden');
   				this.errorTarget.innerHTML = "Vous devez d'abord sélectionner tous les champs ci-dessus avant de pouvoir ajouter un nouvel emploi fonctionnel";
   			}
   		}
@@ -74,7 +75,7 @@ export default class extends Controller {
         this.error1Target.innerHTML = "Veuillez sélectionner un champ ci-dessous";
       }else{
         // si ef select mais pas les dates 
-        if (this.emploifEchelonTarget.selectedIndex == 0 || this.dureefEchelonTarget.selectedIndex == 0 || this.finfEchelonTarget.selectedIndex == 0){
+        if (this.emploifTarget.selectedIndex != 1 && (this.emploifEchelonTarget.selectedIndex == 0 || this.dureefEchelonTarget.selectedIndex == 0 || this.finfEchelonTarget.selectedIndex == 0)){
           this.error2Target.classList.remove('visually-hidden');
           this.error2Target.innerHTML = "Veuillez sélectionner tous les champs ci-dessus";
         }else{
@@ -170,10 +171,16 @@ export default class extends Controller {
 
     this.boutonEditTarget.classList.add('visually-hidden');
     this.errorTarget.classList.add('visually-hidden');
-    [0,1,2,3].forEach((indice) => {
-        emploi_f[indice].classList.remove('visually-hidden');
-        result_emploi_f[indice].classList.add('visually-hidden');
+    this.errorCorpsTarget.classList.add('visually-hidden');
+    // on remet champ emploi 
+    emploi_f[0].classList.remove('visually-hidden');
+    result_emploi_f[0].classList.add('visually-hidden');
+    if (emploi_f[0].value != "Aucun"){
+    [1,2,3].forEach((indice) => {
+          emploi_f[indice].classList.remove('visually-hidden');
+          result_emploi_f[indice].classList.add('visually-hidden');    
       });
+    }
 
     [0,1,2,3,4,5].forEach((indice) => {
         content_targets[indice].classList.add('visually-hidden');

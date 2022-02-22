@@ -244,8 +244,13 @@ text-align:right;
   }
 }
 .bouton_inactive {
-  background-color:#F8F8F8;
-  color: #fff;
+  background-color:#F8F8F8 !important;
+  color: #fff !important;
+  &:hover,&:focus,&:active {
+  background-color:#F8F8F8 !important;
+  color: #fff !important;
+  cursor: not-allowed !important;
+  }
 }
 .bouton_i{
   text-decoration:none;

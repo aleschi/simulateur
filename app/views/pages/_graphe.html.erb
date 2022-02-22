@@ -1,5 +1,5 @@
 <% if @liste_indices.length == 0 %>
-<div class="texte_etiquette text-center">Les courbes s'afficheront une fois les informations sur votre simulation actuelle renseignées</div>
+<div class="texte_etiquette text-center">Les courbes s'afficheront lorsque vous aurez renseigné les informations sur votre situation</div>
 <% end %>
 <div data-controller="highcharts" data-highcharts-donnees="<%= @liste_indices %>" data-highcharts-donnees2="<%=@liste_indices2%>">
 	<div data-highcharts-target="canvasElement"></div>

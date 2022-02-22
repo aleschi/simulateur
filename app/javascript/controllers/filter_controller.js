@@ -6,7 +6,7 @@ export default class extends Controller {
      'emploifEchelon','dureefEchelon','finfEchelon',
      'debutfEmploi1','debutfEmploi2','debutfEmploi3','debutfEmploi4','debutfEmploi5','debutfEmploi6',
      'dureefEmploi1','dureefEmploi2','dureefEmploi3','dureefEmploi4','dureefEmploi5','dureefEmploi6',
-     'resultEchelonf','resultDureef','resultFinf',"error1"];
+     'resultEchelonf','resultDureef','resultFinf',"error1",'errorCorps'];
 
   	connect() {    
         this.filters =  { corps: [], grades: [], echelons: [],grade2: [],grade3: [],
@@ -24,27 +24,32 @@ export default class extends Controller {
         this.grade2Target.innerHTML = ""
         this.grade3Target.innerHTML = ""
         this.grade4Target.innerHTML = ""
+        this.errorCorpsTarget.classList.add('visually-hidden');
         this.change()
     }
 
     gradesChange(event) {
         this.filters.grades = getSelectedValues(event)
         this.filters.echelons = []
+        this.errorCorpsTarget.classList.add('visually-hidden');
         this.change2()
     }
 
     echelonsChange(event) {
         this.filters.echelons = getSelectedValues(event)
+        this.errorCorpsTarget.classList.add('visually-hidden');
         this.change3()
     }
 
     promoGrade2Change(event){
         this.filters.grade2 = getSelectedValues(event)
+        this.errorCorpsTarget.classList.add('visually-hidden');
         this.changePromoGrade2()
     }
 
     promoGrade3Change(event){
         this.filters.grade3 = getSelectedValues(event)
+        this.errorCorpsTarget.classList.add('visually-hidden');
         this.changePromoGrade3()
     }
 
@@ -215,6 +220,7 @@ export default class extends Controller {
         var max_grade = parseInt(data.max_grade);
         const grades = [this.grade2Target,this.grade3Target,this.grade4Target];
         const grades_title = [this.grade2TitleTarget, this.grade3TitleTarget,this.grade4TitleTarget]
+        // grades à dégriser 
         const max_arr = Array.from({length:(max_grade-grade)},(v,k)=>k+grade+1);  
 
         [1,2,3].forEach((indice)=> {
@@ -236,6 +242,12 @@ export default class extends Controller {
 
         max_arr.forEach((indice) => {
             grades_title[indice-2].classList.remove("select_inactive");
+            if (grades[indice-2].innerHTML == ""){
+                const option2 = document.createElement("option");
+                option2.value = "";
+                option2.innerHTML = "- Selectionner -";
+                grades[indice-2].appendChild(option2);
+            }
         });
         
     }
@@ -280,6 +292,7 @@ export default class extends Controller {
     // emplois fonctionnels
 
     emploifChange(event){
+        this.errorCorpsTarget.classList.add('visually-hidden');
         this.filters.emploif = getSelectedValues(event);
         this.filters.echelonf = [];
         this.filters.dureef = [];
@@ -290,6 +303,7 @@ export default class extends Controller {
             // on supp les formulaires dapres
             [0,1,2].forEach((indice) => {
                 form_targets[indice].classList.add('visually-hidden');
+                form_targets[indice].selectedIndex = 0;
                 result_targets[indice].classList.remove('visually-hidden');
                 result_targets[indice].innerHTML = "-";
             });
@@ -308,13 +322,14 @@ export default class extends Controller {
     echelonfChange(event){
         this.filters.echelonf = getSelectedValues(event)  
         this.filters.dureef = [] 
-
+        this.errorCorpsTarget.classList.add('visually-hidden');
         this.changeDatesf()
 
     }
 
     dureefChange(event){
-        this.filters.dureef = getSelectedValues(event)    
+        this.filters.dureef = getSelectedValues(event) 
+        this.errorCorpsTarget.classList.add('visually-hidden');   
         this.changeFinf()
     }
 
@@ -441,7 +456,7 @@ export default class extends Controller {
 
     
     emploifChange2(event){
-        
+        this.errorCorpsTarget.classList.add('visually-hidden');
         var id = event.target.dataset.value;
         const emploi = getSelectedValues(event);
         const dates_arr = Array.from({length:42},(v,k)=>k+2023);

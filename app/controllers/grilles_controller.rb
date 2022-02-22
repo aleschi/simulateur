@@ -18,16 +18,16 @@ class GrillesController < ApplicationController
   	
   	#calcul si changement de grade 
     (2..4).each do |i|
-    	if !params["grade#{i}"].nil? && params["grade#{i}"] != 'null' 
+    	if !params["grade#{i}"].nil? && params["grade#{i}"] != '' 
         #annee changement de grade
     		@annee_grade = params["grade#{i}"].to_i
     		#prendre indice du corps de base année avant la promotion et aller chercher le mm indice par valeur sup dans le grade au dessus + echelon = duree annee a cet indice 
-    		@indice_anciengrade = @liste_indices[@annee_grade-2]
+    		@indice_anciengrade = @liste_indices[@annee_grade-1]
         #depuis cb de temps a cet indice
-        @count_indice = @liste_indices[0..@annee_grade-2].count(@indice_anciengrade)
+        @count_indice = @liste_indices[0..@annee_grade-1].count(@indice_anciengrade)
     		@liste_indices_nouveau_grade = Grille.where(corps: params[:corps], grade: i).where("indice >= ?",@indice_anciengrade).order('indice ASC').pluck(:indice)
     		#si ancien indice plusieurs fois on decalle de la duree ou avait ancien indice
-        @liste_indices = @liste_indices[0..@annee_grade-2]+@liste_indices_nouveau_grade[@count_indice..@duree_carriere-1-@annee_grade-1+@count_indice]
+        @liste_indices = @liste_indices[0..@annee_grade-1]+@liste_indices_nouveau_grade[@count_indice..@duree_carriere-1-@annee_grade+@count_indice]
     	end
     end
 

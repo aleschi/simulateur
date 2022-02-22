@@ -29,7 +29,7 @@ export default class extends Controller {
         },
         yAxis: { 
         title: {
-            text: "Rémunération €",
+            text: "indices",
             
             }
         },

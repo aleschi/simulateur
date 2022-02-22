@@ -4,8 +4,7 @@ class PagesController < ApplicationController
   	@liste_indices = []
   	@liste_indices2 = []
   	if Grille.all.count > 0
-  		@corps = Grille.all.pluck(:corps).uniq
-  		@grades = Grille.where(corps: @corps[0]).pluck(:grade).uniq
+  		@corps = Grille.where('corps != ?','AE').pluck(:corps).uniq
   	end
   	if Emploi.all.count > 0 
   		@emplois_f = ["Aucun"] + Emploi.all.pluck(:nom).uniq
@@ -30,7 +29,7 @@ class PagesController < ApplicationController
   	grades = Grille.where(corps: @corps).order('grade ASC').pluck(:grade).uniq
   	max_grade = grades.last
 
-  	array = (2023..2082).to_a
+  	array = (2023..2072).to_a
 
 	#grade selectionne
   	if !params[:grades].nil? && !params[:grades][0].nil? && !params[:grades][0] != ""
@@ -75,7 +74,7 @@ class PagesController < ApplicationController
 
   	if !params[:dureef].nil? && !params[:dureef][0].nil? && !params[:dureef][0] != ""
   		@max_duree = Emploi.where(nom: params[:emploif], echelon: params[:echelonf][0].to_i).order('duree ASC').last.duree.to_i
-  		finf = (2023..2023+@max_duree).to_a
+  		finf = (2023..2028).to_a
   	else
   		finf = nil
   	end
