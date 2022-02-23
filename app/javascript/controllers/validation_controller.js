@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 
 export default class extends Controller {
-    static targets = [ 'form','submitBouton', 'emploif','emploifEchelon','dureefEchelon','finfEchelon',
+    static targets = [ 'form','submitBouton', 'emploif','emploifEchelon','dureefEchelon','finfEchelon','debutfEmploi',
     'errorCorps','age','date1','date2','date3',
     "emploif1","emploif2","emploif3","emploif4","emploif5","emploif6",
   "debutf1","debutf2","debutf3","debutf4","debutf5","debutf6",
@@ -33,7 +33,7 @@ export default class extends Controller {
 
         if (this.emploifTarget.value != "Aucun" && this.emploifTarget.value != ""){
       
-          if (this.emploifEchelonTarget.value == "" || this.dureefEchelonTarget.value == "" ||  this.finfEchelonTarget.value == ""){
+          if (this.emploifEchelonTarget.value == "" || this.dureefEchelonTarget.value == "" ||  this.finfEchelonTarget.value == "" || this.debutfEmploiTarget.value == ""){
             isValid = false;
           }
         }

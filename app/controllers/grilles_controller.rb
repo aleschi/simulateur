@@ -21,9 +21,11 @@ class GrillesController < ApplicationController
     end
   	
   	#calcul si changement de grade 
+    @grade = params[:grade]
     (2..4).each do |i|
     	if !params["grade#{i}"].nil? && params["grade#{i}"] != '' 
         #annee changement de grade
+        @grade = i
     		@annee_grade = params["grade#{i}"].to_i
         if @duree_carriere - @annee_grade > 0 #vérifie promo avant retraite
       		#prendre indice du corps de base année 1 an avant la promotion et aller chercher le mm indice par valeur sup dans le grade au dessus + echelon = duree annee a cet indice 
@@ -40,6 +42,7 @@ class GrillesController < ApplicationController
         end
     	end
     end
+    @liste_indices2 = @liste_indices #nvlle courbe principale apres reforme pour traiter cas reduction anciennete
 
     #2 calcul courbe secondaire 
     
@@ -48,8 +51,8 @@ class GrillesController < ApplicationController
     #courbe apres reforme sans droit option pour partie emploi fonctionnel
     @liste_indices_emploi2 = Array.new(@liste_indices.length, 0)
     #initialement dans un emploi fonctionnaire
-    if !params[:type_emploi].nil? && params[:type_emploi] != "" && params[:type_emploi] != "Aucun" && params[:fin_emploif] != "" && params[:duree_emploif] != ""
-      @duree_emploi = params[:fin_emploif].to_i - 2022
+    if !params[:type_emploi].nil? && params[:type_emploi] != "" && params[:type_emploi] != "Aucun" && params[:fin_emploif] != "" && params[:duree_emploif] != "" && params[:debut_emploif] != ""
+      @duree_emploi = params[:fin_emploif].to_i - 2022 + 1
       @duree = params[:duree_emploif].to_f
       
       #avant reforme
@@ -81,7 +84,22 @@ class GrillesController < ApplicationController
           @liste_indices_moyenne_ae[i] = (((10-2*i)*@liste_indices_ae[i]).to_f/12 + (2*(i+1)*@liste_indices_ae[i+1]).to_f/12).round()
         end
       end
-      @liste_indices_emploi2 = @liste_indices_moyenne_ae + @liste_indices_emploi2[@duree_emploi..@liste_indices.length-1]  
+      @liste_indices_emploi2 = @liste_indices_moyenne_ae + @liste_indices_emploi2[@duree_emploi..@liste_indices.length-1] 
+
+      #reduction anciennete si plus de 5 ans 
+      @duree_emploi_totale = params[:fin_emploif].to_i - 2022 + params[:debut_emploif].to_i
+      if @duree_emploi_totale >= 5 && @duree_emploi_totale < @duree_carriere
+        #on va decaller la courbe principale d'un indice apres la fin de l'emploi fonctionnel et il faut completer le dernier indice 
+        @dernier_indice_i = @liste_indices2.last
+        @liste_indices_new = Grille.where(corps: params[:corps], grade: @grade).where("indice >= ?",@dernier_indice_i).order('indice ASC').pluck(:indice)
+        @count = @liste_indices2.count(@dernier_indice_i) #cb de fois est apparu l'indice
+        if @liste_indices_new.length > @count+1
+          @indice_new = Array.new(1,@liste_indices_new[@count])
+        else
+          @indice_new = Array.new(1,@dernier_indice_i)
+        end
+        @liste_indices2 = @liste_indices2[0..@duree_emploi-1]+@liste_indices2[@duree_emploi+1..@liste_indices2.length-1] + @indice_new
+      end
     end
 
     #nouvel emploi fonctionel  
@@ -129,11 +147,25 @@ class GrillesController < ApplicationController
         else
           @liste_indices_emploi2 = @liste_indices_emploi2[0..@start_emploi-1] + @liste_indices_emplois2_moyenne_ae[0..@duree_carriere-@start_emploi-1]
         end
+
+        #reduction anciennete si plus de 5 ans et ne termine pas sur retraite
+        if @duree_emploi >= 5 && (@start_emploi+@duree_emploi+1 < @duree_carriere)
+          #on va decaller la courbe principale d'un indice apres la fin de l'emploi fonctionnel et il faut completer le dernier indice 
+          @dernier_indice_i = @liste_indices2.last
+          @liste_indices_new = Grille.where(corps: params[:corps], grade: @grade).where("indice >= ?",@dernier_indice_i).order('indice ASC').pluck(:indice)
+          @count = @liste_indices2.count(@dernier_indice_i) #cb de fois est apparu l'indice
+          if @liste_indices_new.length > @count+1
+            @indice_new = Array.new(1,@liste_indices_new[@count])
+          else
+            @indice_new = Array.new(1,@dernier_indice_i)
+          end
+          @liste_indices2 = @liste_indices2[0..@start_emploi+@duree_emploi]+@liste_indices2[@start_emploi+@duree_emploi+2..@liste_indices2.length-1] + @indice_new
+        end
       end
     end
 
     @liste_indices = [@liste_indices, @liste_indices_emploi].transpose.map(&:max)
-    @liste_indices2 = [@liste_indices, @liste_indices_emploi2].transpose.map(&:max)
+    @liste_indices2 = [@liste_indices2, @liste_indices_emploi2].transpose.map(&:max)
 
   	#@liste_indices= @liste_indices.collect { |n| (n * 56.2323).round(2) }
     @liste_indices = @liste_indices[0..@duree_carriere-1]

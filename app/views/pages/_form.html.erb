@@ -9,17 +9,18 @@
 	
 	<div class="align_flex w100" >
 		<div class="w3">
+			<div class="texte_etiquette">Age*</div>
+			<div class="form"><%= f.select :age, (18..66).to_a.map { |a| [a.to_s + " ans",a]},{prompt: "- Selectionner -"},{data:{action: 'change->validation#validateForm','validation-target': "age"},required: true}%></div>
+		</div>
+		<div class="w3 pcenter">
 			<div class="texte_etiquette">Corps*</div>
 			<div class="form"><%= f.select :corps, @corps.map {|c| [c,c]},{prompt: "- Selectionner -"}, {data: {action: 'change->filter#corpsChange change->validation#validateForm' },required: true}%></div>
 		</div>
-		<div class="w3 pcenter">
+		<div class="w3">
 			<div class="texte_etiquette" >Grade*</div>
 			<div class="form"><%= f.select :grade, [],{prompt: "- Selectionner -"}, {data: {action: 'change->filter#gradesChange change->validation#validateForm','filter-target': 'gradeId'},required: true}%></div>
 		</div>
-		<div class="w3">
-			<div class="texte_etiquette">Age*</div>
-			<div class="form"><%= f.select :age, (18..66).to_a.map { |a| [a,a]},{prompt: "- Selectionner -"},{data:{action: 'change->validation#validateForm','validation-target': "age"},required: true}%></div>
-		</div>
+		
 	</div>
 	<div class="align_flex w100">
 		<div class="w50 pr">
@@ -57,30 +58,33 @@
 		<%= render 'modal_edit'%>
 		<div class="texte_etiquette"><em>Sélectionnez "Aucun" si vous n'êtes pas dans un emploi fonctionnel à ce jour.</em></div>
 		<div class="d12"></div>
+		<div class="texte_etiquette">Nature de l'emploi fonctionnel actuel*</div>
+		<div class="texte_error" data-toggle-target="error1" data-filter-target="error1"></div>
+		<div class="form"><%= f.select :type_emploi, @emplois_f.map {|e| [e,e]},{prompt: "- Selectionner -"},{data:{action: 'change->filter#emploifChange change->validation#validateForm','toggle-target': 'emploif','validation-target': 'emploif'},required: true}%></div>
+		<div class="texte_etiquette" data-toggle-target='resultEmploif'></div>
+		<div class="d12"></div>
 		<div class="align_flex w100">
 			<div class="w50 pr">
-				<div class="texte_etiquette">Nature de l'emploi fonctionnel actuel*</div>
-				<div class="texte_error" data-toggle-target="error1" data-filter-target="error1"></div>
-				<div class="form"><%= f.select :type_emploi, @emplois_f.map {|e| [e,e]},{prompt: "- Selectionner -"},{data:{action: 'change->filter#emploifChange change->validation#validateForm','toggle-target': 'emploif','validation-target': 'emploif'},required: true}%></div>
-				<div class="texte_etiquette" data-toggle-target='resultEmploif'></div>
-			</div>
-
-			<div class="w50 pl">
-				<div class="texte_etiquette">Echelon emploi*</div>
+				<div class="texte_etiquette">Echelon actuel de cet emploi*</div>
 				<div class="form"><%= f.select :echelon_emploif, [],{prompt: "- Selectionner -"},{data: {action: 'change->filter#echelonfChange change->validation#validateForm', 'filter-target': 'emploifEchelon','toggle-target': 'emploifEchelon','validation-target': 'emploifEchelon'}}%></div>
 				<div class="texte_etiquette" data-toggle-target='resultEchelonf' data-filter-target='resultEchelonf'></div>
 			</div>
-		</div>
-		<div class="d12"></div>
-		<div class="align_flex w100">
-			
-			<div class="w50 pr">
+
+			<div class="w50 pl">
 				<div class="texte_etiquette" >Durée passée à cet échelon*</div>
 				<div class="form"><%= f.select :duree_emploif, [], {prompt: "- Selectionner -"},{data: {action: 'change->filter#dureefChange change->validation#validateForm','filter-target': 'dureefEchelon','toggle-target': 'dureefEchelon','validation-target': 'dureefEchelon'}}%></div>
 				<div class="texte_etiquette" data-toggle-target='resultDureef' data-filter-target='resultDureef'></div>
 			</div>
+		</div>
+		<div class="d12"></div>
+		<div class="align_flex w100">
+			<div class="w50 pr">
+				<div class="texte_etiquette" >Durée passée à cet emploi*</div>
+				<div class="form"><%= f.select :debut_emploif, [["1 an",1],["2 ans",2],["3 ans",3],["4 ans",4],["5 ans",5]], {prompt: "- Selectionner -"},{data: {action: 'change->filter#debutfChange change->validation#validateForm','filter-target': 'debutfEmploi','toggle-target': 'debutfEmploi','validation-target': 'debutfEmploi'}}%></div>
+				<div class="texte_etiquette" data-toggle-target='resultDebutf' data-filter-target='resultDebutf'></div>
+			</div>
 			<div class="w50 pl">
-				<div class="texte_etiquette">Fin prévue de l'emploi*</div>
+				<div class="texte_etiquette">Fin prévue de cet emploi*</div>
 				<div class="form"><%= f.select :fin_emploif, [],{prompt: "- Selectionner -"},{data: {action: 'change->validation#validateForm','filter-target': 'finfEchelon','toggle-target': 'finfEchelon','validation-target': 'finfEchelon'}}%></div>
 				<div class="texte_etiquette" data-toggle-target='resultFinf' data-filter-target='resultFinf'></div>
 			</div>

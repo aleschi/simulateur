@@ -46,14 +46,14 @@ class PagesController < ApplicationController
 
 	  	if !params[:grade2].nil? && !params[:grade2][0].nil? && !params[:grade2][0] != ""
 	  		@start = params[:grade2][0].to_i + 2022 + 1 #ne peut démarrer au min qu'un an apres promo du grade 2
-	  		array_grade3 = (@start..2082).to_a
+	  		array_grade3 = (@start..2072).to_a
 	  	else
 	  		array_grade3 = array
 	  	end 
 
 	  	if !params[:grade3].nil? && !params[:grade3][0].nil? && !params[:grade3][0] != ""
 	  		@start = params[:grade3][0].to_i + 2022 + 1 #ne peut démarrer au min qu'un an apres promo du grade 2
-	  		array_grade4 = (@start..2082).to_a
+	  		array_grade4 = (@start..2072).to_a
 	  	else
 	  		array_grade4 = array
 	  	end
@@ -72,17 +72,11 @@ class PagesController < ApplicationController
   		dureef = nil
   	end
 
-  	if !params[:dureef].nil? && !params[:dureef][0].nil? && !params[:dureef][0] != ""
-  		@max_duree = Emploi.where(nom: params[:emploif], echelon: params[:echelonf][0].to_i).order('duree ASC').last.duree.to_i
-  		finf = (2023..2028).to_a
-  	else
-  		finf = nil
-  	end
 
   	durees = Grille.where(corps: @corps, grade: grades, echelon: echelons).pluck(:duree).uniq
 
   	response = {grades: grades, max_grade: max_grade, echelons: echelons, durees: durees, array: array,array_grade3: array_grade3,array_grade4: array_grade4, 
-  		echelonsf: echelonsf, dureef: dureef, finf: finf}
+  		echelonsf: echelonsf, dureef: dureef}
   	render json: response
   end
 end

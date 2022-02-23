@@ -3,14 +3,15 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
     static targets = [ "gradeId", "echelonId", "dureeId", "grade2", "grade3", "grade4",'grade2Title','grade3Title','grade4Title',
-     'emploifEchelon','dureefEchelon','finfEchelon',
+     'emploifEchelon','dureefEchelon','finfEchelon','debutfEmploi',
      'debutfEmploi1','debutfEmploi2','debutfEmploi3','debutfEmploi4','debutfEmploi5','debutfEmploi6',
      'dureefEmploi1','dureefEmploi2','dureefEmploi3','dureefEmploi4','dureefEmploi5','dureefEmploi6',
-     'resultEchelonf','resultDureef','resultFinf',"error1",'errorCorps'];
+     'resultEchelonf','resultDureef','resultFinf','resultDebutf',
+     "error1",'errorCorps'];
 
   	connect() {    
         this.filters =  { corps: [], grades: [], echelons: [],grade2: [],grade3: [],
-         emploif: [], echelonf: [], dureef: [],}
+         emploif: [], echelonf: [], }
         
   	}
 
@@ -210,7 +211,12 @@ export default class extends Controller {
         data.durees.forEach((duree) => {
             const option = document.createElement("option");
             option.value = duree;
-            option.innerHTML = duree;
+            if (duree == 1){
+                option.innerHTML = duree + " an";
+            }else{
+              option.innerHTML = duree + " ans";  
+            }
+            
             this.dureeIdTarget.appendChild(option);
         })
     }
@@ -295,13 +301,13 @@ export default class extends Controller {
         this.errorCorpsTarget.classList.add('visually-hidden');
         this.filters.emploif = getSelectedValues(event);
         this.filters.echelonf = [];
-        this.filters.dureef = [];
-        const form_targets = [this.emploifEchelonTarget,this.dureefEchelonTarget, this.finfEchelonTarget];
-        const result_targets = [this.resultEchelonfTarget, this.resultDureefTarget, this.resultFinfTarget];
+        
+        const form_targets = [this.emploifEchelonTarget,this.dureefEchelonTarget, this.finfEchelonTarget, this.debutfEmploiTarget];
+        const result_targets = [this.resultEchelonfTarget, this.resultDureefTarget, this.resultFinfTarget, this.resultDebutfTarget];
         this.error1Target.classList.add('visually-hidden');
         if (this.filters.emploif == "Aucun") {
             // on supp les formulaires dapres
-            [0,1,2].forEach((indice) => {
+            [0,1,2,3].forEach((indice) => {
                 form_targets[indice].classList.add('visually-hidden');
                 form_targets[indice].selectedIndex = 0;
                 result_targets[indice].classList.remove('visually-hidden');
@@ -310,7 +316,7 @@ export default class extends Controller {
 
 
         } else {
-            [0,1,2].forEach((indice) => {
+            [0,1,2,3].forEach((indice) => {
                 form_targets[indice].classList.remove('visually-hidden');
                 result_targets[indice].classList.add('visually-hidden');
             });
@@ -321,16 +327,34 @@ export default class extends Controller {
 
     echelonfChange(event){
         this.filters.echelonf = getSelectedValues(event)  
-        this.filters.dureef = [] 
+       
         this.errorCorpsTarget.classList.add('visually-hidden');
         this.changeDatesf()
 
     }
 
     dureefChange(event){
-        this.filters.dureef = getSelectedValues(event) 
         this.errorCorpsTarget.classList.add('visually-hidden');   
-        this.changeFinf()
+    }
+
+    debutfChange(event){
+        this.errorCorpsTarget.classList.add('visually-hidden');  
+
+        const annee = getSelectedValues(event) 
+        const array = Array.from({length:6-annee},(v,k)=>k+2023);
+        this.finfEchelonTarget.innerHTML = "";
+        const option = document.createElement("option");
+        option.value = "";
+        option.innerHTML = "- Selectionner -";
+        this.finfEchelonTarget.appendChild(option);
+        if ( annee != ""){
+            array.forEach((duree) => {
+                const option = document.createElement("option");
+                option.value = duree;
+                option.innerHTML = duree;
+                this.finfEchelonTarget.appendChild(option);
+            })
+        }
     }
 
 
@@ -371,33 +395,14 @@ export default class extends Controller {
         this.updateDatesf(data)
         })
     }
-
-    changeFinf() {
-        const token = document.querySelector('meta[name="csrf-token"]').content;
-        fetch(this.data.get("url"), { 
-          method: 'POST', 
-          body: JSON.stringify( this.filters ),
-          credentials: "include",
-          dataType: 'script',
-          headers: {
-            "X-CSRF-Token": token,
-            "Content-Type": "application/json"
-          },
-        })
-        .then(response => response.json()/*response.text()*/)
-        .then(data => {
-        //this.form.innerHTML = html
-        this.updateFinf(data)
-        })
-    }   
-
+ 
 
     updateEf(data){
         this.emploifEchelonTarget.innerHTML = "";
         const option = document.createElement("option");
-            option.value = "";
-            option.innerHTML = "- Selectionner -";
-            this.emploifEchelonTarget.appendChild(option);
+        option.value = "";
+        option.innerHTML = "- Selectionner -";
+        this.emploifEchelonTarget.appendChild(option);
 
         this.dureefEchelonTarget.innerHTML = "";
         const option2 = document.createElement("option");
@@ -411,6 +416,8 @@ export default class extends Controller {
             option3.innerHTML = "- Selectionner -";
             this.finfEchelonTarget.appendChild(option3);
 
+        this.debutfEmploiTarget.selectedIndex = 0;
+
         data.echelonsf.forEach((duree) => {
             const option = document.createElement("option");
             option.value = duree;
@@ -422,37 +429,23 @@ export default class extends Controller {
     updateDatesf(data){
         this.dureefEchelonTarget.innerHTML = "";
         const option = document.createElement("option");
-            option.value = "";
-            option.innerHTML = "- Selectionner -";
-            this.dureefEchelonTarget.appendChild(option);
-
-        this.finfEchelonTarget.innerHTML = "";
-        const option2 = document.createElement("option");
-            option2.value = "";
-            option2.innerHTML = "- Selectionner -";
-            this.finfEchelonTarget.appendChild(option2);
+        option.value = "";
+        option.innerHTML = "- Selectionner -";
+        this.dureefEchelonTarget.appendChild(option);
 
         data.dureef.forEach((duree) => {
             const option = document.createElement("option");
             option.value = duree;
-            option.innerHTML = duree;
+            if (duree == 1){
+                option.innerHTML = duree + " an";
+            }else{
+              option.innerHTML = duree + " ans";  
+            }
+            
             this.dureefEchelonTarget.appendChild(option);
         })
     }
 
-    updateFinf(data){
-        this.finfEchelonTarget.innerHTML = "";
-        const option = document.createElement("option");
-            option.value = "";
-            option.innerHTML = "- Selectionner -";
-            this.finfEchelonTarget.appendChild(option);
-        data.finf.forEach((duree) => {
-            const option = document.createElement("option");
-            option.value = duree;
-            option.innerHTML = duree;
-            this.finfEchelonTarget.appendChild(option);
-        })
-    }
 
     
     emploifChange2(event){
@@ -501,7 +494,7 @@ export default class extends Controller {
             }
             if ( id > 1 ){
                 if (debut_targets[id-2].value != null && debut_targets[id-2].value != "" && duree_targets[id-2].value != null && duree_targets[id-2].value != ""){
-                nouvelles_dates = dates_arr.filter(date => date > parseInt(debut_targets[id-2].value)+parseInt(duree_targets[id-2].value));
+                nouvelles_dates = dates_arr.filter(date => date >= parseInt(debut_targets[id-2].value)+parseInt(duree_targets[id-2].value));
                 }
                 
             } 

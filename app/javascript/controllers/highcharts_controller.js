@@ -17,7 +17,7 @@ export default class extends Controller {
         },
         
         title: {
-            text: "Simulations graphiques de la rémunération",
+            text: "Simulations graphiques de la rémunération indiciaire",
             style: {
             fontSize: '15px',
             fontWeight: "900",
@@ -51,12 +51,14 @@ export default class extends Controller {
 		    data: data,
 		    pointStart: 2022,
 		    pointInterval: 1,
+            color: "#000091",
 		    
 		},{
 		    name: 'rémunération après réforme avec maintien dans le corps en extinction ',
 		    data: data2,
 		    pointStart: 2022,
 		    pointInterval: 1,
+            color: "#169B62",
 		   
 		}],
     	};

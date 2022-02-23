@@ -10,7 +10,7 @@ export default class extends Controller {
   "resultDebutf1","resultDebutf2","resultDebutf3","resultDebutf4","resultDebutf5","resultDebutf6",
   "resultDureef1","resultDureef2","resultDureef3","resultDureef4","resultDureef5","resultDureef6",
   "resultEmploif","resultEchelonf","resultDureef","resultFinf",
-  "emploif","emploifEchelon","dureefEchelon","finfEchelon",
+  "emploif","emploifEchelon","dureefEchelon","finfEchelon",'debutfEmploi',
   "boutonEdit","errorCorps"];
 
   connect() { 
