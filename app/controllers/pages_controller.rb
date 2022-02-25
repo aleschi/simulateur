@@ -33,7 +33,7 @@ class PagesController < ApplicationController
 
 	#grade selectionne
   	if !params[:grades].nil? && !params[:grades][0].nil? && !params[:grades][0] != ""
-	  	grades = params[:grades][0]	  	
+	  	grades = params[:grades][0].to_i	  	
 	
 
 		#liste echelons
@@ -44,18 +44,22 @@ class PagesController < ApplicationController
 	  		echelons = params[:echelons][0]
 	  	end	  	
 
-	  	if !params[:grade2].nil? && !params[:grade2][0].nil? && !params[:grade2][0] != ""
+	  	if !params[:grade2].nil? && !params[:grade2][0].nil? && params[:grade2][0] != ""
 	  		@start = params[:grade2][0].to_i + 2022 + 1 #ne peut démarrer au min qu'un an apres promo du grade 2
 	  		array_grade3 = (@start..2072).to_a
-	  	else
+	  	elsif grades == 2
 	  		array_grade3 = array
+      else
+        array_grade3 = nil
 	  	end 
 
-	  	if !params[:grade3].nil? && !params[:grade3][0].nil? && !params[:grade3][0] != ""
+	  	if !params[:grade3].nil? && !params[:grade3][0].nil? && params[:grade3][0] != ""
 	  		@start = params[:grade3][0].to_i + 2022 + 1 #ne peut démarrer au min qu'un an apres promo du grade 2
 	  		array_grade4 = (@start..2072).to_a
-	  	else
+	  	elsif grades == 3
 	  		array_grade4 = array
+      else 
+        array_grade4 = nil
 	  	end
   	end
 

@@ -7,7 +7,7 @@ export default class extends Controller {
      'debutfEmploi1','debutfEmploi2','debutfEmploi3','debutfEmploi4','debutfEmploi5','debutfEmploi6',
      'dureefEmploi1','dureefEmploi2','dureefEmploi3','dureefEmploi4','dureefEmploi5','dureefEmploi6',
      'resultEchelonf','resultDureef','resultFinf','resultDebutf',
-     "error1",'errorCorps'];
+     "error1",'errorCorps','finProjet'];
 
   	connect() {    
         this.filters =  { corps: [], grades: [], echelons: [],grade2: [],grade3: [],
@@ -22,9 +22,12 @@ export default class extends Controller {
         this.grade2TitleTarget.classList.add("select_inactive")
         this.grade3TitleTarget.classList.add("select_inactive")
         this.grade4TitleTarget.classList.add("select_inactive")
-        this.grade2Target.innerHTML = ""
-        this.grade3Target.innerHTML = ""
-        this.grade4Target.innerHTML = ""
+        
+        const grades = [this.grade2Target,this.grade3Target,this.grade4Target];
+        [0,1,2].forEach((indice)=>{
+            grades[indice].innerHTML = "";
+        })
+        
         this.errorCorpsTarget.classList.add('visually-hidden');
         this.change()
     }
@@ -43,13 +46,18 @@ export default class extends Controller {
     }
 
     promoGrade2Change(event){
-        this.filters.grade2 = getSelectedValues(event)
+        this.filters.grade2 = getSelectedValues(event);
         this.errorCorpsTarget.classList.add('visually-hidden');
+        this.filters.grade3 = [];
+        this.filters.grade4 = [];
+
         this.changePromoGrade2()
+      
     }
 
     promoGrade3Change(event){
-        this.filters.grade3 = getSelectedValues(event)
+        this.filters.grade3 = getSelectedValues(event);
+        this.filters.grade4 = [];
         this.errorCorpsTarget.classList.add('visually-hidden');
         this.changePromoGrade3()
     }
@@ -239,7 +247,7 @@ export default class extends Controller {
                 grades[indice-1].appendChild(option);
                 data.array.forEach((ar) => {
                     const option = document.createElement("option");
-                    option.value = ar-2022;
+                    option.value = ar;
                     option.innerHTML = ar;
                     grades[indice-1].appendChild(option);
                 })
@@ -267,13 +275,14 @@ export default class extends Controller {
             option.value = "";
             option.innerHTML = "- Selectionner -";
             this.grade3Target.appendChild(option);
-            
-            data.array_grade3.forEach((ar) => {
-            const option = document.createElement("option");
-            option.value = ar-2022;
-            option.innerHTML = ar;
-            this.grade3Target.appendChild(option);
-        })
+            if (data.array_grade3 != null){
+                data.array_grade3.forEach((ar) => {
+                const option = document.createElement("option");
+                option.value = ar;
+                option.innerHTML = ar;
+                this.grade3Target.appendChild(option);
+                })
+            }
         }
     }
 
@@ -288,7 +297,7 @@ export default class extends Controller {
             
             data.array_grade4.forEach((ar) => {
             const option = document.createElement("option");
-            option.value = ar-2022;
+            option.value = ar;
             option.innerHTML = ar;
             this.grade4Target.appendChild(option);
             })
@@ -510,7 +519,26 @@ export default class extends Controller {
 
         }
     }
-      
+    
+    projetChange(event){
+        const debut = getSelectedValues(event);
+        if (debut != ''){
+        const dates = Array.from({length:(2072-parseInt(debut))},(v,k)=>k+parseInt(debut)+1);
+        
+        dates.forEach((date)=>{
+            const option = document.createElement("option");
+            option.value = date;
+            option.innerHTML = date;
+            this.finProjetTarget.appendChild(option);
+        })
+        }else{
+            this.finProjetTarget.innerHTML = "";
+            const option = document.createElement("option");
+            option.value = "";
+            option.innerHTML = "- Selectionner -";
+            this.finProjetTarget.appendChild(option); 
+        }
+    } 
 
 }
 

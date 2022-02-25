@@ -20,14 +20,35 @@ class GrillesController < ApplicationController
       @liste_indices = @liste_indices[0..@duree_carriere-1]
     end
   	
+    #check projet de dispo de plus de 5 ans + pas de promotions à venir 
+    if params[:debut_projet] != '' && params[:fin_projet] != '' && (params[:fin_projet].to_i - params[:debut_projet].to_i > 5) && (params["grade2"] == '' || params["grade2"].nil?) && (params["grade3"] == '' || params["grade3"].nil?) && (params["grade4"] == '' || params["grade4"].nil?)
+      #ca ne bouge pas jusqua 5 ans puis stagne jusqua fin du projet 
+      @debut = params[:debut_projet].to_i - 2022
+      @duree = params[:fin_projet].to_i-params[:debut_projet].to_i
+      @dernier_indice_5 = @liste_indices[@debut+5-1]
+      @liste_indices_bloque = Array.new(@duree-5, @dernier_indice_5)
+      @liste_indices = @liste_indices[0..@debut+5-1] + @liste_indices_bloque + @liste_indices[@debut+5..@duree_carriere-1+5-@duree]
+    end
+
   	#calcul si changement de grade 
     @grade = params[:grade]
     (2..4).each do |i|
     	if !params["grade#{i}"].nil? && params["grade#{i}"] != '' 
         #annee changement de grade
         @grade = i
-    		@annee_grade = params["grade#{i}"].to_i
+    		@annee_grade = params["grade#{i}"].to_i - 2022
         if @duree_carriere - @annee_grade > 0 #vérifie promo avant retraite
+
+          #check projet de dispo de plus de 5 ans avant promotions de grade alors reset courbe principale 
+          if params[:debut_projet] != '' && params[:fin_projet] != '' && (params[:fin_projet].to_i - params[:debut_projet].to_i > 5) && params[:fin_projet].to_i < @annee_grade + 2022
+            #ca ne bouge pas jusqua 5 ans puis stagne jusqua fin du projet 
+            @debut = params[:debut_projet].to_i - 2022
+            @duree = params[:fin_projet].to_i-params[:debut_projet].to_i
+            @dernier_indice_5 = @liste_indices[@debut+5-1]
+            @liste_indices_bloque = Array.new(@duree-5, @dernier_indice_5)
+            @liste_indices = @liste_indices[0..@debut+5-1] + @liste_indices_bloque + @liste_indices[@debut+5..@duree_carriere-1+5-@duree]
+          end 
+
       		#prendre indice du corps de base année 1 an avant la promotion et aller chercher le mm indice par valeur sup dans le grade au dessus + echelon = duree annee a cet indice 
       		@indice_anciengrade = @liste_indices[@annee_grade-1]
           #depuis cb de temps a cet indice
@@ -42,6 +63,8 @@ class GrillesController < ApplicationController
         end
     	end
     end
+
+
     @liste_indices2 = @liste_indices #nvlle courbe principale apres reforme pour traiter cas reduction anciennete
 
     #2 calcul courbe secondaire 

@@ -9,7 +9,7 @@ export default class extends Controller {
   "resultEmploif1","resultEmploif2","resultEmploif3","resultEmploif4","resultEmploif5","resultEmploif6",
   "resultDebutf1","resultDebutf2","resultDebutf3","resultDebutf4","resultDebutf5","resultDebutf6",
   "resultDureef1","resultDureef2","resultDureef3","resultDureef4","resultDureef5","resultDureef6",
-  "resultEmploif","resultEchelonf","resultDureef","resultFinf",
+  "resultEmploif","resultEchelonf","resultDureef","resultFinf","resultDebutf",
   "emploif","emploifEchelon","dureefEchelon","finfEchelon",'debutfEmploi',
   "boutonEdit","errorCorps"];
 
@@ -31,8 +31,8 @@ export default class extends Controller {
   	const result_debut_targets = [this.resultDebutf1Target,this.resultDebutf2Target,this.resultDebutf3Target,this.resultDebutf4Target,this.resultDebutf5Target,this.resultDebutf6Target];
   	const result_duree_targets = [this.resultDureef1Target,this.resultDureef2Target,this.resultDureef3Target,this.resultDureef4Target,this.resultDureef5Target,this.resultDureef6Target];
 
-    const result_emploi_f = [this.resultEmploifTarget, this.resultEchelonfTarget,this.resultDureefTarget,this.resultFinfTarget]
-  	const emploi_f = [this.emploifTarget,this.emploifEchelonTarget, this.dureefEchelonTarget, this.finfEchelonTarget];
+    const result_emploi_f = [this.resultEmploifTarget, this.resultEchelonfTarget,this.resultDureefTarget,this.resultFinfTarget,this.resultDebutfTarget]
+  	const emploi_f = [this.emploifTarget,this.emploifEchelonTarget, this.dureefEchelonTarget, this.finfEchelonTarget, this.debutfEmploiTarget];
 
     [6,5,4,3,2].forEach((indice) => {
   		if (content_targets[indice-1].classList.contains('visually-hidden') && (content_targets[indice-2].classList.contains('visually-hidden')==false)){
@@ -80,7 +80,7 @@ export default class extends Controller {
           this.error2Target.innerHTML = "Veuillez sélectionner tous les champs ci-dessus";
         }else{
         // on ne peut plus modifier emploi f actuel 
-        [0,1,2,3].forEach((indice) => {
+        [0,1,2,3,4].forEach((indice) => {
           result_emploi_f[indice].classList.remove('visually-hidden');
           if (emploi_f[indice].value == undefined || emploi_f[indice].value == "" ){
           result_emploi_f[indice].innerHTML = "-";
@@ -165,8 +165,8 @@ export default class extends Controller {
     const result_debut_targets = [this.resultDebutf1Target,this.resultDebutf2Target,this.resultDebutf3Target,this.resultDebutf4Target,this.resultDebutf5Target,this.resultDebutf6Target];
     const result_duree_targets = [this.resultDureef1Target,this.resultDureef2Target,this.resultDureef3Target,this.resultDureef4Target,this.resultDureef5Target,this.resultDureef6Target];
 
-    const result_emploi_f = [this.resultEmploifTarget, this.resultEchelonfTarget,this.resultDureefTarget,this.resultFinfTarget]
-    const emploi_f = [this.emploifTarget,this.emploifEchelonTarget, this.dureefEchelonTarget, this.finfEchelonTarget];
+    const result_emploi_f = [this.resultEmploifTarget, this.resultEchelonfTarget,this.resultDureefTarget,this.resultFinfTarget,this.resultDebutfTarget]
+    const emploi_f = [this.emploifTarget,this.emploifEchelonTarget, this.dureefEchelonTarget, this.finfEchelonTarget, this.debutfEmploiTarget];
 
 
     this.boutonEditTarget.classList.add('visually-hidden');
@@ -176,7 +176,7 @@ export default class extends Controller {
     emploi_f[0].classList.remove('visually-hidden');
     result_emploi_f[0].classList.add('visually-hidden');
     if (emploi_f[0].value != "Aucun"){
-    [1,2,3].forEach((indice) => {
+    [1,2,3,4].forEach((indice) => {
           emploi_f[indice].classList.remove('visually-hidden');
           result_emploi_f[indice].classList.add('visually-hidden');    
       });
