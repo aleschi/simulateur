@@ -11,7 +11,7 @@ export default class extends Controller {
   "resultDureef1","resultDureef2","resultDureef3","resultDureef4","resultDureef5","resultDureef6",
   "resultEmploif","resultEchelonf","resultDureef","resultFinf","resultDebutf",
   "emploif","emploifEchelon","dureefEchelon","finfEchelon",'debutfEmploi',
-  "boutonEdit","errorCorps"];
+  "boutonEdit","errorCorps",'contentdispo','boutonprojet'];
 
   connect() { 
   }
@@ -197,6 +197,12 @@ export default class extends Controller {
         debut_targets[indice].selectedIndex = 0;
     })
     e.preventDefault();
+  }
+
+  toggleprojet(e){
+    e.preventDefault();
+    this.boutonprojetTarget.classList.add('visually-hidden');
+    this.contentdispoTarget.classList.remove('visually-hidden');
   }
 
 }

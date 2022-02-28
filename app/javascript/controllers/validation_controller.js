@@ -12,7 +12,7 @@ export default class extends Controller {
   "resultDebutf1","resultDebutf2","resultDebutf3","resultDebutf4","resultDebutf5","resultDebutf6",
   "resultDureef1","resultDureef2","resultDureef3","resultDureef4","resultDureef5","resultDureef6",
   "trash1","trash2","trash3","trash4","trash5","trash6",
-  'debutProjet','finProjet', 'resultdebutProjet', 'resultfinProjet', 'boutonDispo',
+  'debutProjet','finProjet', 'resultdebutProjet', 'resultfinProjet', 'boutonDispo','contentdispo',
   'age','corps','grade','echelon','duree',
   'resultAge','resultCorps','resultGrade','resultEchelon','resultDuree','boutonSituation',
   "content1","content2","content3","content4","content5","content6",];
@@ -156,6 +156,14 @@ export default class extends Controller {
             this.boutonDispoTarget.classList.remove('visually-hidden');
             this.boutonSituationTarget.classList.remove('visually-hidden');
             this.boutonEditTarget.classList.remove('visually-hidden');
+
+            if (this.contentdispoTarget.classList.contains('visually-hidden')){
+              this.boutonDispoTarget.classList.add('visually-hidden');
+              this.finProjetTarget.classList.remove('visually-hidden');
+              this.debutProjetTarget.classList.remove('visually-hidden');
+              this.resultfinProjetTarget.classList.add('visually-hidden');
+              this.resultdebutProjetTarget.classList.add('visually-hidden');
+            }
 
             const content_targets = [this.content1Target,this.content2Target,this.content3Target,this.content4Target,this.content5Target,this.content6Target];
             const emploif_targets = [this.emploif1Target,this.emploif2Target,this.emploif3Target,this.emploif4Target,this.emploif5Target,this.emploif6Target];

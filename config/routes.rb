@@ -19,6 +19,13 @@ Rails.application.routes.draw do
      
     end
   end
+
+  resources :reclassements do 
+    collection do 
+      post 'import' => 'reclassements#import'
+     
+    end
+  end
   
   post 'search_grilles', to: 'grilles#search_grilles'
 

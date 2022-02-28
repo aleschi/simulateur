@@ -175,10 +175,12 @@ text-align:right;
 }
 .titre_2{
   font-size:24px;
+  position:relative;
 }
 .titre_etiquette{
   font-size:15px;
   font-weight:bold;
+  position:relative;
 }
 .texte_etiquette{
   font-size:13px;
@@ -255,6 +257,8 @@ text-align:right;
 .bouton_i{
   text-decoration:none;
   color:#000091;
+  position:absolute;
+  right:0px;
 }
 .form {
   position:relative;
@@ -332,7 +336,7 @@ text-align:right;
       margin-right:5px;
     }
     input{
-      display: none;
+      //display: none;
     }
     &:hover{
       cursor:pointer;
@@ -377,6 +381,12 @@ text-align:right;
 }
 
 .graphe{
-  position:sticky;
-  top:12px;
+  //position:sticky;
+  //top:12px;
+}
+.texte_light{
+  font-weight: lighter;
+}
+.italic{
+  font-style: italic;
 }

@@ -3,6 +3,7 @@ class PagesController < ApplicationController
   def index
   	@liste_indices = []
   	@liste_indices2 = []
+    @liste_indices3 = []
   	if Grille.all.count > 0
   		@corps = Grille.where('corps != ?','AE').pluck(:corps).uniq
   	end
@@ -10,6 +11,8 @@ class PagesController < ApplicationController
   		@emplois_f = ["Aucun"] + Emploi.all.pluck(:nom).uniq
   		@emplois_f2 = Emploi.all.pluck(:nom).uniq 
   	end
+    @debut_dispo=0
+    @fin_dispo=0
   end
 
   def mentions_legales

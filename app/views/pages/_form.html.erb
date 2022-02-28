@@ -2,11 +2,10 @@
 	<div data-controller="toggle">
 	<%= form_with(url: search_grilles_path, method: :post, data: { controller: "validation", 'validation-target': "form", action: "turbo:before-fetch-request->validation#submitForm change->validation#change"}) do |f|%>
 	
-
-	<div class="titre_2">Votre situation  :</div>
-	<div class="titre_etiquette">Votre situation actuelle : <span class="visually-hidden" data-validation-target="boutonSituation"> <button  type="button" data-action="click->validation#reset_situation" > <i class="fa-solid fa-pen-to-square bouton_i"></i></button></span></div>
+	<div><%= link_to root_path, class:"bouton" do %><i class="fa-solid fa-arrow-rotate-right"></i> Réinitialiser le formulaire<%end%><div class="d24"></div></div>
+	<div class="titre_2">Votre situation  actuelle <button class="visually-hidden bouton_i" data-validation-target="boutonSituation" type="button" data-action="click->validation#reset_situation"> <%= image_tag 'edit.svg'%></button></div>
 	<div class="texte_etiquette">Tous les champs comportant un astérisque (*) sont à remplir obligatoirement.</div>
-	<div class="d24"></div>
+	<div class="d12"></div>
 	
 	<div class="align_flex w100" >
 		<div class="w3">
@@ -60,9 +59,7 @@
 	<div class="d24"></div>
 
 	
-		<div class="titre_2">Emploi fonctionnel :</div>
-		<div class="d12"></div>
-		<div class="titre_etiquette">Emploi fonctionnel actuel : <span data-toggle-target="boutonEdit" data-validation-target="boutonEdit" class="visually-hidden"><button type="button"  data-bs-toggle="modal" data-bs-target="#edit"> <i class="fa-solid fa-pen-to-square bouton_i"></i></button></span></div>
+		<div class="titre_2">Votre emploi fonctionnel actuel <span data-toggle-target="boutonEdit" data-validation-target="boutonEdit" class="visually-hidden bouton_i"><button type="button"  data-bs-toggle="modal" data-bs-target="#edit" > <%= image_tag 'edit.svg'%></button></span></div>
 
 		<%= render 'modal_edit'%>
 		<div class="texte_etiquette"><em>Sélectionnez "Aucun" si vous n'êtes pas dans un emploi fonctionnel à ce jour.</em></div>
@@ -100,13 +97,14 @@
 		</div>
 		<div class="texte_error" data-toggle-target="error2"></div>
 		<div class="d24"></div>
-		<div class="titre_etiquette">Projections futures d'emplois fonctionnels :</div>
-		<div class="texte_etiquette"><em>Vous pouvez simuler jusqu’à 6 emplois fonctionnels.</em></div>
-		<div class="d12"></div>
+		<div class="titre_2">Simulations situations futures <span class='texte_light italic'>(optionnel)</span></div>
+		
+		<div class="texte_etiquette"><em>Vous pouvez simuler jusqu’à 6 emplois fonctionnels et 1 projet de disponibilité.</em></div>
 		
 		<% (1..6).each do |i|%>
 		<div class="visually-hidden" data-toggle-target="content<%=i%>" data-validation-target="content<%=i%>">
-			<div class="texte_etiquette"><span class="texte_b">Simulation <%=i %></span> <button data-action="toggle#toggle2"><i data-toggle-target="trash<%=i%>" data-validation-target="trash<%=i%>" class="fas fa-trash-alt bouton_i"></i></button></div>
+			<div class="d12"></div>
+			<div class="titre_etiquette">Simulation <%=i %>  <button data-action="toggle#toggle2" data-toggle-target="trash<%=i%>" data-validation-target="trash<%=i%>" class='bouton_i'><%= image_tag 'trash.svg'%></button></div>
 			<div class="d12"></div>
 			<div>
 				<div class="texte_etiquette">Nature de l'emploi fonctionnel exercé*</div>
@@ -125,7 +123,7 @@
 					<div class="texte_etiquette" data-toggle-target='resultDureef<%=i%>' data-validation-target='resultDureef<%=i%>'></div>
 				</div>
 			</div>
-			<div class="d12"></div>
+			
 		</div>
 		<% end %>
 
@@ -133,30 +131,32 @@
 
 		<div class="d12"></div>
 
-		<div class="texte_etiquette" data-toggle-target="bouton"><button  data-action="toggle#toggle1"> <i class="fas fa-plus-circle bouton_i"></i> Ajouter un emploi fonctionnel futur</button></div>		
-		<div class="d12"></div>
+		<div class="texte_etiquette" data-toggle-target="bouton"><button  data-action="toggle#toggle1"> <i class="fas fa-plus-circle cbleu"></i> Ajouter un emploi fonctionnel futur</button></div>		
+		<div class="d24"></div>
 
-		<div class="titre_2">Projet de disponibilité  :</div>
-		<div class="d12"></div>
-		<div class="titre_etiquette">Ajouter un projet de disponibilité (optionnel) : <span class="visually-hidden" data-validation-target="boutonDispo"> <button  type="button" data-action="click->validation#reset_dispo" > <i class="fa-solid fa-pen-to-square bouton_i"></i></button></span></div>
-		<div class="d12"></div>
-		
+		<div class="texte_etiquette" data-toggle-target="boutonprojet"><button  data-action="toggle#toggleprojet"> <i class="fas fa-plus-circle cbleu"></i> Ajouter un projet de disponibilité</button></div>		
 
-		<div class="align_flex w100">
-			<div class="w50 pr">
-				<div class="texte_etiquette" >Début du projet</div>
-				<div class="form"><%= f.select :debut_projet, (2023..2072).to_a.map { |a| [a,a]}, {prompt: "- Selectionner -"},{data: {action: 'change->filter#projetChange change->validation#validateForm','validation-target': 'debutProjet'}}%></div>
-				<div class="texte_etiquette" data-validation-target='resultdebutProjet'></div>
-			</div>
-			<div class="w50 pl">
-				<div class="texte_etiquette">Fin prévue du projet</div>
-				<div class="form"><%= f.select :fin_projet, [],{prompt: "- Selectionner -"},{data: {action: 'change->validation#validateForm','filter-target': 'finProjet','validation-target': 'finProjet'}}%></div>
-				<div class="texte_etiquette" data-validation-target='resultfinProjet'></div>
+		<div class="visually-hidden" data-toggle-target="contentdispo" data-validation-target="contentdispo">
+			<div class="titre_etiquette">Projet de disponibilité <button class="visually-hidden bouton_i" data-validation-target="boutonDispo" type="button" data-action="click->validation#reset_dispo" ><%= image_tag 'edit.svg'%></button></div>
+			<div class="d12"></div>
+			
+
+			<div class="align_flex w100">
+				<div class="w50 pr">
+					<div class="texte_etiquette" >Début du projet</div>
+					<div class="form"><%= f.select :debut_projet, (2023..2072).to_a.map { |a| [a,a]}, {prompt: "- Selectionner -"},{data: {action: 'change->filter#projetChange change->validation#validateForm','validation-target': 'debutProjet'}}%></div>
+					<div class="texte_etiquette" data-validation-target='resultdebutProjet'></div>
+				</div>
+				<div class="w50 pl">
+					<div class="texte_etiquette">Fin prévue du projet</div>
+					<div class="form"><%= f.select :fin_projet, [],{prompt: "- Selectionner -"},{data: {action: 'change->validation#validateForm','filter-target': 'finProjet','validation-target': 'finProjet'}}%></div>
+					<div class="texte_etiquette" data-validation-target='resultfinProjet'></div>
+				</div>
 			</div>
 		</div>
 
 	<div class="texte_error visually-hidden" data-validation-target="errorCorps" data-toggle-target="errorCorps" data-filter-target="errorCorps"> </div>
-	<div class="d12"></div>
+	<div class="d24"></div>
 
 	<div><%= f.submit "Valider", class: "bouton bouton_inactive", data: {action: 'click->validation#submitForm','validation-target': "submitBouton"} %></div>
 	<div class="d12"></div>

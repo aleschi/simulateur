@@ -524,7 +524,11 @@ export default class extends Controller {
         const debut = getSelectedValues(event);
         if (debut != ''){
         const dates = Array.from({length:(2072-parseInt(debut))},(v,k)=>k+parseInt(debut)+1);
-        
+        this.finProjetTarget.innerHTML = "";
+            const option = document.createElement("option");
+            option.value = "";
+            option.innerHTML = "- Selectionner -";
+            this.finProjetTarget.appendChild(option); 
         dates.forEach((date)=>{
             const option = document.createElement("option");
             option.value = date;

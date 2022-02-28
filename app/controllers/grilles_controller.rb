@@ -7,6 +7,13 @@ class GrillesController < ApplicationController
   	@age = params[:age].to_i
   	@duree_carriere = 67 - @age
 
+    @debut_dispo=0
+    @fin_dispo=0
+    if params[:debut_projet] != '' && params[:fin_projet] != ''
+      @debut_dispo = params[:debut_projet].to_i
+      @fin_dispo = params[:fin_projet].to_i
+    end
+
     #1/Courbe carriere principale (corps)
 
   	#calcul indice initial dans le corps de l'agent
@@ -31,14 +38,17 @@ class GrillesController < ApplicationController
     end
 
   	#calcul si changement de grade 
-    @grade = params[:grade]
+    @grade = params[:grade].to_i
+    @array_grade = Array.new(@liste_indices.length, @grade)
+
     (2..4).each do |i|
     	if !params["grade#{i}"].nil? && params["grade#{i}"] != '' 
         #annee changement de grade
         @grade = i
     		@annee_grade = params["grade#{i}"].to_i - 2022
         if @duree_carriere - @annee_grade > 0 #vérifie promo avant retraite
-
+          #met a jour arr grade 
+          @array_grade = @array_grade[0..@annee_grade-1] + Array.new(@liste_indices.length-@annee_grade, @grade)
           #check projet de dispo de plus de 5 ans avant promotions de grade alors reset courbe principale 
           if params[:debut_projet] != '' && params[:fin_projet] != '' && (params[:fin_projet].to_i - params[:debut_projet].to_i > 5) && params[:fin_projet].to_i < @annee_grade + 2022
             #ca ne bouge pas jusqua 5 ans puis stagne jusqua fin du projet 
@@ -73,6 +83,9 @@ class GrillesController < ApplicationController
     @liste_indices_emploi = Array.new(@liste_indices.length, 0)
     #courbe apres reforme sans droit option pour partie emploi fonctionnel
     @liste_indices_emploi2 = Array.new(@liste_indices.length, 0)
+    #courbe apres reforme avec droit option pour partie emploi fonctionnel
+    @liste_indices_emploi3 = Array.new(@liste_indices.length, 0)
+
     #initialement dans un emploi fonctionnaire
     if !params[:type_emploi].nil? && params[:type_emploi] != "" && params[:type_emploi] != "Aucun" && params[:fin_emploif] != "" && params[:duree_emploif] != "" && params[:debut_emploif] != ""
       @duree_emploi = params[:fin_emploif].to_i - 2022 + 1
@@ -88,14 +101,18 @@ class GrillesController < ApplicationController
       end
 
       #calcul emploi fonctionnel avec réforme 
+      @grade = params[:grade].to_i #check grade max 3 pour table AE
+      if @grade > 3 
+        @grade = 3
+      end 
       #on va chercher indice le plus proche au meme indice quil avait dans son emploi fonctionnel
       @indice_emploi = Emploi.where(nom: params[:type_emploi], echelon: params[:echelon_emploif].to_i, duree: @duree).first.indice      
-      @liste_indices_ae = Grille.where(corps: "AE", grade: params[:grade]).where('indice >= ?',@indice_emploi).order('indice ASC').pluck(:indice)
+      @liste_indices_ae = Grille.where(corps: "AE", grade: @grade).where('indice >= ?',@indice_emploi).order('indice ASC').pluck(:indice)
       if @liste_indices_ae.last.nil? #indice emploi f trop eleve pour grade table AE
         @liste_indices_ae = Array.new(@duree_emploi+1, @indice_emploi)
         @liste_indices_moyenne_ae = Array.new(@duree_emploi, @indice_emploi)
       else
-        #on prendre @duree_emploi et pas @duree_emploi-1 car on a besoin du dernier indice pour la relation de recurrence
+        #on prend @duree_emploi et pas @duree_emploi-1 car on a besoin du dernier indice pour la relation de recurrence
         if @liste_indices_ae.length >= @duree_emploi + 1
           @liste_indices_ae = @liste_indices_ae[0..@duree_emploi]
         else 
@@ -108,6 +125,29 @@ class GrillesController < ApplicationController
         end
       end
       @liste_indices_emploi2 = @liste_indices_moyenne_ae + @liste_indices_emploi2[@duree_emploi..@liste_indices.length-1] 
+
+      #calcul emploi fonctionnel avec réforme + droit option
+      #on va chercher indice le plus proche au meme indice quil avait dans son emploi fonctionnel dans table de reclassement puis on prend echelon correspondant
+      @nouvel_echelon = Reclassement.where('indice >= ?',@indice_emploi).order('indice ASC').first
+      @liste_indices_ae3 = Grille.where(corps: "AE", grade: @grade).where('echelon >= ?',@nouvel_echelon).order('indice ASC').pluck(:indice)    
+      if @liste_indices_ae3.last.nil? #indice emploi f trop eleve pour grade table AE
+        @liste_indices_ae3 = Array.new(@duree_emploi+1, @indice_emploi)
+        @liste_indices_moyenne_ae3 = Array.new(@duree_emploi, @indice_emploi)
+      else
+        #on prend @duree_emploi et pas @duree_emploi-1 car on a besoin du dernier indice pour la relation de recurrence
+        if @liste_indices_ae3.length >= @duree_emploi + 1
+          @liste_indices_ae3 = @liste_indices_ae3[0..@duree_emploi]
+        else 
+          @liste_indices_ae3 = @liste_indices_ae3[0..@duree_emploi] + Array.new(@duree_emploi+1-@liste_indices_ae3.length, @liste_indices_ae3.last)
+        end
+        @liste_indices_moyenne_ae3 = Array.new(@duree_emploi, 0)
+        @liste_indices_ae3[0..@duree_emploi-1].each_with_index do |indice,i|
+          #i demarre à 0
+          @liste_indices_moyenne_ae3[i] = (((10-2*i)*@liste_indices_ae3[i]).to_f/12 + (2*(i+1)*@liste_indices_ae3[i+1]).to_f/12).round()
+        end
+      end
+      @liste_indices_emploi3 = @liste_indices_moyenne_ae3 + @liste_indices_emploi3[@duree_emploi..@liste_indices.length-1] 
+
 
       #reduction anciennete si plus de 5 ans 
       @duree_emploi_totale = params[:fin_emploif].to_i - 2022 + params[:debut_emploif].to_i
@@ -147,10 +187,18 @@ class GrillesController < ApplicationController
         else
           @liste_indices_emploi = @liste_indices_emploi[0..@start_emploi-1] + @liste_indices_emploi_new[0..@duree_carriere-@start_emploi-1] 
         end
+
         #apres reforme
+        #on regarde a quel grade on est a ce moment la 
+        @grade = @array_grade[@start_emploi-1]
+        #on bloque a 3 max pour grille AE
+        if @grade > 3 
+          @grade = 3
+        end 
+
         @i3=@liste_indices_emploi2.max
         @indice_emploi_ae = [@i1,@i3].max
-        @liste_indices_emplois2_ae = Grille.where(corps: "AE", grade: params[:grade]).where('indice >= ?',@indice_emploi_ae).order('indice ASC').pluck(:indice)
+        @liste_indices_emplois2_ae = Grille.where(corps: "AE", grade: @grade).where('indice >= ?',@indice_emploi_ae).order('indice ASC').pluck(:indice)
         if @liste_indices_emplois2_ae.last.nil? #indice emploi f trop eleve pour grade table AE
           @liste_indices_emplois2_ae = Array.new(@duree_emploi+1, @indice_emploi_ae)
           @liste_indices_emplois2_moyenne_ae = Array.new(@duree_emploi, @indice_emploi_ae)
@@ -171,6 +219,32 @@ class GrillesController < ApplicationController
           @liste_indices_emploi2 = @liste_indices_emploi2[0..@start_emploi-1] + @liste_indices_emplois2_moyenne_ae[0..@duree_carriere-@start_emploi-1]
         end
 
+        #apres reforme + droit option
+        @i4=@liste_indices_emploi3.max
+        @indice_emploi_ae3 = [@i1,@i4].max
+        @nouvel_echelon = Reclassement.where('indice >= ?',@indice_emploi_ae3).order('indice ASC').first
+        @liste_indices_emplois3_ae = Grille.where(corps: "AE", grade: @grade).where('echelon >= ?',@nouvel_echelon).order('indice ASC').pluck(:indice)
+        if @liste_indices_emplois3_ae.last.nil? #indice emploi f trop eleve pour grade table AE
+          @liste_indices_emplois3_ae = Array.new(@duree_emploi+1, @indice_emploi_ae3)
+          @liste_indices_emplois3_moyenne_ae = Array.new(@duree_emploi, @indice_emploi_ae3)
+        else
+          if @liste_indices_emplois3_ae.length >= @duree_emploi+1
+            @liste_indices_emplois3_ae = @liste_indices_emplois3_ae[0..@duree_emploi]
+          else
+            @liste_indices_emplois3_ae = @liste_indices_emplois3_ae[0..@duree_emploi] + Array.new(@duree_emploi-@liste_indices_emplois3_ae.length,@liste_indices_emplois3_ae.last)
+          end
+          @liste_indices_emplois3_moyenne_ae = Array.new(@duree_emploi, 0)
+          @liste_indices_emplois3_ae[0..@duree_emploi-1].each_with_index do |indice,i|
+            @liste_indices_emplois3_moyenne_ae[i] = (((10-2*i)*@liste_indices_emplois3_ae[i]).to_f/12 + (2*(i+1)*@liste_indices_emplois3_ae[i+1]).to_f/12).round()
+          end
+        end
+        if @start_emploi+@duree_emploi < @duree_carriere #retraite non dépassée 
+          @liste_indices_emploi3 = @liste_indices_emploi3[0..@start_emploi-1] + @liste_indices_emplois3_moyenne_ae + @liste_indices_emploi3[@start_emploi+@duree_emploi..@liste_indices.length-1]
+        else
+          @liste_indices_emploi3 = @liste_indices_emploi3[0..@start_emploi-1] + @liste_indices_emplois3_moyenne_ae[0..@duree_carriere-@start_emploi-1]
+        end
+
+
         #reduction anciennete si plus de 5 ans et ne termine pas sur retraite
         if @duree_emploi >= 5 && (@start_emploi+@duree_emploi+1 < @duree_carriere)
           #on va decaller la courbe principale d'un indice apres la fin de l'emploi fonctionnel et il faut completer le dernier indice 
@@ -189,10 +263,12 @@ class GrillesController < ApplicationController
 
     @liste_indices = [@liste_indices, @liste_indices_emploi].transpose.map(&:max)
     @liste_indices2 = [@liste_indices2, @liste_indices_emploi2].transpose.map(&:max)
+    @liste_indices3 = [@liste_indices2, @liste_indices_emploi3].transpose.map(&:max)
 
   	#@liste_indices= @liste_indices.collect { |n| (n * 56.2323).round(2) }
     @liste_indices = @liste_indices[0..@duree_carriere-1]
     @liste_indices2 = @liste_indices2[0..@duree_carriere-1]
+    @liste_indices3 = @liste_indices3[0..@duree_carriere-1]
 
   	respond_to do |format|
           format.turbo_stream do 
