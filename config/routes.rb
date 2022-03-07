@@ -26,6 +26,13 @@ Rails.application.routes.draw do
      
     end
   end
+
+  resources :grades do 
+    collection do 
+      post 'import' => 'grades#import'
+     
+    end
+  end
   
   post 'search_grilles', to: 'grilles#search_grilles'
 

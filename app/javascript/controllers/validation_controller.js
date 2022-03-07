@@ -12,10 +12,10 @@ export default class extends Controller {
   "resultDebutf1","resultDebutf2","resultDebutf3","resultDebutf4","resultDebutf5","resultDebutf6",
   "resultDureef1","resultDureef2","resultDureef3","resultDureef4","resultDureef5","resultDureef6",
   "trash1","trash2","trash3","trash4","trash5","trash6",
-  'debutProjet','finProjet', 'resultdebutProjet', 'resultfinProjet', 'boutonDispo','contentdispo',
+  'debutProjet','finProjet', 'resultdebutProjet', 'resultfinProjet', 'boutonDispo','contentdispo','boutonprojet',
   'age','corps','grade','echelon','duree',
   'resultAge','resultCorps','resultGrade','resultEchelon','resultDuree','boutonSituation',
-  "content1","content2","content3","content4","content5","content6",];
+  "content1","content2","content3","content4","content5","content6",'error2'];
 
   	connect() {
   	 this.validateForm();
@@ -72,6 +72,7 @@ export default class extends Controller {
     change(event){
       event.preventDefault();
       this.errorCorpsTarget.classList.add('visually-hidden');
+      this.error2Target.classList.add('visually-hidden');
     }
 
     submitForm(event) {
@@ -107,7 +108,7 @@ export default class extends Controller {
             //ef interdit pdt dispo
             [0,1,2,3,4,5].forEach((indice)=>{
               if (debut_targets[indice].value != '' && duree_targets[indice].value  != '' ){
-                if ( (parseInt(debut_targets[indice].value)  <= parseInt(this.debutProjetTarget.value) && parseInt(this.debutProjetTarget.value) <= parseInt(debut_targets[indice].value) +parseInt(duree_targets[indice].value) ) || (parseInt(debut_targets[indice].value)  <= parseInt(this.finProjetTarget.value) && parseInt(this.finProjetTarget.value) <= parseInt(debut_targets[indice].value) +parseInt(duree_targets[indice].value)) ){
+                if ( ( parseInt(this.debutProjetTarget.value) <= parseInt(debut_targets[indice].value) && parseInt(debut_targets[indice].value) <= parseInt(this.finProjetTarget.value)) || ( parseInt(debut_targets[indice].value)  <= parseInt(this.debutProjetTarget.value) && parseInt(this.debutProjetTarget.value) <= parseInt(debut_targets[indice].value) +parseInt(duree_targets[indice].value) ) || (parseInt(debut_targets[indice].value)  <= parseInt(this.finProjetTarget.value) && parseInt(this.finProjetTarget.value) <= parseInt(debut_targets[indice].value) +parseInt(duree_targets[indice].value)) ){
                   projet_invalid = false;
                 }
               }
@@ -131,7 +132,7 @@ export default class extends Controller {
           if (date_invalid == false){
             event.preventDefault();
             this.errorCorpsTarget.classList.remove('visually-hidden');
-            this.errorCorpsTarget.innerHTML = "Les dates renseignées sont incompatibles avec l'age renseigné";
+            this.errorCorpsTarget.innerHTML = "Les dates renseignées sont incompatibles avec l'âge renseigné";
           } else if (projet_invalid == false){
             event.preventDefault();
             this.errorCorpsTarget.classList.remove('visually-hidden');
@@ -163,6 +164,11 @@ export default class extends Controller {
               this.debutProjetTarget.classList.remove('visually-hidden');
               this.resultfinProjetTarget.classList.add('visually-hidden');
               this.resultdebutProjetTarget.classList.add('visually-hidden');
+            }else if (this.finProjetTarget.value == ''){
+              this.contentdispoTarget.classList.add('visually-hidden');
+              this.boutonprojetTarget.classList.remove('visually-hidden');
+              this.debutProjetTarget.selectedIndex =0;
+              this.finProjetTarget.selectedIndex =0;
             }
 
             const content_targets = [this.content1Target,this.content2Target,this.content3Target,this.content4Target,this.content5Target,this.content6Target];
@@ -172,7 +178,7 @@ export default class extends Controller {
             const result_emploif_targets = [this.resultEmploif1Target,this.resultEmploif2Target,this.resultEmploif3Target,this.resultEmploif4Target,this.resultEmploif5Target,this.resultEmploif6Target];
             const result_debut_targets = [this.resultDebutf1Target,this.resultDebutf2Target,this.resultDebutf3Target,this.resultDebutf4Target,this.resultDebutf5Target,this.resultDebutf6Target];
             const result_duree_targets = [this.resultDureef1Target,this.resultDureef2Target,this.resultDureef3Target,this.resultDureef4Target,this.resultDureef5Target,this.resultDureef6Target];
-            const trash_targets = [this.trash1Target,this.trash2Target,this.trash3Target,this.trash4Target,this.trash5Target,this.trash6Target];
+            //const trash_targets = [this.trash1Target,this.trash2Target,this.trash3Target,this.trash4Target,this.trash5Target,this.trash6Target];
     
             [5,4,3,2,1,0].forEach((indice)=>{
               if (content_targets[indice].classList.contains('visually-hidden') == false){
@@ -180,7 +186,7 @@ export default class extends Controller {
                 emploif_targets[indice].classList.add('visually-hidden');
                 debut_targets[indice].classList.add('visually-hidden');
                 duree_targets[indice].classList.add('visually-hidden');
-                trash_targets[indice].classList.add('visually-hidden');
+                //trash_targets[indice].classList.add('visually-hidden');
                 result_emploif_targets[indice].classList.remove('visually-hidden');
                 result_debut_targets[indice].classList.remove('visually-hidden');
                 result_duree_targets[indice].classList.remove('visually-hidden');
@@ -212,7 +218,7 @@ export default class extends Controller {
       
       const form_targets = [this.ageTarget,this.corpsTarget,this.gradeTarget,this.echelonTarget,this.dureeTarget,this.date1Target,this.date2Target,this.date3Target];
       const result_targets = [this.resultAgeTarget,this.resultCorpsTarget,this.resultGradeTarget,this.resultEchelonTarget,this.resultDureeTarget,this.resultdate1Target,this.resultdate2Target,this.resultdate3Target];
-      [0,1,2,3,4].forEach((indice)=>{
+      [0,1,2,3,4,5,6,7].forEach((indice)=>{
           form_targets[indice].classList.remove('visually-hidden');
           result_targets[indice].classList.add('visually-hidden');
       })

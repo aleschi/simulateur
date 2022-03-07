@@ -7,7 +7,7 @@ export default class extends Controller {
      'debutfEmploi1','debutfEmploi2','debutfEmploi3','debutfEmploi4','debutfEmploi5','debutfEmploi6',
      'dureefEmploi1','dureefEmploi2','dureefEmploi3','dureefEmploi4','dureefEmploi5','dureefEmploi6',
      'resultEchelonf','resultDureef','resultFinf','resultDebutf',
-     "error1",'errorCorps','finProjet'];
+     "error1",'errorCorps','finProjet','dureeTitle','dureeTitle2'];
 
   	connect() {    
         this.filters =  { corps: [], grades: [], echelons: [],grade2: [],grade3: [],
@@ -22,6 +22,7 @@ export default class extends Controller {
         this.grade2TitleTarget.classList.add("select_inactive")
         this.grade3TitleTarget.classList.add("select_inactive")
         this.grade4TitleTarget.classList.add("select_inactive")
+        this.dureeTitleTarget.classList.remove("select_inactive");
         
         const grades = [this.grade2Target,this.grade3Target,this.grade4Target];
         [0,1,2].forEach((indice)=>{
@@ -36,6 +37,7 @@ export default class extends Controller {
         this.filters.grades = getSelectedValues(event)
         this.filters.echelons = []
         this.errorCorpsTarget.classList.add('visually-hidden');
+        this.dureeTitleTarget.classList.remove("select_inactive");
         this.change2()
     }
 
@@ -180,11 +182,13 @@ export default class extends Controller {
         option3.innerHTML = "- Selectionner -";
         this.dureeIdTarget.appendChild(option3);
 
-        data.grades.forEach((grade) => {
+        const nom_grades = data.nom_grades;
+
+        data.grades.forEach((grade,index) => {
             const option = document.createElement("option");
             option.value = grade;
             //option.innerHTML = "Grade " + grade;
-            option.innerHTML = grade;
+            option.innerHTML = grade + ' - ' + nom_grades[index];
             this.gradeIdTarget.appendChild(option);
         })
     }
@@ -212,21 +216,21 @@ export default class extends Controller {
 
     updateDurees(data){
         this.dureeIdTarget.innerHTML = "";
-        const option = document.createElement("option");
+        if (data.durees.length != 0){
+            this.dureeTitleTarget.classList.remove("select_inactive");
+            const option = document.createElement("option");
             option.value = "";
             option.innerHTML = "- Selectionner -";
             this.dureeIdTarget.appendChild(option);
         data.durees.forEach((duree) => {
             const option = document.createElement("option");
             option.value = duree;
-            if (duree == 1){
-                option.innerHTML = duree + " an";
-            }else{
-              option.innerHTML = duree + " ans";  
-            }
-            
+            option.innerHTML = duree ;       
             this.dureeIdTarget.appendChild(option);
         })
+        }else{
+            this.dureeTitleTarget.classList.add("select_inactive");
+        }
     }
 
     updatePromotions(data){
@@ -274,7 +278,14 @@ export default class extends Controller {
             const option = document.createElement("option");
             option.value = "";
             option.innerHTML = "- Selectionner -";
+
             this.grade3Target.appendChild(option);
+            if (max_grade == 4){
+                const option2 = document.createElement("option");
+                option2.value = "";
+                option2.innerHTML = "- Selectionner -";
+                this.grade4Target.appendChild(option2);
+            }
             if (data.array_grade3 != null){
                 data.array_grade3.forEach((ar) => {
                 const option = document.createElement("option");
@@ -308,6 +319,7 @@ export default class extends Controller {
 
     emploifChange(event){
         this.errorCorpsTarget.classList.add('visually-hidden');
+        this.dureeTitle2Target.classList.remove("select_inactive");
         this.filters.emploif = getSelectedValues(event);
         this.filters.echelonf = [];
         
@@ -437,22 +449,22 @@ export default class extends Controller {
 
     updateDatesf(data){
         this.dureefEchelonTarget.innerHTML = "";
-        const option = document.createElement("option");
-        option.value = "";
-        option.innerHTML = "- Selectionner -";
-        this.dureefEchelonTarget.appendChild(option);
+        if (data.dureef.length != 0){
+            this.dureeTitle2Target.classList.remove("select_inactive");
+            const option = document.createElement("option");
+            option.value = "";
+            option.innerHTML = "- Selectionner -";
+            this.dureefEchelonTarget.appendChild(option);
 
         data.dureef.forEach((duree) => {
             const option = document.createElement("option");
-            option.value = duree;
-            if (duree == 1){
-                option.innerHTML = duree + " an";
-            }else{
-              option.innerHTML = duree + " ans";  
-            }
-            
+            option.value = duree;      
+            option.innerHTML = duree ;  
             this.dureefEchelonTarget.appendChild(option);
         })
+        }else{
+            this.dureeTitle2Target.classList.add("select_inactive");
+        }
     }
 
 
@@ -461,7 +473,8 @@ export default class extends Controller {
         this.errorCorpsTarget.classList.add('visually-hidden');
         var id = event.target.dataset.value;
         const emploi = getSelectedValues(event);
-        const dates_arr = Array.from({length:42},(v,k)=>k+2023);
+
+        const dates_arr = Array.from({length:50},(v,k)=>k+2023);
       
         const option = document.createElement("option");
         option.value = "";
@@ -522,25 +535,19 @@ export default class extends Controller {
     
     projetChange(event){
         const debut = getSelectedValues(event);
+        this.finProjetTarget.innerHTML = "";
+        const option = document.createElement("option");
+        option.value = "";
+        option.innerHTML = "- Selectionner -";
+        this.finProjetTarget.appendChild(option);
         if (debut != ''){
         const dates = Array.from({length:(2072-parseInt(debut))},(v,k)=>k+parseInt(debut)+1);
-        this.finProjetTarget.innerHTML = "";
-            const option = document.createElement("option");
-            option.value = "";
-            option.innerHTML = "- Selectionner -";
-            this.finProjetTarget.appendChild(option); 
         dates.forEach((date)=>{
             const option = document.createElement("option");
             option.value = date;
             option.innerHTML = date;
             this.finProjetTarget.appendChild(option);
         })
-        }else{
-            this.finProjetTarget.innerHTML = "";
-            const option = document.createElement("option");
-            option.value = "";
-            option.innerHTML = "- Selectionner -";
-            this.finProjetTarget.appendChild(option); 
         }
     } 
 

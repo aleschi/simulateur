@@ -215,6 +215,14 @@ text-align:right;
   display: -moz-inline-flex;
   width:100%;
 }
+.align_flex_center{
+  display: inline-flex;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flex;
+  display: -moz-inline-flex;
+  width:100%;
+  align-items:center;
+}
 .d32{
   height:32px;
 }
@@ -256,9 +264,16 @@ text-align:right;
 }
 .bouton_i{
   text-decoration:none;
-  color:#000091;
   position:absolute;
   right:0px;
+}
+.bouton_i2{
+  height:16px;
+  margin-left:4px;
+  img{
+  height:16px;
+  float:left;
+  }
 }
 .form {
   position:relative;
@@ -389,4 +404,7 @@ text-align:right;
 }
 .italic{
   font-style: italic;
+}
+.bold{
+  font-weight:bold ;
 }

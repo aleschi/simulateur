@@ -9,12 +9,63 @@ export default class extends Controller {
   		const data = JSON.parse(this.data.get("donnees"));
         const data2 = JSON.parse(this.data.get("donnees2"));
         const data3 = JSON.parse(this.data.get("donnees3"));
+
         const sub1 = data2.map((v, i) => v - data[i]);
         const sub2 = data3.map((v, i) => v - data2[i]);
         const sub3 = data3.map((v, i) => v - data[i]);
 
+
+       
         const debut =this.data.get("debutdispo");
         const fin = this.data.get("findispo");
+        var series;
+        if (data.length != 0 && data2.length != 0 && data3.length != 0 ){
+            series = [{
+                name: 'rémunération avant réforme',
+                data: data,
+                pointStart: 2022,
+                pointInterval: 1,
+                color: "#000091",
+                type: 'spline',  
+                
+              },{
+                name: 'rémunération après réforme avec maintien dans le corps en extinction ',
+                data: data2,
+                pointStart: 2022,
+                pointInterval: 1,
+                color: "#169B62",
+                type: 'spline',  
+               
+              },{
+                name: "rémunération après réforme avec droit d'option ",
+                data: data3,
+                pointStart: 2022,
+                pointInterval: 1,
+                color: "#E18876",
+                type: 'spline',  
+               
+                },];
+        } else if (data.length != 0 && data2.length == 0 && data3.length != 0){
+            series = [{
+                name: 'rémunération avant réforme',
+                data: data,
+                pointStart: 2022,
+                pointInterval: 1,
+                color: "#000091",
+                type: 'spline',  
+                
+              },{
+                name: "rémunération après réforme avec droit d'option ",
+                data: data3,
+                pointStart: 2022,
+                pointInterval: 1,
+                color: "#E18876",
+                type: 'spline',  
+               
+                },];
+        } else {
+            series = [];
+        }
   
   		const options = {
             chart: {
@@ -81,32 +132,50 @@ export default class extends Controller {
             	},
                 
             },
-            series: [{
-    		    name: 'rémunération avant réforme',
-    		    data: data,
-    		    pointStart: 2022,
-    		    pointInterval: 1,
-                color: "#000091",
-                type: 'spline',  
-    		    
-    		  },{
-    		    name: 'rémunération après réforme avec maintien dans le corps en extinction ',
-    		    data: data2,
-    		    pointStart: 2022,
-    		    pointInterval: 1,
-                color: "#169B62",
-                type: 'spline',  
-    		   
-    		  },{
-                name: "rémunération après réforme avec droit d'option ",
-                data: data3,
+            series: series,
+    	};
+
+        
+        var series2;
+        if (data.length != 0 && data2.length != 0 && data3.length != 0 ){
+            series2 = [{
+                name: 'Ecart Après Réforme - Avant Réforme  ',
+                data: sub1,
                 pointStart: 2022,
                 pointInterval: 1,
-                color: "#E18876",
-                type: 'spline',  
+                color: "#5770BE",
+                type: 'column',  
+                
+              },{
+                name: 'Ecart Après Réforme avec droit option - Avant Réforme',
+                data: sub3,
+                pointStart: 2022,
+                pointInterval: 1,
+                color: "#6D1247",
+                type: 'column',  
                
-                },],
-    	};
+              },{
+                name: "Ecart Après Réforme avec droit option - Après Réforme",
+                data: sub2,
+                pointStart: 2022,
+                pointInterval: 1,
+                color: "#00949C",
+                type: 'column',  
+               
+                },]
+        } else if (data.length != 0 && data2.length == 0 && data3.length != 0){
+            series2 = [{
+                name: 'Ecart Après Réforme avec droit option - Avant Réforme',
+                data: sub3,
+                pointStart: 2022,
+                pointInterval: 1,
+                color: "#6D1247",
+                type: 'column',  
+               
+              },]
+        }else {
+            series2 = [];
+        }
 
         const options2 = {
             chart: {
@@ -117,7 +186,7 @@ export default class extends Controller {
             },
             
             title: {
-                text: "Ecarts",
+                text: "Ecarts indiciaires",
                 style: {
                 fontSize: '15px',
                 fontWeight: "900",
@@ -148,7 +217,7 @@ export default class extends Controller {
                       fontStyle: 'italic',
                     },
                     },
-                    zIndex: 1,
+                    zIndex: 10,
                     from: debut,
                     to: fin,
                 }],
@@ -160,44 +229,16 @@ export default class extends Controller {
                 }
             },
             plotOptions: {
-                spline: {
-                    lineWidth: 4,
-                    states: {
-                        hover: {
-                            lineWidth: 5
-                        }
-                    },
+                column: {
+                    pointWidth: 4,
+                    
                     marker: {
                         enabled: false
                     },
                 },
                 
             },
-            series: [{
-                name: 'Ecart ApR-AvR ',
-                data: sub1,
-                pointStart: 2022,
-                pointInterval: 1,
-                color: "#5770BE",
-                type: 'column',  
-                
-              },{
-                name: 'Ecart ApRdO-AvR',
-                data: sub2,
-                pointStart: 2022,
-                pointInterval: 1,
-                color: "#6D1247",
-                type: 'column',  
-               
-              },{
-                name: "Ecart ApRdO-ApR",
-                data: sub3,
-                pointStart: 2022,
-                pointInterval: 1,
-                color: "#00949C",
-                type: 'column',  
-               
-                },],
+            series: series2,
         };
   		//let contex = this.canvasElementTarget.getContext("2d");
         

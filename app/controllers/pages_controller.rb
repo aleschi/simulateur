@@ -9,7 +9,7 @@ class PagesController < ApplicationController
   	end
   	if Emploi.all.count > 0 
   		@emplois_f = ["Aucun"] + Emploi.all.pluck(:nom).uniq
-  		@emplois_f2 = Emploi.all.pluck(:nom).uniq 
+  		@emplois_f2 = Emploi.all.pluck(:nom).uniq + ["Sous-préfets", "Préfets", "Fonctions diplomatiques", "Missions d'inspections générales","Emplois supérieurs de l'administration fiscale" ]
   	end
     @debut_dispo=0
     @fin_dispo=0
@@ -25,64 +25,76 @@ class PagesController < ApplicationController
   end
 
   def select_filter
-  	#corps 
+    #partie corps
+    if !params[:corps].nil? && !params[:corps][0].nil? && params[:corps][0] != ""
+  	
+    #corps 
   	@corps = params[:corps][0]
 
   	#liste grades
   	grades = Grille.where(corps: @corps).order('grade ASC').pluck(:grade).uniq
   	max_grade = grades.last
+    nom_grades = Grade.where(corps: @corps).order('numero ASC').pluck(:nom).uniq
+
+    if max_grade > 4
+      max_grade = 4
+    end 
 
   	array = (2023..2072).to_a
 
-	#grade selectionne
-  	if !params[:grades].nil? && !params[:grades][0].nil? && !params[:grades][0] != ""
-	  	grades = params[:grades][0].to_i	  	
-	
+  	  #grade selectionne
+    	if !params[:grades].nil? && !params[:grades][0].nil? && params[:grades][0] != ""
+  	  	grades = params[:grades][0].to_i	 
 
-		#liste echelons
-	  	echelons = Grille.where(corps: @corps, grade: grades).order('echelon ASC').pluck(:echelon).uniq
+  	
 
-	  	#si echelon selectionne
-	  	if !params[:echelons].nil? && !params[:echelons][0].nil? && !params[:echelons][0] != ""
-	  		echelons = params[:echelons][0]
-	  	end	  	
+  		  #liste echelons
+  	  	echelons = Grille.where(corps: @corps, grade: grades).order('echelon ASC').pluck(:echelon).uniq
 
-	  	if !params[:grade2].nil? && !params[:grade2][0].nil? && params[:grade2][0] != ""
-	  		@start = params[:grade2][0].to_i + 2022 + 1 #ne peut démarrer au min qu'un an apres promo du grade 2
-	  		array_grade3 = (@start..2072).to_a
-	  	elsif grades == 2
-	  		array_grade3 = array
-      else
-        array_grade3 = nil
-	  	end 
+  	  	#si echelon selectionne
+  	  	if !params[:echelons].nil? && !params[:echelons][0].nil? && params[:echelons][0] != ""
+  	  		echelons = params[:echelons][0]
+  	  	end	  	
 
-	  	if !params[:grade3].nil? && !params[:grade3][0].nil? && params[:grade3][0] != ""
-	  		@start = params[:grade3][0].to_i + 2022 + 1 #ne peut démarrer au min qu'un an apres promo du grade 2
-	  		array_grade4 = (@start..2072).to_a
-	  	elsif grades == 3
-	  		array_grade4 = array
-      else 
-        array_grade4 = nil
-	  	end
-  	end
+  	  	if !params[:grade2].nil? && !params[:grade2][0].nil? && params[:grade2][0] != ""
+  	  		@start = params[:grade2][0].to_i + 1 #ne peut démarrer au min qu'un an apres promo du grade 2
+  	  		array_grade3 = (@start..2072).to_a
+  	  	elsif grades == 2
+  	  		array_grade3 = array
+        else
+          array_grade3 = nil
+  	  	end 
 
-  	if !params[:emploif].nil? && !params[:emploif][0].nil? && !params[:emploif][0] != "Aucun" && !params[:emploif][0] != ""
+  	  	if !params[:grade3].nil? && !params[:grade3][0].nil? && params[:grade3][0] != ""
+  	  		@start = params[:grade3][0].to_i + 1 #ne peut démarrer au min qu'un an apres promo du grade 2
+  	  		array_grade4 = (@start..2072).to_a
+  	  	elsif grades == 3
+  	  		array_grade4 = array
+        else 
+          array_grade4 = nil
+  	  	end
+    	end
+    else 
+      nom_grades= nil
+    end
+
+  	if !params[:emploif].nil? && !params[:emploif][0].nil? && params[:emploif][0] != "Aucun" && params[:emploif][0] != ""
   		echelonsf = Emploi.where(nom: params[:emploif][0]).pluck(:echelon).uniq
   	else
   		echelonsf = nil
   	end
 
-  	if !params[:echelonf].nil? && !params[:echelonf][0].nil? && !params[:echelonf][0] != ""
-  		@max_duree = Emploi.where(nom: params[:emploif][0], echelon: params[:echelonf][0].to_i).order('duree ASC').last.duree.to_i
-  		dureef = (1..@max_duree).to_a
+  	if !params[:echelonf].nil? && !params[:echelonf][0].nil? && params[:echelonf][0] != ""
+  		dureef = Emploi.where(nom: params[:emploif][0], echelon: params[:echelonf][0].to_i).where.not(duree: nil).order('indice ASC').pluck(:duree).uniq
+
   	else
   		dureef = nil
   	end
 
 
-  	durees = Grille.where(corps: @corps, grade: grades, echelon: echelons).pluck(:duree).uniq
+  	durees = Grille.where(corps: @corps, grade: grades, echelon: echelons).where.not(duree: nil).order('indice ASC').pluck(:duree).uniq
 
-  	response = {grades: grades, max_grade: max_grade, echelons: echelons, durees: durees, array: array,array_grade3: array_grade3,array_grade4: array_grade4, 
+  	response = {grades: grades,nom_grades: nom_grades, max_grade: max_grade, echelons: echelons, durees: durees, array: array,array_grade3: array_grade3,array_grade4: array_grade4, 
   		echelonsf: echelonsf, dureef: dureef}
   	render json: response
   end

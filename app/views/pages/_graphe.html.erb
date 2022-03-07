@@ -1,9 +1,12 @@
 
 <% if @liste_indices.length == 0 %>
 <div class="texte_etiquette text-center">Les courbes s'afficheront lorsque vous aurez renseigné et validé les informations sur votre situation</div>
-<% end %>
+<% else %>
+<div class="d24"></div>
 <div data-controller="highcharts" data-highcharts-donnees="<%= @liste_indices %>" data-highcharts-donnees2="<%=@liste_indices2%>" data-highcharts-donnees3="<%=@liste_indices3%>" data-highcharts-debutdispo="<%=@debut_dispo%>" data-highcharts-findispo="<%=@fin_dispo%>">
+
 	<div data-highcharts-target="canvasElement"></div>
 	<div class="d24"></div>
 	<div data-highcharts-target="canvasElement2"></div>
 </div>
+<%end%>

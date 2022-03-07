@@ -3,7 +3,7 @@
   <div class="titre_page text-center">Ajouter un nouveau document</div>
   <div class="d24"></div>
    <div class="new_form_box">
-      <%= form_tag import_grilles_path, multipart: true do %>
+      <%= form_tag import_grades_path, multipart: true do %>
         <div class="document-file-input">
           <label><%= file_field_tag  :file, accept: '.xlsx' %>
             <!--<div class="document-type"><i class="far fa-file-pdf"></i> </div>-->
@@ -12,12 +12,12 @@
           </label>
           
         <div class="text-center">
-          <%= submit_tag "Transmettre", class:"bouton" %>  
+          <%= submit_tag "Transmettre", id: "submit_btn", class:"bouton" %>  
         </div>
                     
         </div>
         <% end %>
   </div>
   <div class="d24"></div>
-  <div><%= Grille.all.count%> données de corps</div>
+  <div><%= Grade.all.count%> données</div>
 </div>

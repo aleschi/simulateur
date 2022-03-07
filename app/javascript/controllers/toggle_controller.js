@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["error","error1","error2","bouton","content","content1","content2","content3","content4","content5","content6",
+  static targets = ["error","error1","error2","bouton","content",'titreEf',"content1","content2","content3","content4","content5","content6",
   "trash1","trash2","trash3","trash4","trash5","trash6",
   "emploif1","emploif2","emploif3","emploif4","emploif5","emploif6",
   "debutf1","debutf2","debutf3","debutf4","debutf5","debutf6",
@@ -11,7 +11,7 @@ export default class extends Controller {
   "resultDureef1","resultDureef2","resultDureef3","resultDureef4","resultDureef5","resultDureef6",
   "resultEmploif","resultEchelonf","resultDureef","resultFinf","resultDebutf",
   "emploif","emploifEchelon","dureefEchelon","finfEchelon",'debutfEmploi',
-  "boutonEdit","errorCorps",'contentdispo','boutonprojet'];
+  "boutonEdit","errorCorps",'contentdispo','boutonprojet','debutProjet','finProjet','boutonTrashProjet','resultdebutProjet','resultfinProjet','boutonDispo'];
 
   connect() { 
   }
@@ -39,6 +39,7 @@ export default class extends Controller {
 	  		if (emploif_targets[indice-2].selectedIndex != 0 && debut_targets[indice-2].selectedIndex != 0 && duree_targets[indice-2].selectedIndex != 0 ){
 	  			content_targets[indice-1].classList.remove('visually-hidden');
 	  			trash_targets[indice-2].classList.add('visually-hidden');
+          trash_targets[indice-1].classList.remove('visually-hidden');
 
 	  			emploif_targets[indice-2].classList.add('visually-hidden');
 	  			debut_targets[indice-2].classList.add('visually-hidden');
@@ -49,6 +50,13 @@ export default class extends Controller {
 	  			result_debut_targets[indice-2].innerHTML = debut_targets[indice-2].value;
 	  			result_duree_targets[indice-2].classList.remove('visually-hidden');
 	  			result_duree_targets[indice-2].innerHTML = duree_targets[indice-2].value + " ans";
+          
+          emploif_targets[indice-1].classList.remove('visually-hidden');
+          debut_targets[indice-1].classList.remove('visually-hidden');
+          duree_targets[indice-1].classList.remove('visually-hidden');
+          result_emploif_targets[indice-1].classList.add('visually-hidden');
+          result_debut_targets[indice-1].classList.add('visually-hidden');
+          result_duree_targets[indice-1].classList.add('visually-hidden');
 
 		        debut_targets[indice-1].innerHTML = ""
 		        const option = document.createElement("option");
@@ -80,6 +88,7 @@ export default class extends Controller {
           this.error2Target.innerHTML = "Veuillez sélectionner tous les champs ci-dessus";
         }else{
         // on ne peut plus modifier emploi f actuel 
+        this.titreEfTarget.classList.remove('visually-hidden');
         [0,1,2,3,4].forEach((indice) => {
           result_emploi_f[indice].classList.remove('visually-hidden');
           if (emploi_f[indice].value == undefined || emploi_f[indice].value == "" ){
@@ -89,6 +98,7 @@ export default class extends Controller {
           }
           emploi_f[indice].classList.add('visually-hidden');
         });
+        trash_targets[0].classList.remove('visually-hidden');
         this.error1Target.classList.add('visually-hidden');
         this.error2Target.classList.add('visually-hidden');
     		this.content1Target.classList.remove('visually-hidden');
@@ -112,9 +122,16 @@ export default class extends Controller {
     this.errorTarget.classList.add('visually-hidden');
   	if (this.content2Target.classList.contains('visually-hidden') && (this.content1Target.classList.contains('visually-hidden')==false)){
   		  this.content1Target.classList.add('visually-hidden');
+        this.titreEfTarget.classList.add('visually-hidden');
   		  this.emploif1Target.selectedIndex = 0;
         this.debutf1Target.selectedIndex = 0;
         this.dureef1Target.selectedIndex = 0;
+        this.emploif1Target.classList.remove('visually-hidden');
+        this.debutf1Target.classList.remove('visually-hidden');
+        this.dureef1Target.classList.remove('visually-hidden');
+        this.resultEmploif1Target.classList.add('visually-hidden');
+        this.resultDebutf1Target.classList.add('visually-hidden');
+        this.resultDureef1Target.classList.add('visually-hidden');
   	}
   	[2,3,4,5].forEach((indice) => {
   		if (content_targets[indice].classList.contains('visually-hidden') && (content_targets[indice-1].classList.contains('visually-hidden')==false)){
@@ -172,6 +189,7 @@ export default class extends Controller {
     this.boutonEditTarget.classList.add('visually-hidden');
     this.errorTarget.classList.add('visually-hidden');
     this.errorCorpsTarget.classList.add('visually-hidden');
+    this.titreEfTarget.classList.add('visually-hidden');
     // on remet champ emploi 
     emploi_f[0].classList.remove('visually-hidden');
     result_emploi_f[0].classList.add('visually-hidden');
@@ -203,6 +221,60 @@ export default class extends Controller {
     e.preventDefault();
     this.boutonprojetTarget.classList.add('visually-hidden');
     this.contentdispoTarget.classList.remove('visually-hidden');
+    this.boutonTrashProjetTarget.classList.remove('visually-hidden');
+    this.finProjetTarget.innerHTML = "";
+    const option = document.createElement("option");
+    option.value = "";
+    option.innerHTML = "- Selectionner -";
+    this.finProjetTarget.appendChild(option);
+  }
+  toggleprojet2(e){
+    e.preventDefault();
+    this.boutonprojetTarget.classList.remove('visually-hidden');
+    this.contentdispoTarget.classList.add('visually-hidden');
+    this.boutonTrashProjetTarget.classList.add('visually-hidden');
+    this.debutProjetTarget.selectedIndex =0;
+    this.finProjetTarget.selectedIndex =0;
+    this.debutProjetTarget.classList.remove('visually-hidden');
+    this.finProjetTarget.classList.remove('visually-hidden');
+    this.resultdebutProjetTarget.classList.add('visually-hidden');
+    this.resultfinProjetTarget.classList.add('visually-hidden');
+    this.boutonDispoTarget.classList.add('visually-hidden');
+
+  }
+
+  toggletrash(e){
+    const content_targets = [this.content1Target,this.content2Target,this.content3Target,this.content4Target,this.content5Target,this.content6Target];
+    const trash_targets = [this.trash1Target,this.trash2Target,this.trash3Target,this.trash4Target,this.trash5Target,this.trash6Target];
+    const emploif_targets = [this.emploif1Target,this.emploif2Target,this.emploif3Target,this.emploif4Target,this.emploif5Target,this.emploif6Target];
+    const debut_targets = [this.debutf1Target,this.debutf2Target,this.debutf3Target,this.debutf4Target,this.debutf5Target,this.debutf6Target];
+    const duree_targets = [this.dureef1Target,this.dureef2Target,this.dureef3Target,this.dureef4Target,this.dureef5Target,this.dureef6Target];
+    const result_emploif_targets = [this.resultEmploif1Target,this.resultEmploif2Target,this.resultEmploif3Target,this.resultEmploif4Target,this.resultEmploif5Target,this.resultEmploif6Target];
+    const result_debut_targets = [this.resultDebutf1Target,this.resultDebutf2Target,this.resultDebutf3Target,this.resultDebutf4Target,this.resultDebutf5Target,this.resultDebutf6Target];
+    const result_duree_targets = [this.resultDureef1Target,this.resultDureef2Target,this.resultDureef3Target,this.resultDureef4Target,this.resultDureef5Target,this.resultDureef6Target];
+
+    const result_emploi_f = [this.resultEmploifTarget, this.resultEchelonfTarget,this.resultDureefTarget,this.resultFinfTarget,this.resultDebutfTarget]
+    const emploi_f = [this.emploifTarget,this.emploifEchelonTarget, this.dureefEchelonTarget, this.finfEchelonTarget, this.debutfEmploiTarget];
+
+    this.errorTarget.classList.add('visually-hidden');
+    this.errorCorpsTarget.classList.add('visually-hidden');
+    this.titreEfTarget.classList.add('visually-hidden');
+
+    [0,1,2,3,4,5].forEach((indice) => {
+        content_targets[indice].classList.add('visually-hidden');
+
+        emploif_targets[indice].classList.remove('visually-hidden');
+        debut_targets[indice].classList.remove('visually-hidden');
+        duree_targets[indice].classList.remove('visually-hidden');
+        result_emploif_targets[indice].classList.add('visually-hidden');
+        result_debut_targets[indice].classList.add('visually-hidden');
+        result_duree_targets[indice].classList.add('visually-hidden');
+
+        emploif_targets[indice].selectedIndex = 0;
+        duree_targets[indice].selectedIndex = 0;
+        debut_targets[indice].selectedIndex = 0;
+    })
+    e.preventDefault();
   }
 
 }

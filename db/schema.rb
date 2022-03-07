@@ -10,15 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_28_082813) do
+ActiveRecord::Schema.define(version: 2022_03_07_153843) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "emplois", force: :cascade do |t|
-    t.float "duree"
+    t.string "duree"
     t.integer "echelon"
     t.integer "indice"
+    t.string "nom"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "grades", force: :cascade do |t|
+    t.string "corps"
+    t.integer "numero"
     t.string "nom"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -29,10 +37,11 @@ ActiveRecord::Schema.define(version: 2022_02_28_082813) do
     t.string "corps"
     t.integer "grade"
     t.integer "echelon"
-    t.float "duree"
+    t.string "duree"
     t.integer "indice"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "annee"
   end
 
   create_table "reclassements", force: :cascade do |t|
