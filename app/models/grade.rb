@@ -4,7 +4,8 @@ class Grade < ApplicationRecord
   	require 'axlsx'
 
   	def self.import(file)
-
+  		Grade.all.destroy_all
+  		
 	  	data = Roo::Spreadsheet.open(file.path)
 	    headers = data.row(1) # get header row
 

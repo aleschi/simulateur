@@ -5,7 +5,7 @@ class EmploisController < ApplicationController
 	  	Emploi.import(params[:file])
 
 	  	respond_to do |format|
-		  	format.turbo_stream {redirect_to root_path} 
+		  	format.turbo_stream {redirect_to emplois_path} 
 		end
 	end
 end

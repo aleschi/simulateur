@@ -33,8 +33,8 @@
 			<div class="texte_etiquette bold" data-validation-target='resultEchelon'></div>
 		</div>
 		<div class="w50 pl">
-			<div class="texte_etiquette" data-filter-target='dureeTitle'>Durée passée à cet échelon*</div>
-			<div class="form"><%= f.select :duree, [],{prompt: "- Selectionner -"},{data: {'filter-target': 'dureeId', action: 'change->validation#validateForm','validation-target': 'duree'},required: true}%></div>
+			<div class="texte_etiquette" data-filter-target='dureeTitle' data-validation-target='dureeTitle'>Durée passée à cet échelon*</div>
+			<div class="form"><%= f.select :duree, [],{prompt: "- Selectionner -"},{data: {'filter-target': 'dureeId', action: 'change->validation#validateForm','validation-target': 'duree'}}%></div>
 			<div class="texte_etiquette bold" data-validation-target='resultDuree'></div>
 		</div>
 	</div>

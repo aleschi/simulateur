@@ -4,6 +4,7 @@ class Emploi < ApplicationRecord
   	require 'axlsx'
 
   	def self.import(file)
+  		Emploi.where(annee: nil).destroy_all
 
 	  	data = Roo::Spreadsheet.open(file.path)
 	    headers = data.row(1) # get header row
@@ -19,6 +20,7 @@ class Emploi < ApplicationRecord
 	        if !row_data["Emploi"].nil? && !row_data["Emploi"].blank? #on verifie que la colonne existe 
 
 	            @emploi = Emploi.new 
+	            @emploi.annee = row_data["Annee"].to_i
 	            @emploi.nom = row_data["Emploi"]
 	            @emploi.duree = row_data["Duree"]
 	            if row_data["Duree"] == " " 

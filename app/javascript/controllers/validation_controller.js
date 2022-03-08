@@ -13,7 +13,7 @@ export default class extends Controller {
   "resultDureef1","resultDureef2","resultDureef3","resultDureef4","resultDureef5","resultDureef6",
   "trash1","trash2","trash3","trash4","trash5","trash6",
   'debutProjet','finProjet', 'resultdebutProjet', 'resultfinProjet', 'boutonDispo','contentdispo','boutonprojet',
-  'age','corps','grade','echelon','duree',
+  'age','corps','grade','echelon','duree','dureeTitle',
   'resultAge','resultCorps','resultGrade','resultEchelon','resultDuree','boutonSituation',
   "content1","content2","content3","content4","content5","content6",'error2'];
 
@@ -45,6 +45,10 @@ export default class extends Controller {
           if (this.emploifEchelonTarget.value == "" || this.dureefEchelonTarget.value == "" ||  this.finfEchelonTarget.value == "" || this.debutfEmploiTarget.value == ""){
             isValid = false;
           }
+        }
+
+        if (this.dureeTitleTarget.classList.contains('select_inactive') == false && this.dureeTarget.value == ""){
+          isValid = false;
         }
 
         const emploif_targets = [this.emploif1Target,this.emploif2Target,this.emploif3Target,this.emploif4Target,this.emploif5Target,this.emploif6Target];
@@ -121,7 +125,7 @@ export default class extends Controller {
             //promo interdite pdt dispo
             [0,1,2].forEach((indice)=>{            
               if (promo_targets[indice].value != ""){
-                if ((parseInt(this.debutProjetTarget.value) <= parseInt(promo_targets[indice].value)+2022) &&  (parseInt(promo_targets[indice].value)+2022<= parseInt(this.finProjetTarget.value))){
+                if ((parseInt(this.debutProjetTarget.value) <= parseInt(promo_targets[indice].value)) &&  (parseInt(promo_targets[indice].value)<= parseInt(this.finProjetTarget.value))){
                   projet_invalid = false;      
                 }
               }

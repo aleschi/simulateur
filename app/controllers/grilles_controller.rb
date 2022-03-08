@@ -5,11 +5,12 @@ class GrillesController < ApplicationController
   end
   
   def search_grilles
-    @fonctions = ["Sous-préfets", "Préfets", "Fonctions diplomatiques", "Missions d'inspections générales","Emplois supérieurs de l'administration fiscale" ]
+    @fonctions = ["Sous-préfet", "Préfet", "Fonctions diplomatiques", "Missions d'inspections générales","Emplois supérieurs de l'administration fiscale" ]
 
   	@age = params[:age].to_i
   	@duree_carriere = 67 - @age
     @corps = params[:corps]
+
     @debut_dispo=0
     @fin_dispo=0
     if params[:debut_projet] != '' && params[:fin_projet] != ''
@@ -20,11 +21,12 @@ class GrillesController < ApplicationController
     #1/Courbe carriere principale (corps)
 
   	#liste indice corps de l'agent 
-  	@liste_grilles = Grille.where(corps: params[:corps], grade: params[:grade]).where("echelon > ? OR (echelon = ? AND duree > ?)",params[:echelon],params[:echelon],params[:duree]).order('indice ASC')
   	@annee_i = Grille.where(corps: params[:corps], grade: params[:grade], echelon: params[:echelon], duree: params[:duree]).first.annee 
+    @liste_grilles = Grille.where(corps: params[:corps], grade: params[:grade]).where("annee >= ?",@annee_i).order('annee ASC')
     @echelon_i = Grille.where(corps: params[:corps], grade: params[:grade], echelon: params[:echelon], duree: params[:duree]).first.echelon
     @liste_indices=[Grille.where(corps: params[:corps], grade: params[:grade], echelon: params[:echelon], duree: params[:duree]).first.indice]
     
+    #saut de lignes dans grilles pour 1/2 echelon
     @liste_grilles.each do |grille|
       #on prend année + 1 et on voit si il y a 2 lignes alors on prend echelon + 1
       if grille.annee == @annee_i + 1
@@ -39,6 +41,7 @@ class GrillesController < ApplicationController
         @annee_i = @annee_i + 1
       end     
     end
+
     if @liste_indices.length < @duree_carriere #on complete jusqua la retraite avec le dernier indice
       @liste_indices = @liste_indices[0..@duree_carriere-1] + Array.new(@duree_carriere-@liste_indices.length, @liste_indices.last)
     else #on prend uniquement les indices jusqua la retraite
@@ -67,7 +70,25 @@ class GrillesController < ApplicationController
       
       #avant reforme grille ef
       @indice_emploi = Emploi.where(nom: params[:type_emploi], echelon: params[:echelon_emploif].to_i, duree: @duree).first.indice
-      @liste_indices_emploi_new = Emploi.where(nom: params[:type_emploi]).where("indice >= ?",@indice_emploi).order('indice ASC').pluck(:indice)
+      @annee_e = Emploi.where(nom: params[:type_emploi], echelon: params[:echelon_emploif].to_i, duree: @duree).first.annee
+      @liste_e = Emploi.where(nom: params[:type_emploi]).where("annee >= ?",@annee_e).order('annee ASC')
+      @echelon_e = Emploi.where(nom: params[:type_emploi], echelon: params[:echelon_emploif].to_i, duree: @duree).first.echelon
+      @liste_indices_emploi_new = [@indice_emploi]
+      #saut de ligne si 2 echelons possible meme annee ex DP-EHN
+      @liste_e.each do |emploi|
+        #on prend année + 1 et on voit si il y a 2 lignes alors on prend echelon + 1
+        if emploi.annee == @annee_e + 1
+          if @liste_e.where('annee = ?',emploi.annee).count > 1
+            @indice = Emploi.where(nom: params[:type_emploi]).where('annee = ? AND echelon = ?',emploi.annee, @echelon_e+1).first.indice
+            @echelon_i = @echelon_e+1
+            @liste_indices_emploi_new << @indice
+          else 
+            @liste_indices_emploi_new << emploi.indice
+            @echelon_e = emploi.echelon
+          end
+          @annee_e = @annee_e + 1
+        end     
+      end
       #on initialise avec les donnees ef jusqua a la fin emploi f puis 0 partout
       if @liste_indices_emploi_new.length < @duree_emploi #on complete pour avoir array de taille duree emploi
         @liste_indices_emploi = @liste_indices_emploi_new[0..@duree_emploi-1] + Array.new(@duree_emploi-liste_indices_emploi_new.length, @liste_indices_emploi_new.last) + @liste_indices_emploi[@duree_emploi..@liste_indices.length-1] 

@@ -9,7 +9,7 @@ class PagesController < ApplicationController
   	end
   	if Emploi.all.count > 0 
   		@emplois_f = ["Aucun"] + Emploi.all.pluck(:nom).uniq
-  		@emplois_f2 = Emploi.all.pluck(:nom).uniq + ["Sous-préfets", "Préfets", "Fonctions diplomatiques", "Missions d'inspections générales","Emplois supérieurs de l'administration fiscale" ]
+  		@emplois_f2 = Emploi.all.pluck(:nom).uniq + ["Sous-préfet", "Préfet", "Fonctions diplomatiques", "Missions d'inspections générales","Emplois supérieurs de l'administration fiscale" ]
   	end
     @debut_dispo=0
     @fin_dispo=0
