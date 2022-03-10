@@ -10,6 +10,8 @@ export default class extends Controller {
         const data2 = JSON.parse(this.data.get("donnees2"));
         const data3 = JSON.parse(this.data.get("donnees3"));
 
+        const grades = JSON.parse(this.data.get("grades"));
+
         const sub1 = data2.map((v, i) => v - data[i]);
         const sub2 = data3.map((v, i) => v - data2[i]);
         const sub3 = data3.map((v, i) => v - data[i]);
@@ -88,6 +90,14 @@ export default class extends Controller {
                 borderColor: 'transparent',
                 borderRadius: 16,
                 backgroundColor: '#fff', 
+                //headerFormat: '{point.key} - Grade : <br>',
+                formatter: function () {
+                    var indice = this.x - 2022;
+                    var grade = grades[indice];
+                    return this.points.reduce(function (s, point) {
+                        return s + '<br/>' + point.series.name + ': ' + point.y + '*56.2323€';
+                    }, '<b>' + this.x + ' - Grade : '+grade+'</b>');
+                },
             },
             xAxis:{
             	tickInterval: 1,
