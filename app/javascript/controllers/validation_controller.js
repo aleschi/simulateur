@@ -13,7 +13,7 @@ export default class extends Controller {
   "resultDureef1","resultDureef2","resultDureef3","resultDureef4","resultDureef5","resultDureef6",
   "trash1","trash2","trash3","trash4","trash5","trash6",
   'debutProjet','finProjet', 'resultdebutProjet', 'resultfinProjet', 'boutonDispo','contentdispo','boutonprojet',
-  'age','corps','grade','echelon','duree','dureeTitle',
+  'age','corps','grade','echelon','duree','dureeTitle','dureeTitle2',
   'resultAge','resultCorps','resultGrade','resultEchelon','resultDuree','boutonSituation',
   "content1","content2","content3","content4","content5","content6",'error2'];
 
@@ -42,14 +42,17 @@ export default class extends Controller {
 
         if (this.emploifTarget.value != "Aucun" && this.emploifTarget.value != ""){
       
-          if (this.emploifEchelonTarget.value == "" || this.dureefEchelonTarget.value == "" ||  this.finfEchelonTarget.value == "" || this.debutfEmploiTarget.value == ""){
+          if (this.emploifEchelonTarget.value == "" || this.finfEchelonTarget.value == "" || this.debutfEmploiTarget.value == ""){
             isValid = false;
           }
+          if (this.dureeTitle2Target.classList.contains('select_inactive') == false && this.dureefEchelonTarget.value == ""){
+            isValid = false;  
+          }
         }
-
         if (this.dureeTitleTarget.classList.contains('select_inactive') == false && this.dureeTarget.value == ""){
           isValid = false;
         }
+        
 
         const emploif_targets = [this.emploif1Target,this.emploif2Target,this.emploif3Target,this.emploif4Target,this.emploif5Target,this.emploif6Target];
         const debut_targets = [this.debutf1Target,this.debutf2Target,this.debutf3Target,this.debutf4Target,this.debutf5Target,this.debutf6Target];
@@ -97,6 +100,7 @@ export default class extends Controller {
           const dates = [parseInt(this.date1Target.value), parseInt(this.date2Target.value), parseInt(this.date3Target.value), parseInt(this.debutf1Target.value),parseInt(this.debutf2Target.value),parseInt(this.debutf3Target.value),parseInt(this.debutf4Target.value),parseInt(this.debutf5Target.value),parseInt(this.debutf6Target.value), parseInt(this.debutProjetTarget.value), parseInt(this.finProjetTarget.value)];
           let date_invalid = true;
           let projet_invalid = true;
+          let emploi_invalid = true;
 
           dates.forEach((date) => {
             if (date >= 2022+67-age){
@@ -117,7 +121,7 @@ export default class extends Controller {
                 }
               }
             });
-            if (this.finfEchelonTarget != ""){
+            if (this.finfEchelonTarget.value != ""){
               if (parseInt(this.debutProjetTarget.value) <= parseInt(this.finfEchelonTarget.value)){
                 projet_invalid = false;
               }
@@ -131,6 +135,11 @@ export default class extends Controller {
               }
             })
           }
+          if (this.finfEchelonTarget.value != ""){
+            if (67-age <= this.finfEchelonTarget.value-2022){
+              emploi_invalid = false
+            }
+          }
 
 
           if (date_invalid == false){
@@ -141,6 +150,11 @@ export default class extends Controller {
             event.preventDefault();
             this.errorCorpsTarget.classList.remove('visually-hidden');
             this.errorCorpsTarget.innerHTML = "Les dates d'un projet de disponibilité ne peuvent pas correspondre à des dates d'occupation d'un emploi fonctionnel ni de promotions de grade";
+          }else if (emploi_invalid == false){
+            event.preventDefault();
+            this.errorCorpsTarget.classList.remove('visually-hidden');
+            this.errorCorpsTarget.innerHTML = "La date de fin d'un emploi fonctionnel doit être inférieure à la durée de votre carrière";
+          
           }else {
             this.errorCorpsTarget.classList.add('visually-hidden');
             // on eleve tous les forms

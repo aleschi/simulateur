@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  root 'pages#index'
+  root 'pages#accueil'
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -12,6 +12,8 @@ Rails.application.routes.draw do
      
     end
   end
+
+  get '/supp' => 'grilles#supp'
 
   resources :emplois do 
     collection do 
@@ -36,12 +38,12 @@ Rails.application.routes.draw do
   
   post 'search_grilles', to: 'grilles#search_grilles'
 
-  
+  get '/hg2et5zbk05ea', to: 'pages#index'
 
   get '/mentions-legales', to: 'pages#mentions_legales'
   get '/donnees-personnelles', to: 'pages#donnees_personnelles'
   get '/accessibilite', to: 'pages#accessibilite'
   post 'select_filter' => 'pages#select_filter'
 
-  get '/*path', to: 'pages#index'
+  get '/*path', to: 'pages#accueil'
 end

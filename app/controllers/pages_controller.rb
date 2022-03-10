@@ -1,15 +1,18 @@
 class PagesController < ApplicationController
 	protect_from_forgery with: :null_session
+  def accueil
+  end
+
   def index
   	@liste_indices = []
   	@liste_indices2 = []
     @liste_indices3 = []
   	if Grille.all.count > 0
-  		@corps = Grille.where('corps != ?','AE').pluck(:corps).uniq
+  		@corps = Grille.where('corps != ?','AE').order('corps ASC').pluck(:corps).uniq
   	end
   	if Emploi.all.count > 0 
-  		@emplois_f = ["Aucun"] + Emploi.all.pluck(:nom).uniq
-  		@emplois_f2 = Emploi.all.pluck(:nom).uniq + ["Sous-préfet", "Préfet", "Fonctions diplomatiques", "Missions d'inspections générales","Emplois supérieurs de l'administration fiscale" ]
+  		@emplois_f = ["Aucun"] + Emploi.all.order('created_at DESC').pluck(:nom).uniq
+  		@emplois_f2 = Emploi.all.order('created_at DESC').pluck(:nom).uniq + ["Sous-préfet / sous-préfète", "Préfet / Préfète", "Fonctions diplomatiques", "Missions d'inspections générales","Emplois supérieurs de l'administration fiscale" ]
   	end
     @debut_dispo=0
     @fin_dispo=0
@@ -79,7 +82,7 @@ class PagesController < ApplicationController
     end
 
   	if !params[:emploif].nil? && !params[:emploif][0].nil? && params[:emploif][0] != "Aucun" && params[:emploif][0] != ""
-  		echelonsf = Emploi.where(nom: params[:emploif][0]).pluck(:echelon).uniq
+  		echelonsf = Emploi.where(nom: params[:emploif][0]).order('echelon ASC').pluck(:echelon).uniq
   	else
   		echelonsf = nil
   	end

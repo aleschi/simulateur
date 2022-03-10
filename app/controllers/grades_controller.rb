@@ -2,7 +2,7 @@ class GradesController < ApplicationController
 	def index
 	end 
 	def import
-	
+		
 	  	Grade.import(params[:file])
 
 	  	respond_to do |format|

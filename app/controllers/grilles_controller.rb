@@ -5,7 +5,7 @@ class GrillesController < ApplicationController
   end
   
   def search_grilles
-    @fonctions = ["Sous-préfet", "Préfet", "Fonctions diplomatiques", "Missions d'inspections générales","Emplois supérieurs de l'administration fiscale" ]
+    @fonctions = ["Sous-préfet / sous-préfète", "Préfet / Préfète", "Fonctions diplomatiques", "Missions d'inspections générales","Emplois supérieurs de l'administration fiscale" ]
 
   	@age = params[:age].to_i
   	@duree_carriere = 67 - @age
@@ -125,15 +125,17 @@ class GrillesController < ApplicationController
       #on va chercher indice le plus proche au meme indice quil avait dans son emploi fonctionnel dans table de reclassement puis on prend echelon correspondant et on fait derouler table jusqua a la fin
       @nouvel_echelon = Reclassement.where('indice >= ?',@indice_emploi).order('indice ASC').first
       @liste_indices_emploi3 = Grille.where(corps: "AE", grade: @grade_max).where('echelon >= ?',@nouvel_echelon).order('indice ASC').pluck(:indice)    
+      
       if @liste_indices_emploi3.last.nil? #indice emploi f trop eleve pour grade table AE
         @liste_indices_emploi3 = Array.new(@liste_indices.length, @indice_emploi)
         @liste_indices_moyenne_ae3 = Array.new(@duree_emploi, @indice_emploi)
       else
-        if @liste_indices_emploi3.length >= @duree_carriere
-          @liste_indices_emploi3 = @liste_indices_emploi3[0..@duree_carriere-1]
-        else 
-          @liste_indices_emploi3 = @liste_indices_emploi3[0..@duree_carriere-1] + Array.new(@duree_carriere-@liste_indices_emploi3.length, @liste_indices_emploi3.last)
-        end
+          if @liste_indices_emploi3.length >= @duree_carriere
+            @liste_indices_emploi3 = @liste_indices_emploi3[0..@duree_carriere-1]
+          else 
+            @liste_indices_emploi3 = @liste_indices_emploi3[0..@duree_carriere-1] + Array.new(@duree_carriere-@liste_indices_emploi3.length+1, @liste_indices_emploi3.last)
+          end
+        
         #on met a jour les indices sur la duree de lemploi car progresse plus vite
         @liste_indices_moyenne_ae3 = Array.new(@duree_emploi, 0)
         @liste_indices_emploi3[0..@duree_emploi-1].each_with_index do |indice,i|
@@ -141,7 +143,8 @@ class GrillesController < ApplicationController
           @liste_indices_moyenne_ae3[i] = (((10-2*i)*@liste_indices_emploi3[i]).to_f/12 + (2*(i+1)*@liste_indices_emploi3[i+1]).to_f/12).round()
         end
       end
-      @liste_indices_emploi3 = @liste_indices_moyenne_ae3 + @liste_indices_emploi3[@duree_emploi..@liste_indices.length-1] 
+      
+        @liste_indices_emploi3 = @liste_indices_moyenne_ae3 + @liste_indices_emploi3[@duree_emploi..@liste_indices.length-1] 
 
 
       #reduction anciennete si plus de 5 ans 
@@ -398,13 +401,15 @@ class GrillesController < ApplicationController
     end 
   end 
 
-  
+  def supp
+    Grille.destroy_all
+    redirect_to root_path
+  end
 
   def import
-    #Grille.where('corps = ? AND grade = ?','Administrateurs des finances publiques',5).destroy_all
-  	Grille.import(params[:file])
+    Grille.import(params[:file])
   	respond_to do |format|
-	  	format.turbo_stream {redirect_to root_path} 
+	  	format.turbo_stream {redirect_to grilles_path} 
 	end
   end 
 end

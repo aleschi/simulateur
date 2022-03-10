@@ -5,8 +5,8 @@ class Emploi < ApplicationRecord
 
   	def self.import(file)
   		Emploi.where(annee: nil).destroy_all
-
-	  	data = Roo::Spreadsheet.open(file.path)
+  		
+  		data = Roo::Spreadsheet.open(file.path)
 	    headers = data.row(1) # get header row
 
 	    row2 = data.row(2)
