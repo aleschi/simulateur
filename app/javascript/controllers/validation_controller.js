@@ -2,7 +2,8 @@ import { Controller } from "@hotwired/stimulus"
 
 
 export default class extends Controller {
-    static targets = [ 'form','submitBouton', 'emploif','emploifEchelon','dureefEchelon','finfEchelon','debutfEmploi',
+    static get targets() {
+  return [ 'form','submitBouton', 'emploif','emploifEchelon','dureefEchelon','finfEchelon','debutfEmploi',
     "resultEmploif","resultEchelonf","resultDureef","resultFinf","resultDebutf","boutonEdit",
     'errorCorps','age','date1','date2','date3','resultdate1','resultdate2','resultdate3',
     "emploif1","emploif2","emploif3","emploif4","emploif5","emploif6",
@@ -16,9 +17,11 @@ export default class extends Controller {
   'age','corps','grade','echelon','duree','dureeTitle','dureeTitle2',
   'resultAge','resultCorps','resultGrade','resultEchelon','resultDuree','boutonSituation',
   "content1","content2","content3","content4","content5","content6",'error2'];
+}
 
   	connect() {
   	 this.validateForm();
+     
   	}
 
     validateForm() {
@@ -103,7 +106,7 @@ export default class extends Controller {
           let emploi_invalid = true;
 
           dates.forEach((date) => {
-            if (date >= 2022+67-age){
+            if (date >= 2023+67-age){
               date_invalid = false;
             }
           })
@@ -136,8 +139,8 @@ export default class extends Controller {
             })
           }
           if (this.finfEchelonTarget.value != ""){
-            if (67-age <= this.finfEchelonTarget.value-2022){
-              emploi_invalid = false
+            if (67-age <= this.finfEchelonTarget.value-2023){
+              emploi_invalid = false;
             }
           }
 

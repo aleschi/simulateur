@@ -1,8 +1,18 @@
 import { Controller } from "@hotwired/stimulus"
 import Highcharts from "highcharts"
+import exporting from "exporting"
+import data from "data"
+import accessibility from "accessibility"
+import nodata from "nodata"
+exporting(Highcharts)
+data(Highcharts)
+accessibility(Highcharts)
+nodata(Highcharts)
 
 export default class extends Controller {
-	static targets = [ "canvasElement","canvasElement2" ];
+	static get targets() {
+  return [ "canvasElement","canvasElement2" ];
+}
 
   	connect() {
         
@@ -11,6 +21,7 @@ export default class extends Controller {
         const data3 = JSON.parse(this.data.get("donnees3"));
 
         const grades = JSON.parse(this.data.get("grades"));
+        const efs = JSON.parse(this.data.get("efs"));
 
         const sub1 = data2.map((v, i) => v - data[i]);
         const sub2 = data3.map((v, i) => v - data2[i]);
@@ -23,35 +34,37 @@ export default class extends Controller {
         var series;
         if (data.length != 0 && data2.length != 0 && data3.length != 0 ){
             series = [{
-                name: 'rémunération avant réforme',
-                data: data,
-                pointStart: 2022,
-                pointInterval: 1,
-                color: "#000091",
-                type: 'spline',  
-                
-              },{
                 name: 'rémunération après réforme avec maintien dans le corps en extinction ',
                 data: data2,
-                pointStart: 2022,
+                pointStart: 2023,
                 pointInterval: 1,
                 color: "#169B62",
                 type: 'spline',  
+                lineWidth: 4,
                
+              },{
+                name: 'rémunération avant réforme',
+                data: data,
+                pointStart: 2023,
+                pointInterval: 1,
+                color: "#000091",
+                type: 'spline',  
+                lineWidth: 5,
+                dashStyle: 'ShortDot',
               },{
                 name: "rémunération après réforme avec droit d'option ",
                 data: data3,
-                pointStart: 2022,
+                pointStart: 2023,
                 pointInterval: 1,
                 color: "#E18876",
                 type: 'spline',  
-               
+                lineWidth: 4,
                 },];
         } else if (data.length != 0 && data2.length == 0 && data3.length != 0){
             series = [{
                 name: 'rémunération avant réforme',
                 data: data,
-                pointStart: 2022,
+                pointStart: 2023,
                 pointInterval: 1,
                 color: "#000091",
                 type: 'spline',  
@@ -59,7 +72,7 @@ export default class extends Controller {
               },{
                 name: "rémunération après réforme avec droit d'option ",
                 data: data3,
-                pointStart: 2022,
+                pointStart: 2023,
                 pointInterval: 1,
                 color: "#E18876",
                 type: 'spline',  
@@ -71,12 +84,25 @@ export default class extends Controller {
   
   		const options = {
             chart: {
+                spacing: 0,
+
                 style:{
                     fontFamily: "Marianne",
                 },  
                   
             },
-            
+            lang: {
+                downloadCSV:"Télécharger en format CSV",
+                downloadJPEG:"Télécharger l'image en JPEG",
+                downloadPDF:"Télécharger en format PDF",
+                downloadPNG:"Télécharger l'image en PNG",
+                downloadSVG:"Télécharger l'image en SVG",
+                downloadXLS:"Télécharger en format XLS",
+                printChart:"Imprimer le graphique",
+                viewFullscreen: "Voir en plein écran",
+                viewData: "Voir la table des données",
+                noData: "Les courbes s'afficheront lorsque vous aurez <br>renseigné et validé les informations du formulaire."
+            },
             title: {
                 text: "Simulations graphiques de la rémunération indiciaire",
                 style: {
@@ -85,24 +111,28 @@ export default class extends Controller {
                 color: '#1E1E1E',
                 }
             },
+            subtitle:{
+                text: "Les valeurs des graphes sont données à titre indicatif et sont non contractuelles",
+            },
             tooltip: {
                 shared: true,
                 borderColor: 'transparent',
                 borderRadius: 16,
-                backgroundColor: '#fff', 
+                backgroundColor: "rgba(245, 245, 245, 0.75)", 
                 //headerFormat: '{point.key} - Grade : <br>',
                 formatter: function () {
-                    var indice = this.x - 2022;
+                    var indice = this.x - 2023;
                     var grade = grades[indice];
+                    var ef = efs[indice];
                     return this.points.reduce(function (s, point) {
                         return s + '<br/>' + point.series.name + ': ' + point.y + '*56.2323€';
-                    }, '<b>' + this.x + ' - Grade : '+grade+'</b>');
+                    }, '<b>' + this.x + '<br>Grade : '+grade+'<br>Emploi fonctionnel : '+ef +'</b>');
                 },
             },
             xAxis:{
             	tickInterval: 1,
                 //type: 'datetime',
-                //softMin: Date.UTC(2022),
+                //softMin: Date.UTC(2023),
                 plotBands: [{
                     borderColor:'#F0F0F0',
                     borderWidth: 0,
@@ -128,9 +158,12 @@ export default class extends Controller {
                 
                 }
             },
+            legend: {
+                symbolWidth: 40,
+            },
             plotOptions: {
             	spline: {
-    	            lineWidth: 4,
+    	            //lineWidth: 4,
     	            states: {
     	                hover: {
     	                    lineWidth: 5
@@ -149,25 +182,25 @@ export default class extends Controller {
         var series2;
         if (data.length != 0 && data2.length != 0 && data3.length != 0 ){
             series2 = [{
-                name: 'Ecart Après Réforme - Avant Réforme  ',
+                name: 'Écart Après Réforme - Avant Réforme  ',
                 data: sub1,
-                pointStart: 2022,
+                pointStart: 2023,
                 pointInterval: 1,
                 color: "#5770BE",
                 type: 'column',  
                 
               },{
-                name: 'Ecart Après Réforme avec droit option - Avant Réforme',
+                name: 'Écart Après Réforme avec droit option - Avant Réforme',
                 data: sub3,
-                pointStart: 2022,
+                pointStart: 2023,
                 pointInterval: 1,
                 color: "#6D1247",
                 type: 'column',  
                
               },{
-                name: "Ecart Après Réforme avec droit option - Après Réforme",
+                name: "Écart Après Réforme avec droit option - Après Réforme",
                 data: sub2,
-                pointStart: 2022,
+                pointStart: 2023,
                 pointInterval: 1,
                 color: "#00949C",
                 type: 'column',  
@@ -175,9 +208,9 @@ export default class extends Controller {
                 },]
         } else if (data.length != 0 && data2.length == 0 && data3.length != 0){
             series2 = [{
-                name: 'Ecart Après Réforme avec droit option - Avant Réforme',
+                name: 'Écart Après Réforme avec droit option - Avant Réforme',
                 data: sub3,
-                pointStart: 2022,
+                pointStart: 2023,
                 pointInterval: 1,
                 color: "#6D1247",
                 type: 'column',  
@@ -189,33 +222,56 @@ export default class extends Controller {
 
         const options2 = {
             chart: {
+                spacing: 0,
                 style:{
                     fontFamily: "Marianne",
                 },  
                   
             },
-            
+            lang: {
+                downloadCSV:"Télécharger en format CSV",
+                downloadJPEG:"Télécharger l'image en JPEG",
+                downloadPDF:"Télécharger en format PDF",
+                downloadPNG:"Télécharger l'image en PNG",
+                downloadSVG:"Télécharger l'image en SVG",
+                downloadXLS:"Télécharger en format XLS",
+                printChart:"Imprimer le graphique",
+                viewFullscreen: "Voir en plein écran",
+                viewData: "Voir la table des données",
+                noData: "Les courbes s'afficheront lorsque vous aurez <br>renseigné et validé les informations du formulaire.",
+            },
             title: {
-                text: "Ecarts indiciaires",
+                text: "Écarts indiciaires",
                 style: {
                 fontSize: '15px',
                 fontWeight: "900",
                 color: '#1E1E1E',
                 }
             },
+            subtitle:{
+                text: "Les valeurs des graphes sont données à titre indicatif et sont non contractuelles",
+            },
             tooltip: {
                 shared: true,
                 borderColor: 'transparent',
                 borderRadius: 16,
-                backgroundColor: '#fff', 
+                backgroundColor: 'rgba(245, 245, 245, 0.75)', 
+                formatter: function () {
+                    var indice = this.x - 2023;
+                    var grade = grades[indice];
+                    var ef = efs[indice];
+                    return this.points.reduce(function (s, point) {
+                        return s + '<br/>' + point.series.name + ': ' + point.y ;
+                    }, '<b>' + this.x + '<br>Grade : '+grade+'<br>Emploi fonctionnel : '+ef +'</b>');
+                },
             },
             xAxis:{
                 tickInterval: 1,
                 //type: 'datetime',
-                //softMin: Date.UTC(2022),
+                //softMin: Date.UTC(2023),
                 plotBands: [{
                     borderColor:'#F0F0F0',
-                    borderWidth: 2,
+                    borderWidth: 0,
                     color: '#F0F0F0',
                     label: {
                     text: "Disponibilité",
@@ -227,20 +283,20 @@ export default class extends Controller {
                       fontStyle: 'italic',
                     },
                     },
-                    zIndex: 10,
+                    zIndex: 1,
                     from: debut,
                     to: fin,
                 }],
             },
             yAxis: { 
             title: {
-                text: "Ecart",
+                text: "Écart",
                 
                 }
             },
             plotOptions: {
                 column: {
-                    pointWidth: 4,
+                    pointWidth: 2,
                     
                     marker: {
                         enabled: false
@@ -256,7 +312,8 @@ export default class extends Controller {
 
         this.chart2 = new Highcharts.chart(this.canvasElement2Target, options2);
     	
-
+        this.chart.reflow();
+        this.chart2.reflow();
 
   	}
 }

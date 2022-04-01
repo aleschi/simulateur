@@ -2,12 +2,13 @@ import { Controller } from "@hotwired/stimulus"
 
 
 export default class extends Controller {
-    static targets = [ 'form','submitBouton', "grade2", "grade3", "grade4",'grade2Title','grade3Title','grade4Title',
+    static get targets() {
+  return [ 'form','submitBouton', "grade2", "grade3", "grade4",'grade2Title','grade3Title','grade4Title',
      'emploif','emploifEchelon','dureefEchelon','finfEchelon','debutfEmploi',
     
-     "error","EditEF",
+     "error","EditEF","EditGrades",
      
-    "resultEmploif","resultEchelonf","resultDureef","resultFinf","resultDebutf","boutonEdit",
+    "resultEmploif","resultEchelonf","resultDureef","resultFinf","resultDebutf",
     'errorCorps','age','resultdate1','resultdate2','resultdate3',
     "emploif1","emploif2","emploif3","emploif4","emploif5","emploif6",
       "debutf1","debutf2","debutf3","debutf4","debutf5","debutf6",
@@ -18,8 +19,9 @@ export default class extends Controller {
       'debutProjet','finProjet', 'resultdebutProjet', 'resultfinProjet', 'boutonDispo','contentdispo','boutonprojet',
       ,'corps','grade','echelon','duree','dureeTitle','dureeTitle2',
       'resultAge','resultCorps','resultGrade','resultEchelon','resultDuree','boutonSituation',
-      "content1","content2","content3","content4","content5","content6",'error2'];
-
+      "content1","content2","content3","content4","content5","content6",'error2',
+      "contentgrades","boutongrades"];
+}
   	connect() {    
         this.filters =  { corps: [], grades: [], echelons: [],grade2: [],grade3: [],
          emploif: [], echelonf: [], }
@@ -34,12 +36,14 @@ export default class extends Controller {
         this.grade3TitleTarget.classList.add("select_inactive")
         this.grade4TitleTarget.classList.add("select_inactive")
         this.dureeTitleTarget.classList.remove("select_inactive");
+
         
         const grades = [this.grade2Target,this.grade3Target,this.grade4Target];
         [0,1,2].forEach((indice)=>{
             grades[indice].innerHTML = "";
         })
-        
+        this.boutongradesTarget.classList.add('visually-hidden');
+        this.contentgradesTarget.classList.add('visually-hidden');
         this.errorCorpsTarget.classList.add('visually-hidden');
         this.change()
     }
@@ -180,17 +184,17 @@ export default class extends Controller {
         this.echelonTarget.innerHTML = "";
         const option = document.createElement("option");
         option.value = "";
-        option.innerHTML = "- Selectionner -";
+        option.innerHTML = "- sélectionner -";
         this.gradeTarget.appendChild(option);
 
         const option2 = document.createElement("option");
         option2.value = "";
-        option2.innerHTML = "- Selectionner -";
+        option2.innerHTML = "- sélectionner -";
         this.echelonTarget.appendChild(option2);
 
         const option3 = document.createElement("option");
         option3.value = "";
-        option3.innerHTML = "- Selectionner -";
+        option3.innerHTML = "- sélectionner -";
         this.dureeTarget.appendChild(option3);
 
         const nom_grades = data.nom_grades;
@@ -202,6 +206,8 @@ export default class extends Controller {
             option.innerHTML = grade + ' - ' + nom_grades[index];
             this.gradeTarget.appendChild(option);
         })
+
+        this.validateForm();
     }
 
     updateEchelons(data){
@@ -209,12 +215,12 @@ export default class extends Controller {
         this.dureeTarget.innerHTML = "";
         const option = document.createElement("option");
         option.value = "";
-        option.innerHTML = "- Selectionner -";
+        option.innerHTML = "- sélectionner -";
         this.echelonTarget.appendChild(option);
 
         const option2 = document.createElement("option");
         option2.value = "";
-        option2.innerHTML = "- Selectionner -";
+        option2.innerHTML = "- sélectionner -";
         this.dureeTarget.appendChild(option2);
 
         data.echelons.forEach((echelon) => {
@@ -223,6 +229,8 @@ export default class extends Controller {
             option.innerHTML = echelon;
             this.echelonTarget.appendChild(option);
         })
+
+        this.validateForm();
     }
 
     updateDurees(data){
@@ -231,7 +239,7 @@ export default class extends Controller {
             this.dureeTitleTarget.classList.remove("select_inactive");
             const option = document.createElement("option");
             option.value = "";
-            option.innerHTML = "- Selectionner -";
+            option.innerHTML = "- sélectionner -";
             this.dureeTarget.appendChild(option);
         data.durees.forEach((duree) => {
             const option = document.createElement("option");
@@ -250,24 +258,36 @@ export default class extends Controller {
         var grade = parseInt(data.grades);
         var max_grade = parseInt(data.max_grade);
         const grades = [this.grade2Target,this.grade3Target,this.grade4Target];
-        const grades_title = [this.grade2TitleTarget, this.grade3TitleTarget,this.grade4TitleTarget]
+        const grades_title = [this.grade2TitleTarget, this.grade3TitleTarget,this.grade4TitleTarget];
+        const grades_results = [this.resultdate1Target, this.resultdate2Target,this.resultdate3Target];
         // grades à dégriser 
         const max_arr = Array.from({length:(max_grade-grade)},(v,k)=>k+grade+1);  
+        if (grade == max_grade){
+            this.boutongradesTarget.classList.add('visually-hidden');
+            this.contentgradesTarget.classList.add('visually-hidden');
+        }
 
         [1,2,3].forEach((indice)=> {
+            grades_results[indice-1].classList.add('visually-hidden');
+            grades[indice-1].classList.remove('visually-hidden');
             grades[indice-1].innerHTML = "";
             grades_title[indice-1].classList.add("select_inactive");
             if (grade == indice && max_grade > grade){
                 const option = document.createElement("option");
                 option.value = "";
-                option.innerHTML = "- Selectionner -";
+                option.innerHTML = "- sélectionner -";
                 grades[indice-1].appendChild(option);
+                
                 data.array.forEach((ar) => {
                     const option = document.createElement("option");
                     option.value = ar;
                     option.innerHTML = ar;
                     grades[indice-1].appendChild(option);
                 })
+
+                if(this.contentgradesTarget.classList.contains('visually-hidden')){
+                    this.boutongradesTarget.classList.remove('visually-hidden');
+                }
             }
         })
 
@@ -276,7 +296,7 @@ export default class extends Controller {
             if (grades[indice-2].innerHTML == ""){
                 const option2 = document.createElement("option");
                 option2.value = "";
-                option2.innerHTML = "- Selectionner -";
+                option2.innerHTML = "- sélectionner -";
                 grades[indice-2].appendChild(option2);
             }
         });
@@ -290,13 +310,13 @@ export default class extends Controller {
         if (max_grade > 2){
             const option = document.createElement("option");
             option.value = "";
-            option.innerHTML = "- Selectionner -";
+            option.innerHTML = "- sélectionner -";
 
             this.grade3Target.appendChild(option);
             if (max_grade == 4){
                 const option2 = document.createElement("option");
                 option2.value = "";
-                option2.innerHTML = "- Selectionner -";
+                option2.innerHTML = "- sélectionner -";
                 this.grade4Target.appendChild(option2);
             }
             if (data.array_grade3 != null){
@@ -316,7 +336,7 @@ export default class extends Controller {
         if (max_grade > 3){
             const option = document.createElement("option");
             option.value = "";
-            option.innerHTML = "- Selectionner -";
+            option.innerHTML = "- sélectionner -";
             this.grade4Target.appendChild(option);
             
             data.array_grade4.forEach((ar) => {
@@ -368,7 +388,8 @@ export default class extends Controller {
     }
 
     dureefChange(event){
-        this.errorCorpsTarget.classList.add('visually-hidden');   
+        this.errorCorpsTarget.classList.add('visually-hidden'); 
+        this.validateForm();  
     }
 
     debutfChange(event){
@@ -379,7 +400,7 @@ export default class extends Controller {
         this.finfEchelonTarget.innerHTML = "";
         const option = document.createElement("option");
         option.value = "";
-        option.innerHTML = "- Selectionner -";
+        option.innerHTML = "- sélectionner -";
         this.finfEchelonTarget.appendChild(option);
         if ( annee != ""){
             array.forEach((duree) => {
@@ -389,6 +410,7 @@ export default class extends Controller {
                 this.finfEchelonTarget.appendChild(option);
             })
         }
+        this.validateForm();
     }
 
 
@@ -435,19 +457,19 @@ export default class extends Controller {
         this.emploifEchelonTarget.innerHTML = "";
         const option = document.createElement("option");
         option.value = "";
-        option.innerHTML = "- Selectionner -";
+        option.innerHTML = "- sélectionner -";
         this.emploifEchelonTarget.appendChild(option);
 
         this.dureefEchelonTarget.innerHTML = "";
         const option2 = document.createElement("option");
             option2.value = "";
-            option2.innerHTML = "- Selectionner -";
+            option2.innerHTML = "- sélectionner -";
             this.dureefEchelonTarget.appendChild(option2);
 
         this.finfEchelonTarget.innerHTML = "";
         const option3 = document.createElement("option");
             option3.value = "";
-            option3.innerHTML = "- Selectionner -";
+            option3.innerHTML = "- sélectionner -";
             this.finfEchelonTarget.appendChild(option3);
 
         this.debutfEmploiTarget.selectedIndex = 0;
@@ -458,6 +480,7 @@ export default class extends Controller {
             option.innerHTML = duree;
             this.emploifEchelonTarget.appendChild(option);
         })
+        this.validateForm();
     }
 
     updateDatesf(data){
@@ -466,7 +489,7 @@ export default class extends Controller {
             this.dureeTitle2Target.classList.remove("select_inactive");
             const option = document.createElement("option");
             option.value = "";
-            option.innerHTML = "- Selectionner -";
+            option.innerHTML = "- sélectionner -";
             this.dureefEchelonTarget.appendChild(option);
 
         data.dureef.forEach((duree) => {
@@ -488,11 +511,11 @@ export default class extends Controller {
         var id = event.target.dataset.value;
         const emploi = getSelectedValues(event);
 
-        const dates_arr = Array.from({length:50},(v,k)=>k+2023);
+        const dates_arr = Array.from({length:50},(v,k)=>k+2024);
       
         const option = document.createElement("option");
         option.value = "";
-        option.innerHTML = "- Selectionner -";
+        option.innerHTML = "- sélectionner -";
 
         var target ,target2 ;
         //var data_non_dispo = [];
@@ -545,6 +568,7 @@ export default class extends Controller {
             })
 
         }
+        this.validateForm(); 
     }
     
     projetChange(event){
@@ -552,7 +576,7 @@ export default class extends Controller {
         this.finProjetTarget.innerHTML = "";
         const option = document.createElement("option");
         option.value = "";
-        option.innerHTML = "- Selectionner -";
+        option.innerHTML = "- sélectionner -";
         this.finProjetTarget.appendChild(option);
         if (debut != ''){
         const dates = Array.from({length:(2072-parseInt(debut))},(v,k)=>k+parseInt(debut)+1);
@@ -563,6 +587,7 @@ export default class extends Controller {
             this.finProjetTarget.appendChild(option);
         })
         }
+        this.validateForm(); 
     } 
 
 
@@ -653,7 +678,7 @@ export default class extends Controller {
           let dates_ef_invalid = true;
 
           dates.forEach((date) => {
-            if (date >= 2022+67-age){
+            if (date >= 2023+67-age){
               date_invalid = false;
             }
           })
@@ -686,10 +711,18 @@ export default class extends Controller {
             })
           }
           if (this.finfEchelonTarget.value != ""){
-            if (67-age <= this.finfEchelonTarget.value-2022+1){
+            if (67-age < this.finfEchelonTarget.value-2023){
               emploi_invalid = false
             }
           }
+          //verifie fin des ef avant fin carrière
+          [0,1,2,3,4,5].forEach((indice)=>{
+            if (debut_targets[indice].value != ''){
+                if (67-age < parseInt(debut_targets[indice].value) + parseInt(duree_targets[indice].value) - 2023 ){
+                    emploi_invalid = false
+                }
+            }
+          });
           //verifie date croissante des ef 
           [0,1,2,3,4].forEach((indice)=>{
             if (debut_targets[indice+1].value != ''){
@@ -697,7 +730,7 @@ export default class extends Controller {
                     dates_ef_invalid = false
                 }
             }
-          })
+          });
           if (debut_targets[0].value != '' && this.finfEchelonTarget.value !=''){
             if (parseInt(this.finfEchelonTarget.value) >= parseInt(debut_targets[0].value)){
                 dates_ef_invalid = false
@@ -716,7 +749,7 @@ export default class extends Controller {
           }else if (emploi_invalid == false){
             event.preventDefault();
             this.errorCorpsTarget.classList.remove('visually-hidden');
-            this.errorCorpsTarget.innerHTML = "La date de fin d'un emploi fonctionnel doit être inférieure à la durée de votre carrière.";
+            this.errorCorpsTarget.innerHTML = "La date de fin d'un emploi fonctionnel doit être inférieure à la date maximale de fin de votre carrière.";
           
           }else if (dates_ef_invalid == false){
             event.preventDefault();
@@ -743,7 +776,17 @@ export default class extends Controller {
             })
             this.boutonDispoTarget.classList.remove('visually-hidden');
             this.boutonSituationTarget.classList.remove('visually-hidden');
-            this.boutonEditTarget.classList.remove('visually-hidden');
+
+            //add select inactive
+            const form_inactive = [this.dureeTitleTarget,this.grade2TitleTarget,this.grade3TitleTarget,this.grade4TitleTarget];
+            const result_inactive = [this.resultDureeTarget,this.resultdate1Target,this.resultdate2Target,this.resultdate3Target];
+            [0,1,2,3].forEach((indice)=>{
+               if (form_inactive[indice].classList.contains('select_inactive')){
+                result_inactive[indice].classList.add('select_inactive');
+              }else{
+                result_inactive[indice].classList.remove('select_inactive');
+              } 
+            })
 
             if (this.contentdispoTarget.classList.contains('visually-hidden')){
               this.boutonDispoTarget.classList.add('visually-hidden');
@@ -759,6 +802,7 @@ export default class extends Controller {
             }
 
             this.EditEFTarget.classList.remove('visually-hidden');
+            this.EditGradesTarget.classList.remove('visually-hidden');
             const content_targets = [this.content1Target,this.content2Target,this.content3Target,this.content4Target,this.content5Target,this.content6Target];
             const emploif_targets = [this.emploif1Target,this.emploif2Target,this.emploif3Target,this.emploif4Target,this.emploif5Target,this.emploif6Target];
             const debut_targets = [this.debutf1Target,this.debutf2Target,this.debutf3Target,this.debutf4Target,this.debutf5Target,this.debutf6Target];
@@ -800,24 +844,19 @@ export default class extends Controller {
 
     reset_situation(event){
       event.preventDefault();
-      this.boutonSituationTarget.classList.add('visually-hidden');
-      
-      const form_targets = [this.ageTarget,this.corpsTarget,this.gradeTarget,this.echelonTarget,this.dureeTarget,this.grade2Target,this.grade3Target,this.grade4Target];
-      const result_targets = [this.resultAgeTarget,this.resultCorpsTarget,this.resultGradeTarget,this.resultEchelonTarget,this.resultDureeTarget,this.resultdate1Target,this.resultdate2Target,this.resultdate3Target];
-      [0,1,2,3,4,5,6,7].forEach((indice)=>{
-          form_targets[indice].classList.remove('visually-hidden');
-          result_targets[indice].classList.add('visually-hidden');
-      })
-    }
-
-    reset(e){
-        const result_emploi_f = [this.resultEmploifTarget, this.resultEchelonfTarget,this.resultDureefTarget,this.resultFinfTarget,this.resultDebutfTarget]
-        const emploi_f = [this.emploifTarget,this.emploifEchelonTarget, this.dureefEchelonTarget, this.finfEchelonTarget, this.debutfEmploiTarget];
-
-        this.boutonEditTarget.classList.add('visually-hidden');
         this.errorTarget.classList.add('visually-hidden');
         this.errorCorpsTarget.classList.add('visually-hidden');
+        this.boutonSituationTarget.classList.add('visually-hidden');
+      
+        const form_targets = [this.ageTarget,this.corpsTarget,this.gradeTarget,this.echelonTarget,this.dureeTarget];
+        const result_targets = [this.resultAgeTarget,this.resultCorpsTarget,this.resultGradeTarget,this.resultEchelonTarget,this.resultDureeTarget];
+        [0,1,2,3,4].forEach((indice)=>{
+          form_targets[indice].classList.remove('visually-hidden');
+          result_targets[indice].classList.add('visually-hidden');
+        })
 
+        const result_emploi_f = [this.resultEmploifTarget, this.resultEchelonfTarget,this.resultDureefTarget,this.resultFinfTarget,this.resultDebutfTarget]
+        const emploi_f = [this.emploifTarget,this.emploifEchelonTarget, this.dureefEchelonTarget, this.finfEchelonTarget, this.debutfEmploiTarget];
         // on remet champ emploi 
         emploi_f[0].classList.remove('visually-hidden');
         result_emploi_f[0].classList.add('visually-hidden');
@@ -827,9 +866,15 @@ export default class extends Controller {
               result_emploi_f[indice].classList.add('visually-hidden');    
           });
         }
-
-        e.preventDefault();
-      }
+    }
+    resetGrades(event){
+       const form_targets = [this.grade2Target,this.grade3Target,this.grade4Target];
+        const result_targets = [this.resultdate1Target,this.resultdate2Target,this.resultdate3Target];
+        [0,1,2].forEach((indice)=>{
+          form_targets[indice].classList.remove('visually-hidden');
+          result_targets[indice].classList.add('visually-hidden');
+        }) 
+    }
 
     editEf(e){
         e.preventDefault();
@@ -850,6 +895,28 @@ export default class extends Controller {
             result_duree_targets[indice].classList.add('visually-hidden');
         })
     
+    }
+
+    togglegrades(e){
+        e.preventDefault();
+        this.errorCorpsTarget.classList.add('visually-hidden');
+        this.boutongradesTarget.classList.add('visually-hidden');
+        this.contentgradesTarget.classList.remove('visually-hidden');
+        const result_targets = [this.resultdate1Target,this.resultdate2Target,this.resultdate3Target];
+        const grades = [this.grade2Target,this.grade3Target,this.grade4Target];
+        [0,1,2].forEach((indice)=> {
+            result_targets[indice].classList.add('visually-hidden');
+            grades[indice].classList.remove('visually-hidden');
+        })
+    }
+    deleteGrades(e){
+        e.preventDefault();
+        this.errorCorpsTarget.classList.add('visually-hidden');
+        this.boutongradesTarget.classList.remove('visually-hidden');
+        this.contentgradesTarget.classList.add('visually-hidden');
+        this.grade2Target.selectedIndex =0;
+        this.grade3Target.selectedIndex =0;
+        this.grade4Target.selectedIndex =0;
     }
 
 }

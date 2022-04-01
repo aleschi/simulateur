@@ -7,6 +7,8 @@ class PagesController < ApplicationController
   	@liste_indices = []
   	@liste_indices2 = []
     @liste_indices3 = []
+    @array_ef=[]
+    @array_grade=[]
   	if Grille.all.count > 0
   		@corps = Grille.where('corps != ?','AE').order('corps ASC').pluck(:corps).uniq
   	end
@@ -43,13 +45,11 @@ class PagesController < ApplicationController
       max_grade = 4
     end 
 
-  	array = (2023..2072).to_a
+  	array = (2024..2072).to_a
 
   	  #grade selectionne
     	if !params[:grades].nil? && !params[:grades][0].nil? && params[:grades][0] != ""
   	  	grades = params[:grades][0].to_i	 
-
-  	
 
   		  #liste echelons
   	  	echelons = Grille.where(corps: @corps, grade: grades).order('echelon ASC').pluck(:echelon).uniq

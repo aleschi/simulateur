@@ -49,6 +49,7 @@ gem "sassc-rails"
 gem "roo", "~> 2.8.0"
 gem 'caxlsx'
 gem 'dotenv-rails', "~> 2.7", ">= 2.7.6" 
+gem 'sitemap_generator'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

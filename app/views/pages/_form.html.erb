@@ -1,168 +1,161 @@
-<div data-controller="filter" data-filter-url="<%= select_filter_path %>" >
+<div data-controller="filter" data-filter-url="<%= select_filter_path %>" >	
 	<div data-controller="toggle">
+
 	<%= form_with(url: search_grilles_path, method: :post, data: {'filter-target': "form", action: "turbo:before-fetch-request->filter#submitForm change->filter#change_form"}) do |f|%>
 	
-	<div><%= link_to hg2et5zbk05ea_path, class:"bouton" do %><i class="fa-solid fa-arrow-rotate-right"></i> Réinitialiser le formulaire<%end%><div class="d24"></div></div>
-	<div class="titre_2">Votre situation  actuelle <button class="visually-hidden bouton_i" data-filter-target="boutonSituation" type="button" data-action="click->filter#reset_situation"> <%= image_tag 'edit.svg'%></button></div>
-	<div class="texte_etiquette">Tous les champs comportant un astérisque (*) sont à remplir obligatoirement.</div>
-	<div class="d12"></div>
-
-			<div class="texte_etiquette">Corps*</div>
-			<div class="form"><%= f.select :corps, @corps.map {|c| [c,c]},{prompt: "- Selectionner -"}, {data: {action: 'change->filter#corpsChange change->filter#validateForm','filter-target': 'corps' },required: true}%></div>
-			<div class="texte_etiquette bold" data-filter-target='resultCorps'></div>
-		
 	
-	<div class="align_flex w100" >
-		
-		<div class="w50 pr">
-			<div class="texte_etiquette" >Grade*</div>
-			<div class="form"><%= f.select :grade, [],{prompt: "- Selectionner -"}, {data: {action: 'change->filter#gradesChange change->filter#validateForm','filter-target': 'grade'},required: true}%></div>
-			<div class="texte_etiquette bold" data-filter-target='resultGrade'></div>
-		</div>
-		<div class="w50 pl">
-			<div class="texte_etiquette">Age*</div>
-			<div class="form"><%= f.select :age, (18..66).to_a.map { |a| [a.to_s + " ans",a]},{prompt: "- Selectionner -"},{data:{action: 'change->filter#validateForm','filter-target': "age"},required: true}%></div>
-			<div class="texte_etiquette bold" data-filter-target='resultAge'></div>
-		</div>
-		
+	<h2>Votre situation en 2023 <button class="visually-hidden bouton_i" data-filter-target="boutonSituation" type="button" data-action="click->filter#reset_situation"> <%= image_tag 'edit.svg'%></button></h2>	
+	<p class="fr-text--sm">En cas de changement de grade envisagé en 2023, renseignez directement ce nouveau grade.</p>
+	<div class="fr-select-group"><label for="corps" class="fr-label">Corps*</label><%= f.select :corps, @corps.map {|c| [c,c]},{prompt: "- sélectionner -"}, {data: {action: 'change->filter#corpsChange','filter-target': 'corps' },required: true, id:"corps",class:"fr-select"}%>
+		<div class=" bold" data-filter-target='resultCorps'></div>
 	</div>
-	<div class="align_flex w100">
-		<div class="w50 pr">
-			<div class="texte_etiquette">Echelon*</div>
-			<div class="form"><%= f.select :echelon, [],{prompt: "- Selectionner -"}, {data: {action: 'change->filter#echelonsChange','filter-target': 'echelon'},required: true}%></div>
-			<div class="texte_etiquette bold" data-filter-target='resultEchelon'></div>
-		</div>
-		<div class="w50 pl">
-			<div class="texte_etiquette" data-filter-target='dureeTitle'>Durée passée à cet échelon*</div>
-			<div class="form"><%= f.select :duree, [],{prompt: "- Selectionner -"},{data: {'filter-target': 'duree', action: 'change->filter#validateForm'}}%></div>
-			<div class="texte_etiquette bold" data-filter-target='resultDuree'></div>
-		</div>
-	</div>
-	<div class="d12"></div>
-	<div class="texte_etiquette">Année projetée de promotion :</div>
-	<div class="align_flex w100">
-		<div class="w3">
-			<div class="texte_etiquette select_inactive" data-filter-target="grade2Title">Grade 2</div>
-			<div class="form"><%= f.select :grade2, [[" ",""]],{},{data: {'filter-target': 'grade2','validation-target': "date1", action: 'change->filter#promoGrade2Change'}}%></div>
-			<div class="texte_etiquette bold" data-filter-target='resultdate1'></div>
-		</div>
-		<div class="w3 pcenter">
-			<div class="texte_etiquette select_inactive" data-filter-target="grade3Title">Grade 3</div>
-			<div class="form"><%= f.select :grade3, [[" ",""]],{},{data: {'filter-target': 'grade3','validation-target': "date2",action: 'change->filter#promoGrade3Change'}}%></div>
-			<div class="texte_etiquette bold" data-filter-target='resultdate2'></div>
-		</div>
-		<div class="w3">
-			<div class="texte_etiquette select_inactive" data-filter-target="grade4Title">Grade 4</div>
-			<div class="form"><%= f.select :grade4, [[" ",""]],{},{data: {'filter-target': 'grade4','validation-target': "date3"}}%></div>
-			<div class="texte_etiquette bold" data-filter-target='resultdate3'></div>
-		</div>
-	</div>
-	<div class="d24"></div>
-
 	
-		<div class="titre_2">Votre emploi fonctionnel actuel <span data-filter-target="boutonEdit" class="visually-hidden bouton_i"><button type="button"  data-action="click->filter#reset"> <%= image_tag 'edit.svg'%></button></span></div>
 
-
-		<div class="texte_etiquette"><em>Sélectionnez "Aucun" si vous n'êtes pas dans un emploi fonctionnel à ce jour.</em></div>
-		<div class="d12"></div>
-		<div class="texte_etiquette">Nature de l'emploi fonctionnel actuel*</div>
+	<div class="fr-select-group">
+		<div class="align_flex w100" >
+			<div class="w50 pr">
+				
+				<label for="grade" class="fr-label" >Grade*</label><%= f.select :grade, [],{prompt: "- sélectionner -"}, {data: {action: 'change->filter#gradesChange','filter-target': 'grade'},required: true, id: "grade", class:"fr-select"}%>
+				<div class=" bold" data-filter-target='resultGrade'></div>
 		
-		<div class="form"><%= f.select :type_emploi, @emplois_f.map {|e| [e,e]},{:prompt => '',selected: 'Aucun'},{data:{action: 'change->filter#emploifChange change->filter#validateForm','toggle-target': 'emploif','filter-target': 'emploif'},required: true}%></div>
-		<div class="texte_etiquette bold" data-toggle-target='resultEmploif' data-filter-target='resultEmploif'></div>
-		<div class="d12"></div>
-		<div class="align_flex w100">
-			<div class="w50 pr">
-				<div class="texte_etiquette">Echelon actuel de cet emploi*</div>
-				<div class="form"><%= f.select :echelon_emploif, [],{prompt: "- Selectionner -"},{data: {action: 'change->filter#echelonfChange', 'filter-target': 'emploifEchelon','toggle-target': 'emploifEchelon'}, class: "visually-hidden"}%></div>
-				<div class="texte_etiquette bold" data-toggle-target='resultEchelonf' data-filter-target='resultEchelonf'>-</div>
-			</div>
-
-			<div class="w50 pl">
-				<div class="texte_etiquette" data-filter-target='dureeTitle2'>Durée passée à cet échelon*</div>
-				<div class="form"><%= f.select :duree_emploif, [], {prompt: "- Selectionner -"},{data: {action: 'change->filter#dureefChange change->filter#validateForm','filter-target': 'dureefEchelon','toggle-target': 'dureefEchelon'}, class: "visually-hidden"}%></div>
-				<div class="texte_etiquette bold" data-toggle-target='resultDureef' data-filter-target='resultDureef'>-</div>
-			</div>
-		</div>
-		<div class="d12"></div>
-		<div class="align_flex w100">
-			<div class="w50 pr">
-				<div class="texte_etiquette" >Durée passée à cet emploi*</div>
-				<div class="form"><%= f.select :debut_emploif, [["1 an",1],["2 ans",2],["3 ans",3],["4 ans",4],["5 ans",5]], {prompt: "- Selectionner -"},{data: {action: 'change->filter#debutfChange change->filter#validateForm','filter-target': 'debutfEmploi','toggle-target': 'debutfEmploi'}, class: "visually-hidden"}%></div>
-				<div class="texte_etiquette bold" data-toggle-target='resultDebutf' data-filter-target='resultDebutf'>-</div>
 			</div>
 			<div class="w50 pl">
-				<div class="texte_etiquette">Fin prévue de cet emploi*</div>
-				<div class="form"><%= f.select :fin_emploif, [],{prompt: "- Selectionner -"},{data: {action: 'change->filter#validateForm','filter-target': 'finfEchelon','toggle-target': 'finfEchelon'}, class: "visually-hidden"}%></div>
-				<div class="texte_etiquette bold" data-toggle-target='resultFinf' data-filter-target='resultFinf'>-</div>
+				
+				<label for="age" class="fr-label">Age*</label><%= f.select :age, (18..66).to_a.map { |a| [a.to_s + " ans",a]},{prompt: "- sélectionner -"},{data:{action: 'change->filter#validateForm','filter-target': "age"},required: true, id: "age", class:"fr-select"}%>
+				<div class=" bold" data-filter-target='resultAge'></div>
+			
+			</div>	
+		</div>
+	</div>
+
+	<div class="fr-select-group">
+		<div class="align_flex w100">
+			<div class="w50 pr">			
+				<label for="echelon" class="fr-label">Echelon*</label><%= f.select :echelon, [],{prompt: "- sélectionner -"}, {data: {action: 'change->filter#echelonsChange','filter-target': 'echelon'},required: true, id: "echelon", class:"fr-select"}%>
+				<div class=" bold" data-filter-target='resultEchelon'></div>
+			</div>
+			<div class="w50 pl">			
+				<label for="duree" class="fr-label" data-filter-target='dureeTitle'>Durée passée à cet échelon*</label><%= f.select :duree, [],{prompt: "- sélectionner -"},{data: {'filter-target': 'duree', action: 'change->filter#validateForm'}, id:"duree", class:"fr-select"}%>
+				<div class=" bold" data-filter-target='resultDuree'></div>		
 			</div>
 		</div>
-		<div class="texte_error" data-toggle-target="error2" data-filter-target="error2"></div>
-		<div class="d24"></div>
-		<div class="titre_2">Simulations situations futures <span class='texte_light italic'>(optionnel)</span></div>
+	</div>
+
+	
+	<div class="fr-select-group"><label for="typeef" class="fr-label">Nature de l'emploi fonctionnel actuel*</label><%= f.select :type_emploi, @emplois_f.map {|e| [e,e]},{:prompt => '',selected: 'Aucun'},{data:{action: 'change->filter#emploifChange','toggle-target': 'emploif','filter-target': 'emploif'},required: true, id:"typeef", class:"fr-select"}%>
+		<div class=" bold" data-toggle-target='resultEmploif' data-filter-target='resultEmploif'></div>
+	</div>
+
+	<div class="fr-select-group">
+		<div class="align_flex w100">
+			<div class="w50 pr">		
+				<label for="echelonef" class="fr-label">Echelon actuel de cet emploi*</label><%= f.select :echelon_emploif, [],{prompt: "- sélectionner -"},{data: {action: 'change->filter#echelonfChange', 'filter-target': 'emploifEchelon','toggle-target': 'emploifEchelon'}, class: "visually-hidden fr-select", id:"echelonef"}%>
+
+				<div class=" bold" data-toggle-target='resultEchelonf' data-filter-target='resultEchelonf'>-</div>
+			</div>
+
+			<div class="w50 pl">			
+				<label for="dureeef" class="fr-label" data-filter-target='dureeTitle2'>Durée passée à cet échelon*</label><%= f.select :duree_emploif, [], {prompt: "- sélectionner -"},{data: {action: 'change->filter#dureefChange','filter-target': 'dureefEchelon','toggle-target': 'dureefEchelon'}, class: "visually-hidden fr-select", id:"dureeef"}%>
+					<div class=" bold" data-toggle-target='resultDureef' data-filter-target='resultDureef'>-</div>
+			</div>
+		</div>
+	</div>
+	<div class="fr-select-group">
+		<div class="align_flex w100">
+			<div class="w50 pr">			
+				<label for="debutef" class="fr-label" >Durée passée à cet emploi*</label><%= f.select :debut_emploif, [["1 an",1],["2 ans",2],["3 ans",3],["4 ans",4],["5 ans",5]], {prompt: "- sélectionner -"},{data: {action: 'change->filter#debutfChange','filter-target': 'debutfEmploi','toggle-target': 'debutfEmploi'}, class: "visually-hidden fr-select",id:"debutef"}%>
+					<div class=" bold" data-toggle-target='resultDebutf' data-filter-target='resultDebutf'>-</div>	
+			</div>
+			<div class="w50 pl">			
+				<label for="finef" class="fr-label">Fin prévue de cet emploi*</label><%= f.select :fin_emploif, [],{prompt: "- sélectionner -"},{data: {action: 'change->filter#validateForm','filter-target': 'finfEchelon','toggle-target': 'finfEchelon'}, class: "visually-hidden fr-select", id:"finef"}%>
+					<div class=" bold" data-toggle-target='resultFinf' data-filter-target='resultFinf'>-</div>			
+			</div>
+		</div>
+	</div>
+
+	<div class="fr-error-text" data-toggle-target="error2" data-filter-target="error2" role="alert"></div>
+	<div class="12"></div>
+
+	<h2>Simulations situations futures <span class='texte_light italic'>(optionnel)</span></h2>	
+	<div class="fr-text--sm"><em>Vous pouvez simuler des promotions de grades (lorsqu'elles sont possibles), jusqu’à 6 emplois fonctionnels et 1 disponibilité.</em></div>
+
+
+	<div class="fr-my-2w visually-hidden" data-filter-target="boutongrades"><button  data-action="filter#togglegrades"> <i class="fas fa-plus-circle cbleu"></i> Ajouter une promotion de grade</button></div>
+	<div class="fr-my-2w visually-hidden" data-filter-target="contentgrades">
+		<div class="fr-text-lg bold align_flex_center">Projections de promotion de grade <button class="visually-hidden bouton_i2" data-filter-target="EditGrades" type="button" data-action="click->filter#resetGrades"><%= image_tag 'edit.svg'%></button><button class="bouton_i2" type="button" data-action="click->filter#deleteGrades"><%= image_tag 'trash.svg'%></button></div>
+		<div class="fr-select-group fr-my-2w">
+			<div class="align_flex w100">
+				<div class="w3">				
+					<label for="grade2" class="fr-label select_inactive" data-filter-target="grade2Title">Grade 2</label><%= f.select :grade2, [[" ",""]],{},{data: {'filter-target': 'grade2','validation-target': "date1", action: 'change->filter#promoGrade2Change'}, id:"grade2", class:"fr-select"}%>
+					<div class=" bold" data-filter-target='resultdate1'></div>
+				</div>
+				<div class="w3 pcenter">				
+					<label for="grade3" class="fr-label select_inactive" data-filter-target="grade3Title">Grade 3</label><%= f.select :grade3, [[" ",""]],{},{data: {'filter-target': 'grade3','validation-target': "date2",action: 'change->filter#promoGrade3Change'}, id:"grade3", class:"fr-select"}%>
+					<div class=" bold" data-filter-target='resultdate2'></div>
+				</div>
+				<div class="w3">				
+					<label for="grade4" class="fr-label select_inactive" data-filter-target="grade4Title">Grade 4</label><%= f.select :grade4, [[" ",""]],{},{data: {'filter-target': 'grade4','validation-target': "date3"},id:"grade4", class:"fr-select"}%>
+					<div class=" bold" data-filter-target='resultdate3'></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+
+	<div class="fr-text-lg bold visually-hidden" data-toggle-target="titreEf"><div class="align_flex_center">Projections d'emplois fonctionnels <button class="visually-hidden bouton_i2" data-filter-target="EditEF" type="button" data-action="click->filter#editEf"><%= image_tag 'edit.svg'%></button></div></div>		
+	<% (1..6).each do |i|%>
+	<div class="fr-my-2w visually-hidden" data-toggle-target="content<%=i%>" data-filter-target="content<%=i%>">
+
+		<div><div class="align_flex_center">Projection <%=i %>  <button data-action="toggle#toggle2" data-value="<%=i%>" class='bouton_i2'><%= image_tag 'trash.svg', data: {value: i}%></button></div></div>
 		
-		<div class="texte_etiquette"><em>Vous pouvez simuler jusqu’à 6 emplois fonctionnels et 1 disponibilité.</em></div>
-		<div class="d12"></div>
-		<div class="titre_etiquette align_flex_center visually-hidden" data-toggle-target="titreEf">Projections futures d'emplois fonctionnels <button class="visually-hidden bouton_i2" data-filter-target="EditEF" type="button" data-action="click->filter#editEf"><%= image_tag 'edit.svg'%></button> <button class="bouton_i2 visually-hidden" type="button" data-action="click->toggle#toggletrash"><%= image_tag 'trash.svg'%></button></div>
-			
-		<% (1..6).each do |i|%>
-		<div class="visually-hidden" data-toggle-target="content<%=i%>" data-filter-target="content<%=i%>">
-			<div class="d12"></div>
-			<div class="titre_etiquette align_flex_center">Projection <%=i %>  <button data-action="toggle#toggle2" data-value="<%=i%>" class='bouton_i2'><%= image_tag 'trash.svg', data: {value: i}%></button></div>
-			<div class="d12"></div>
-			<div>
-				<div class="texte_etiquette">Nature de l'emploi fonctionnel exercé*</div>
-				<div class="form"><%= f.select "type_emploi#{i}", @emplois_f2.map {|e| [e,e]},{ prompt: "- Selectionner -"},{data:{action: 'change->filter#emploifChange2 change->filter#validateForm', value: i.to_s, 'toggle-target': 'emploif'+i.to_s,'filter-target': 'emploif'+i.to_s}}%></div>
-				<div class="texte_etiquette bold visually-hidden" data-toggle-target='resultEmploif<%=i%>' data-filter-target='resultEmploif<%=i%>'></div>
-			</div>
-			<div class="align_flex w100">
-				<div class="w50 pr">
-					<div class="texte_etiquette">Début prévu*</div>
-					<div class="form"><%= f.select "debut_emploif#{i}", [], {prompt: "- Selectionner -"},{data: {action: 'change->filter#validateForm','toggle-target': 'debutf'+i.to_s,'filter-target': 'debutf'+i.to_s}}%></div>
-					<div class="texte_etiquette bold visually-hidden" data-toggle-target='resultDebutf<%=i%>' data-filter-target='resultDebutf<%=i%>'></div>
-				</div>
-				<div class="w50 pl">
-					<div class="texte_etiquette">Durée prévue*</div>
-					<div class="form"><%= f.select "duree_emploif#{i}", [['3 ans',3],['6 ans',6]], {prompt: "- Selectionner -"},{data: {action: 'change->filter#validateForm','toggle-target': 'dureef'+i.to_s,'filter-target': 'dureef'+i.to_s}}%></div>
-					<div class="texte_etiquette bold visually-hidden" data-toggle-target='resultDureef<%=i%>' data-filter-target='resultDureef<%=i%>'></div>
-				</div>
-			</div>
-			
+		<div class="fr-select-group">
+			<label for="ef<%=i%>" class="fr-label">Nature de l'emploi fonctionnel exercé*</label><%= f.select "type_emploi#{i}", @emplois_f2.map {|e| [e,e]},{ prompt: "- sélectionner -"},{data:{action: 'change->filter#emploifChange2', value: i.to_s, 'toggle-target': 'emploif'+i.to_s,'filter-target': 'emploif'+i.to_s},id:'ef'+i.to_s, class:"fr-select"}%></div>
+			<div class=" bold visually-hidden" data-toggle-target='resultEmploif<%=i%>' data-filter-target='resultEmploif<%=i%>'>
 		</div>
-		<% end %>
-
-		<div class="texte_error visually-hidden" data-toggle-target="error" data-filter-target="error"> </div>
-
-		<div class="d12"></div>
-
-		<div class="texte_etiquette" data-toggle-target="bouton"><button  data-action="toggle#toggle1"> <i class="fas fa-plus-circle cbleu"></i> Ajouter un emploi fonctionnel futur</button></div>		
-		<div class="d24"></div>
-
-		<div class="texte_etiquette" data-toggle-target="boutonprojet" data-filter-target="boutonprojet"><button  data-action="toggle#toggleprojet"> <i class="fas fa-plus-circle cbleu"></i> Ajouter une disponibilité</button></div>		
-
-		<div class="visually-hidden" data-toggle-target="contentdispo" data-filter-target="contentdispo">
-			<div class="titre_etiquette align_flex_center">Disponibilité <button class="visually-hidden bouton_i2" data-filter-target="boutonDispo" data-toggle-target="boutonDispo"  type="button" data-action="click->filter#reset_dispo" ><%= image_tag 'edit.svg'%></button><button class="visually-hidden bouton_i2" type="button" data-toggle-target="boutonTrashProjet" data-action="click->toggle#toggleprojet2"><%= image_tag 'trash.svg'%></button></div>
-			<div class="d12"></div>
-			
-
+		
+		<div class="fr-select-group">
 			<div class="align_flex w100">
 				<div class="w50 pr">
-					<div class="texte_etiquette" >Début prévue</div>
-					<div class="form"><%= f.select :debut_projet, (2023..2072).to_a.map { |a| [a,a]}, {prompt: "- Selectionner -"},{data: {action: 'change->filter#projetChange change->filter#validateForm','filter-target': 'debutProjet','toggle-target': 'debutProjet'}}%></div>
-					<div class="texte_etiquette bold" data-filter-target='resultdebutProjet' data-toggle-target='resultdebutProjet'></div>
+					
+					<label for="debutef<%=i%>" class="fr-label">Début prévu*</label><%= f.select "debut_emploif#{i}", [], {prompt: "- sélectionner -"},{data: {action: 'change->filter#validateForm','toggle-target': 'debutf'+i.to_s,'filter-target': 'debutf'+i.to_s},id:'debutef'+i.to_s, class:"fr-select"}%>
+					<div class=" bold visually-hidden" data-toggle-target='resultDebutf<%=i%>' data-filter-target='resultDebutf<%=i%>'></div>
 				</div>
 				<div class="w50 pl">
-					<div class="texte_etiquette">Fin prévue</div>
-					<div class="form"><%= f.select :fin_projet, [],{prompt: "- Selectionner -"},{data: {action: 'change->filter#validateForm','filter-target': 'finProjet','filter-target': 'finProjet','toggle-target': 'finProjet'}}%></div>
-					<div class="texte_etiquette bold" data-filter-target='resultfinProjet' data-toggle-target='resultfinProjet'></div>
+					
+					<label for="dureeef<%=i%>" class="fr-label">Durée prévue*</label><%= f.select "duree_emploif#{i}", [['3 ans',3],['6 ans',6]], {prompt: "- sélectionner -"},{data: {action: 'change->filter#validateForm','toggle-target': 'dureef'+i.to_s,'filter-target': 'dureef'+i.to_s}, id:'dureeef'+i.to_s, class:"fr-select"}%>
+					<div class=" bold visually-hidden" data-toggle-target='resultDureef<%=i%>' data-filter-target='resultDureef<%=i%>'></div>
 				</div>
 			</div>
 		</div>
+		
+	</div>
+	<% end %>
 
-	<div class="texte_error visually-hidden" data-filter-target="errorCorps" data-toggle-target="errorCorps" data-filter-target="errorCorps"> </div>
-	<div class="d24"></div>
+	<div class="fr-error-text visually-hidden" data-toggle-target="error" data-filter-target="error" role="alert"> </div>
+	<div class="fr-my-2w" data-toggle-target="bouton"><button data-action="toggle#toggle1"> <i class="fas fa-plus-circle cbleu"></i> Ajouter un emploi fonctionnel futur</button></div>		
 
-	<div><%= f.submit "Valider", class: "bouton bouton_inactive", data: {action: 'click->filter#submitForm','filter-target': "submitBouton"} %></div>
-	<div class="d12"></div>
+
+	<div class="fr-my-2w" data-toggle-target="boutonprojet" data-filter-target="boutonprojet"><button  data-action="toggle#toggleprojet"> <i class="fas fa-plus-circle cbleu"></i> Ajouter une disponibilité</button></div>		
+	<div class="fr-my-2w visually-hidden" data-toggle-target="contentdispo" data-filter-target="contentdispo">
+		<div class="fr-text-lg bold align_flex_center">Disponibilité <button class="visually-hidden bouton_i2" data-filter-target="boutonDispo" data-toggle-target="boutonDispo"  type="button" data-action="click->filter#reset_dispo" ><%= image_tag 'edit.svg'%></button><button class="visually-hidden bouton_i2" type="button" data-toggle-target="boutonTrashProjet" data-action="click->toggle#toggleprojet2"><%= image_tag 'trash.svg'%></button></div>
+		<div class="fr-select-group fr-my-2w">
+			<div class="align_flex w100">
+				<div class="w50 pr">			
+					<label for="debutprojet" class="fr-label" >Début prévue</label><%= f.select :debut_projet, (2023..2072).to_a.map { |a| [a,a]}, {prompt: "- sélectionner -"},{data: {action: 'change->filter#projetChange','filter-target': 'debutProjet','toggle-target': 'debutProjet'}, id:"debutprojet", class:"fr-select"}%>
+					<div class=" bold" data-filter-target='resultdebutProjet' data-toggle-target='resultdebutProjet'></div>
+				</div>
+				<div class="w50 pl">			
+					<label for="finprojet" class="fr-label">Fin prévue</label><%= f.select :fin_projet, [],{prompt: "- sélectionner -"},{data: {action: 'change->filter#validateForm','filter-target': 'finProjet','filter-target': 'finProjet','toggle-target': 'finProjet'},id:"finprojet", class:"fr-select"}%>
+					<div class=" bold" data-filter-target='resultfinProjet' data-toggle-target='resultfinProjet'></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="fr-error-text visually-hidden" data-filter-target="errorCorps" data-toggle-target="errorCorps" data-filter-target="errorCorps" role="alert"> </div>
+
+	<div class="fr-my-3w"><%= f.submit "Valider", class: "fr-btn bouton_inactive", data: {action: 'click->filter#submitForm','filter-target': "submitBouton"}, aria: { label: "Valider le formlulaire pour lancer la simulation"} %></div>
+
 	<% end %>
 </div>
 	

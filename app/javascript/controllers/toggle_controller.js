@@ -1,7 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["error","error2","bouton","content",'titreEf',"content1","content2","content3","content4","content5","content6",
+  static get targets() {
+  return ["error","error2","bouton","content",'titreEf',"content1","content2","content3","content4","content5","content6",
   "emploif1","emploif2","emploif3","emploif4","emploif5","emploif6",
   "debutf1","debutf2","debutf3","debutf4","debutf5","debutf6",
   "dureef1","dureef2","dureef3","dureef4","dureef5","dureef6",
@@ -10,7 +11,9 @@ export default class extends Controller {
   "resultDureef1","resultDureef2","resultDureef3","resultDureef4","resultDureef5","resultDureef6",
   "resultEmploif","resultEchelonf","resultDureef","resultFinf","resultDebutf",
   "emploif","emploifEchelon","dureefEchelon","finfEchelon",'debutfEmploi',
-  "errorCorps",'contentdispo','boutonprojet','debutProjet','finProjet','boutonTrashProjet','resultdebutProjet','resultfinProjet','boutonDispo'];
+  "errorCorps",'contentdispo','boutonprojet','debutProjet','finProjet','boutonTrashProjet','resultdebutProjet','resultfinProjet','boutonDispo',
+  ];
+}
 
   connect() { 
   }
@@ -124,8 +127,6 @@ export default class extends Controller {
   	
   }
 
-  
-
   toggleprojet(e){
     e.preventDefault();
     this.errorCorpsTarget.classList.add('visually-hidden');
@@ -135,7 +136,7 @@ export default class extends Controller {
     this.finProjetTarget.innerHTML = "";
     const option = document.createElement("option");
     option.value = "";
-    option.innerHTML = "- Selectionner -";
+    option.innerHTML = "- sélectionner -";
     this.finProjetTarget.appendChild(option);
   }
   toggleprojet2(e){
@@ -152,39 +153,6 @@ export default class extends Controller {
     this.boutonDispoTarget.classList.add('visually-hidden');
     this.errorCorpsTarget.classList.add('visually-hidden');
 
-  }
-
-  toggletrash(e){
-    const content_targets = [this.content1Target,this.content2Target,this.content3Target,this.content4Target,this.content5Target,this.content6Target];
-    const emploif_targets = [this.emploif1Target,this.emploif2Target,this.emploif3Target,this.emploif4Target,this.emploif5Target,this.emploif6Target];
-    const debut_targets = [this.debutf1Target,this.debutf2Target,this.debutf3Target,this.debutf4Target,this.debutf5Target,this.debutf6Target];
-    const duree_targets = [this.dureef1Target,this.dureef2Target,this.dureef3Target,this.dureef4Target,this.dureef5Target,this.dureef6Target];
-    const result_emploif_targets = [this.resultEmploif1Target,this.resultEmploif2Target,this.resultEmploif3Target,this.resultEmploif4Target,this.resultEmploif5Target,this.resultEmploif6Target];
-    const result_debut_targets = [this.resultDebutf1Target,this.resultDebutf2Target,this.resultDebutf3Target,this.resultDebutf4Target,this.resultDebutf5Target,this.resultDebutf6Target];
-    const result_duree_targets = [this.resultDureef1Target,this.resultDureef2Target,this.resultDureef3Target,this.resultDureef4Target,this.resultDureef5Target,this.resultDureef6Target];
-
-    const result_emploi_f = [this.resultEmploifTarget, this.resultEchelonfTarget,this.resultDureefTarget,this.resultFinfTarget,this.resultDebutfTarget]
-    const emploi_f = [this.emploifTarget,this.emploifEchelonTarget, this.dureefEchelonTarget, this.finfEchelonTarget, this.debutfEmploiTarget];
-
-    this.errorTarget.classList.add('visually-hidden');
-    this.errorCorpsTarget.classList.add('visually-hidden');
-    this.titreEfTarget.classList.add('visually-hidden');
-
-    [0,1,2,3,4,5].forEach((indice) => {
-        content_targets[indice].classList.add('visually-hidden');
-
-        emploif_targets[indice].classList.remove('visually-hidden');
-        debut_targets[indice].classList.remove('visually-hidden');
-        duree_targets[indice].classList.remove('visually-hidden');
-        result_emploif_targets[indice].classList.add('visually-hidden');
-        result_debut_targets[indice].classList.add('visually-hidden');
-        result_duree_targets[indice].classList.add('visually-hidden');
-
-        emploif_targets[indice].selectedIndex = 0;
-        duree_targets[indice].selectedIndex = 0;
-        debut_targets[indice].selectedIndex = 0;
-    })
-    e.preventDefault();
   }
 
   
