@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_08_102829) do
+ActiveRecord::Schema.define(version: 2022_04_05_070954) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -18,7 +18,7 @@ ActiveRecord::Schema.define(version: 2022_03_08_102829) do
   create_table "emplois", force: :cascade do |t|
     t.string "duree"
     t.integer "echelon"
-    t.integer "indice"
+    t.float "indice"
     t.string "nom"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -39,7 +39,7 @@ ActiveRecord::Schema.define(version: 2022_03_08_102829) do
     t.integer "grade"
     t.integer "echelon"
     t.string "duree"
-    t.integer "indice"
+    t.float "indice"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "annee"

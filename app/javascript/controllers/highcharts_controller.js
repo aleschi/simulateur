@@ -68,6 +68,8 @@ export default class extends Controller {
                 pointInterval: 1,
                 color: "#000091",
                 type: 'spline',  
+                lineWidth: 5,
+                dashStyle: 'ShortDot',
                 
               },{
                 name: "rémunération après réforme avec droit d'option ",
@@ -76,7 +78,7 @@ export default class extends Controller {
                 pointInterval: 1,
                 color: "#E18876",
                 type: 'spline',  
-               
+                lineWidth: 4,
                 },];
         } else {
             series = [];
@@ -140,7 +142,7 @@ export default class extends Controller {
                     label: {
                     text: "Disponibilité",
                     textAlign: 'center',
-                    verticalAlign: 'middle',
+                    verticalAlign: 'top',
                     style: {
                       color:'#000',
                       fontWeight: 'light',
@@ -276,7 +278,7 @@ export default class extends Controller {
                     label: {
                     text: "Disponibilité",
                     textAlign: 'center',
-                    verticalAlign: 'middle',
+                    verticalAlign: 'top',
                     style: {
                       color:'#000',
                       fontWeight: 'light',

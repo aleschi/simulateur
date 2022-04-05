@@ -229,18 +229,7 @@ class GrillesController < ApplicationController
 
   def supp
     #Grille.destroy_all
-    if Grille.where(corps: "Administrateur civil").count > 0
-    Grille.where(corps: "Administrateur civil").each do |grille|
-      grille.corps = "Administrateur de l'Etat"
-      grille.save
-    end
-    end
-    if Grade.where(corps: "Administrateur civil").count > 0
-    Grade.where(corps: "Administrateur civil").each do |grade|
-      grade.corps = "Administrateur de l'Etat"
-      grade.save
-    end
-    end
+    
     redirect_to root_path
   end
 
@@ -336,7 +325,7 @@ class GrillesController < ApplicationController
           if @liste_indices_nouveau_grade.length < @count_indice + 1
             @liste_indices_nouveau_grade = @liste_indices_nouveau_grade[0..@count_indice]+ Array.new(@count_indice+1-@liste_indices_nouveau_grade.length, @liste_indices_nouveau_grade.last)
           end
-          liste_indices = liste_indices[0..annee_grade-1]+@liste_indices_nouveau_grade[@count_indice..@liste_indices_nouveau_grade.length-1]
+          liste_indices = liste_indices[0..annee_grade-1]+@liste_indices_nouveau_grade[@count_indice-1..@liste_indices_nouveau_grade.length-1]
           return liste_indices
     end
 

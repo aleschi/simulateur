@@ -4,7 +4,7 @@ class Emploi < ApplicationRecord
   	require 'axlsx'
 
   	def self.import(file)
-  		Emploi.where(annee: nil).destroy_all
+  		
   		
   		data = Roo::Spreadsheet.open(file.path)
 	    headers = data.row(1) # get header row
@@ -27,7 +27,7 @@ class Emploi < ApplicationRecord
 	            	@emploi.duree = nil
 	            end
 	            @emploi.echelon = row_data["Echelon"].to_i          
-	            @emploi.indice = row_data["Indice"].to_i
+	            @emploi.indice = row_data["Indice"].to_f
 	            
 	            @emploi.save
 	            

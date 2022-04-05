@@ -6,7 +6,7 @@
 	
 	<h2>Votre situation en 2023 <button class="visually-hidden bouton_i" data-filter-target="boutonSituation" type="button" data-action="click->filter#reset_situation"> <%= image_tag 'edit.svg'%></button></h2>	
 	<p class="fr-text--sm">En cas de changement de grade envisagé en 2023, renseignez directement ce nouveau grade.</p>
-	<div class="fr-select-group"><label for="corps" class="fr-label">Corps*</label><%= f.select :corps, @corps.map {|c| [c,c]},{prompt: "- sélectionner -"}, {data: {action: 'change->filter#corpsChange','filter-target': 'corps' },required: true, id:"corps",class:"fr-select"}%>
+	<div class="fr-select-group fr-my-2w "><label for="corps" class="fr-label">Corps*</label><%= f.select :corps, @corps.map {|c| [c,c]},{prompt: "- sélectionner -"}, {data: {action: 'change->filter#corpsChange','filter-target': 'corps' },required: true, id:"corps",class:"fr-select"}%>
 		<div class=" bold" data-filter-target='resultCorps'></div>
 	</div>
 	
@@ -77,7 +77,7 @@
 	<div class="12"></div>
 
 	<h2>Simulations situations futures <span class='texte_light italic'>(optionnel)</span></h2>	
-	<div class="fr-text--sm"><em>Vous pouvez simuler des promotions de grades (lorsqu'elles sont possibles), jusqu’à 6 emplois fonctionnels et 1 disponibilité.</em></div>
+	<div class="fr-text--sm">Vous pouvez simuler des promotions de grades (lorsqu'elles sont possibles), jusqu’à 6 emplois fonctionnels et 1 disponibilité.</div>
 
 
 	<div class="fr-my-2w visually-hidden" data-filter-target="boutongrades"><button  data-action="filter#togglegrades"> <i class="fas fa-plus-circle cbleu"></i> Ajouter une promotion de grade</button></div>

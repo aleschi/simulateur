@@ -4,7 +4,7 @@ class Grille < ApplicationRecord
   	require 'axlsx'
 
   	def self.import(file)
-	    Grille.where(annee: nil).destroy_all
+	    
 
 	  	data = Roo::Spreadsheet.open(file.path)
 	    headers = data.row(1) # get header row
@@ -28,7 +28,7 @@ class Grille < ApplicationRecord
 	            @grille.annee = row_data["Annee"].to_i  
 	         	@grille.type_emploi = "non fonctionnel"
 	            @grille.echelon = row_data["Echelon"].to_i          
-	            @grille.indice = row_data["Indice"].to_i
+	            @grille.indice = row_data["Indice"].to_f
 	            @grille.save
 	            
 	        end
