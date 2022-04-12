@@ -1,28 +1,26 @@
 <% content_for :title do %>Effectuez votre simulation - Simulae <% end %>
-<nav role="navigation" class="fr-breadcrumb d-none d-lg-block" aria-label="vous êtes ici :">
-    <button class="fr-breadcrumb__button " aria-expanded="false" aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
-    <div class="fr-collapse" id="breadcrumb-1">
-        <ol class="fr-breadcrumb__list">
-            <li>
-                <a class="fr-breadcrumb__link" href="/">Accueil </a>
-            </li>
-            <li>
-                <a class="fr-breadcrumb__link" aria-current="page">Simulateur</a>
-            </li>
-        </ol>
-    </div>
-</nav>
+
 <main role="main" class="containtAll">
-	<div class="d24 d-lg-none"></div>
 	<div class="fr-container">
+		<nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
+			    <button class="fr-breadcrumb__button " aria-expanded="false" aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
+			    <div class="fr-collapse" id="breadcrumb-1">
+			        <ol class="fr-breadcrumb__list">
+			            <li>
+			                <a class="fr-breadcrumb__link" href="/">Accueil </a>
+			            </li>
+			            <li>
+			                <a class="fr-breadcrumb__link" aria-current="page">Simulateur</a>
+			            </li>
+			        </ol>
+			    </div>
+		</nav>
 		<div class="fr-grid-row fr-grid-row--gutters">
 			<div class="fr-col-lg-12">
-			<h1 class="d-none d-lg-block"> Simulez votre nouvelle rémunération <%= link_to hg2et5zbk05ea_path, class:" fr-btn fr-btn--icon-left pright " do %><i class="fa-solid fa-arrow-rotate-right"></i> Réinitialiser la simulation<%end%></h1>
-			<h1 class="d-lg-none"> Simulez votre nouvelle rémunération </h1>
-			<div class="d-lg-none fr-my-3w"><%= link_to hg2et5zbk05ea_path, class:"fr-btn fr-btn--icon-left" do %><i class="fa-solid fa-arrow-rotate-right"></i> Réinitialiser la simulation<%end%></div>
+			<h1> Simulez votre nouvelle rémunération <span class="pright"> <%= link_to hg2et5zbk05ea_path, class:" fr-btn fr-btn--icon-left" do %><span class="fr-fi-refresh-line fr-fi--sm" aria-hidden="true"></span>Réinitialiser la simulation<%end%></span></h1>
 			<p class="fr-text--sm">Tous les champs comportant un astérisque (*) sont à remplir obligatoirement.</p>
 			<p class="fr-text--sm">Les courbes s'afficheront lorsque vous aurez renseigné et validé les informations sur votre situation dans le formulaire de gauche ci-dessous.</p>
-
+			
 			</div>
 		</div>
 	</div>

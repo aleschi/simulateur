@@ -1,19 +1,18 @@
-<div class="page_container">
-  <div class="d24"></div>
-  <div class="titre_page text-center">Ajouter un nouveau document</div>
-  <div class="d24"></div>
-   <div class="new_form_box">
+<main role="main" class="containtAll">
+  <div class="fr-container fr-mt-7w">
+    <div class="fr-col-lg-10 fr-col-offset-lg-1">
+      <h1>Ajouter un nouveau document</h1>
+      <div class="d24"></div>
+
+     <div>
       <%= form_tag import_reclassements_path, multipart: true do %>
-        <div class="document-file-input">
+        <div>
           <label><%= file_field_tag  :file, accept: '.xlsx' %>
-            <!--<div class="document-type"><i class="far fa-file-pdf"></i> </div>-->
-            <div class="input-text"><i class="fas fa-plus-circle"></i><br>Ajouter un document</div>
-            <!--<div class="document-check"><i class="fas fa-check-circle"></i></div>-->
           </label>
-          
-        <div class="text-center">
-          <%= submit_tag "Transmettre", class:"bouton" %>  
-        </div>
+          <div class="d24"></div> 
+          <div>
+            <%= submit_tag "Transmettre", class:"fr-btn" %>  
+          </div>
                     
         </div>
         <% end %>
@@ -21,3 +20,5 @@
   <div class="d24"></div>
   <div><%= Reclassement.all.count%> données de reclassement</div>
 </div>
+</div>
+</main>

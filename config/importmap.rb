@@ -11,3 +11,4 @@ pin "exporting", to: "https://ga.jspm.io/npm:highcharts@10.0.0/modules/exporting
 pin "accessibility", to: "https://ga.jspm.io/npm:highcharts@10.0.0/modules/accessibility.js"
 pin "data", to: "https://ga.jspm.io/npm:highcharts@10.0.0/modules/export-data.js"
 pin "nodata", to: "https://ga.jspm.io/npm:highcharts@10.0.0/modules/no-data-to-display.js"
+pin_all_from "app/javascript/custom", under: "custom"

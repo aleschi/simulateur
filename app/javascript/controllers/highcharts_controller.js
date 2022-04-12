@@ -110,11 +110,11 @@ export default class extends Controller {
                 style: {
                 fontSize: '15px',
                 fontWeight: "900",
-                color: '#1E1E1E',
+               
                 }
             },
             subtitle:{
-                text: "Les valeurs des graphes sont données à titre indicatif et sont non contractuelles",
+                text: "Les valeurs des graphes sont données à titre indicatif",
             },
             tooltip: {
                 shared: true,
@@ -247,11 +247,10 @@ export default class extends Controller {
                 style: {
                 fontSize: '15px',
                 fontWeight: "900",
-                color: '#1E1E1E',
                 }
             },
             subtitle:{
-                text: "Les valeurs des graphes sont données à titre indicatif et sont non contractuelles",
+                text: "Les valeurs des graphes sont données à titre indicatif",
             },
             tooltip: {
                 shared: true,

@@ -22,7 +22,7 @@ export default class extends Controller {
       "content1","content2","content3","content4","content5","content6",'error2',
       "contentgrades","boutongrades"];
 }
-  	connect() {    
+  	connect() {   
         this.filters =  { corps: [], grades: [], echelons: [],grade2: [],grade3: [],
          emploif: [], echelonf: [], }
         
@@ -42,29 +42,29 @@ export default class extends Controller {
         [0,1,2].forEach((indice)=>{
             grades[indice].innerHTML = "";
         })
-        this.boutongradesTarget.classList.add('visually-hidden');
-        this.contentgradesTarget.classList.add('visually-hidden');
-        this.errorCorpsTarget.classList.add('visually-hidden');
+        this.boutongradesTarget.classList.add('fr-hidden');
+        this.contentgradesTarget.classList.add('fr-hidden');
+        this.errorCorpsTarget.classList.add('fr-hidden');
         this.change()
     }
 
     gradesChange(event) {
         this.filters.grades = getSelectedValues(event)
         this.filters.echelons = []
-        this.errorCorpsTarget.classList.add('visually-hidden');
+        this.errorCorpsTarget.classList.add('fr-hidden');
         this.dureeTitleTarget.classList.remove("select_inactive");
         this.change2()
     }
 
     echelonsChange(event) {
         this.filters.echelons = getSelectedValues(event)
-        this.errorCorpsTarget.classList.add('visually-hidden');
+        this.errorCorpsTarget.classList.add('fr-hidden');
         this.change3()
     }
 
     promoGrade2Change(event){
         this.filters.grade2 = getSelectedValues(event);
-        this.errorCorpsTarget.classList.add('visually-hidden');
+        this.errorCorpsTarget.classList.add('fr-hidden');
         this.filters.grade3 = [];
         this.filters.grade4 = [];
 
@@ -75,7 +75,7 @@ export default class extends Controller {
     promoGrade3Change(event){
         this.filters.grade3 = getSelectedValues(event);
         this.filters.grade4 = [];
-        this.errorCorpsTarget.classList.add('visually-hidden');
+        this.errorCorpsTarget.classList.add('fr-hidden');
         this.changePromoGrade3()
     }
 
@@ -237,6 +237,7 @@ export default class extends Controller {
         this.dureeTarget.innerHTML = "";
         if (data.durees.length != 0){
             this.dureeTitleTarget.classList.remove("select_inactive");
+            this.dureeTarget.disabled=false;
             const option = document.createElement("option");
             option.value = "";
             option.innerHTML = "- sélectionner -";
@@ -249,6 +250,7 @@ export default class extends Controller {
         })
         }else{
             this.dureeTitleTarget.classList.add("select_inactive");
+            this.dureeTarget.disabled=true;
         }
         this.validateForm();
 
@@ -263,15 +265,16 @@ export default class extends Controller {
         // grades à dégriser 
         const max_arr = Array.from({length:(max_grade-grade)},(v,k)=>k+grade+1);  
         if (grade == max_grade){
-            this.boutongradesTarget.classList.add('visually-hidden');
-            this.contentgradesTarget.classList.add('visually-hidden');
+            this.boutongradesTarget.classList.add('fr-hidden');
+            this.contentgradesTarget.classList.add('fr-hidden');
         }
 
         [1,2,3].forEach((indice)=> {
-            grades_results[indice-1].classList.add('visually-hidden');
-            grades[indice-1].classList.remove('visually-hidden');
+            grades_results[indice-1].classList.add('fr-hidden');
+            grades[indice-1].classList.remove('fr-hidden');
             grades[indice-1].innerHTML = "";
             grades_title[indice-1].classList.add("select_inactive");
+            grades[indice-1].disabled = true ;
             if (grade == indice && max_grade > grade){
                 const option = document.createElement("option");
                 option.value = "";
@@ -285,14 +288,15 @@ export default class extends Controller {
                     grades[indice-1].appendChild(option);
                 })
 
-                if(this.contentgradesTarget.classList.contains('visually-hidden')){
-                    this.boutongradesTarget.classList.remove('visually-hidden');
+                if(this.contentgradesTarget.classList.contains('fr-hidden')){
+                    this.boutongradesTarget.classList.remove('fr-hidden');
                 }
             }
         })
 
         max_arr.forEach((indice) => {
             grades_title[indice-2].classList.remove("select_inactive");
+            grades[indice-2].disabled = false ;
             if (grades[indice-2].innerHTML == ""){
                 const option2 = document.createElement("option");
                 option2.value = "";
@@ -351,7 +355,7 @@ export default class extends Controller {
     // emplois fonctionnels
 
     emploifChange(event){
-        this.errorCorpsTarget.classList.add('visually-hidden');
+        this.errorCorpsTarget.classList.add('fr-hidden');
         this.dureeTitle2Target.classList.remove("select_inactive");
         this.filters.emploif = getSelectedValues(event);
         this.filters.echelonf = [];
@@ -362,17 +366,17 @@ export default class extends Controller {
         if (this.filters.emploif == "Aucun") {
             // on supp les formulaires dapres
             [0,1,2,3].forEach((indice) => {
-                form_targets[indice].classList.add('visually-hidden');
+                form_targets[indice].classList.add('fr-hidden');
                 form_targets[indice].selectedIndex = 0;
-                result_targets[indice].classList.remove('visually-hidden');
+                result_targets[indice].classList.remove('fr-hidden');
                 result_targets[indice].innerHTML = "-";
             });
 
 
         } else {
             [0,1,2,3].forEach((indice) => {
-                form_targets[indice].classList.remove('visually-hidden');
-                result_targets[indice].classList.add('visually-hidden');
+                form_targets[indice].classList.remove('fr-hidden');
+                result_targets[indice].classList.add('fr-hidden');
             });
             this.changeEchelon()
         }
@@ -382,18 +386,18 @@ export default class extends Controller {
     echelonfChange(event){
         this.filters.echelonf = getSelectedValues(event)  
        
-        this.errorCorpsTarget.classList.add('visually-hidden');
+        this.errorCorpsTarget.classList.add('fr-hidden');
         this.changeDatesf()
 
     }
 
     dureefChange(event){
-        this.errorCorpsTarget.classList.add('visually-hidden'); 
+        this.errorCorpsTarget.classList.add('fr-hidden'); 
         this.validateForm();  
     }
 
     debutfChange(event){
-        this.errorCorpsTarget.classList.add('visually-hidden');  
+        this.errorCorpsTarget.classList.add('fr-hidden');  
 
         const annee = getSelectedValues(event) 
         const array = Array.from({length:6-annee},(v,k)=>k+2023);
@@ -487,6 +491,7 @@ export default class extends Controller {
         this.dureefEchelonTarget.innerHTML = "";
         if (data.dureef.length != 0){
             this.dureeTitle2Target.classList.remove("select_inactive");
+            this.dureefEchelonTarget.disabled = false;
             const option = document.createElement("option");
             option.value = "";
             option.innerHTML = "- sélectionner -";
@@ -500,6 +505,7 @@ export default class extends Controller {
         })
         }else{
             this.dureeTitle2Target.classList.add("select_inactive");
+            this.dureefEchelonTarget.disabled = true;
         }
         this.validateForm();
     }
@@ -507,7 +513,7 @@ export default class extends Controller {
 
     
     emploifChange2(event){
-        this.errorCorpsTarget.classList.add('visually-hidden');
+        this.errorCorpsTarget.classList.add('fr-hidden');
         var id = event.target.dataset.value;
         const emploi = getSelectedValues(event);
 
@@ -594,7 +600,7 @@ export default class extends Controller {
     //validation
 
        validateForm() {
-        this.errorCorpsTarget.classList.add('visually-hidden');
+        this.errorCorpsTarget.classList.add('fr-hidden');
         let isValid = true;
 
         // Tell the browser to find any required fields
@@ -639,7 +645,7 @@ export default class extends Controller {
 
         if (isValid==true){
             this.submitBoutonTarget.classList.remove("bouton_inactive");
-            this.errorCorpsTarget.classList.add('visually-hidden');
+            this.errorCorpsTarget.classList.add('fr-hidden');
         }else{
             this.submitBoutonTarget.classList.add("bouton_inactive")
         }
@@ -650,9 +656,9 @@ export default class extends Controller {
 
     change_form(event){
       event.preventDefault();
-      this.errorCorpsTarget.classList.add('visually-hidden');
-      this.error2Target.classList.add('visually-hidden');
-      this.errorTarget.classList.add('visually-hidden');
+      this.errorCorpsTarget.classList.add('fr-hidden');
+      this.error2Target.classList.add('fr-hidden');
+      this.errorTarget.classList.add('fr-hidden');
      
     }
 
@@ -663,7 +669,7 @@ export default class extends Controller {
         // so that the form is not submitted
         if (!isValid) {
 
-          this.errorCorpsTarget.classList.remove('visually-hidden');
+          this.errorCorpsTarget.classList.remove('fr-hidden');
           this.errorCorpsTarget.innerHTML = "Vous devez remplir tous les champs obligatoires*";
 
           event.preventDefault();
@@ -740,25 +746,25 @@ export default class extends Controller {
 
           if (date_invalid == false){
             event.preventDefault();
-            this.errorCorpsTarget.classList.remove('visually-hidden');
+            this.errorCorpsTarget.classList.remove('fr-hidden');
             this.errorCorpsTarget.innerHTML = "Les dates renseignées sont incompatibles avec l'âge renseigné.";
           } else if (projet_invalid == false){
             event.preventDefault();
-            this.errorCorpsTarget.classList.remove('visually-hidden');
+            this.errorCorpsTarget.classList.remove('fr-hidden');
             this.errorCorpsTarget.innerHTML = "Les dates d'un projet de disponibilité ne peuvent pas correspondre à des dates d'occupation d'un emploi fonctionnel ni de promotions de grade.";
           }else if (emploi_invalid == false){
             event.preventDefault();
-            this.errorCorpsTarget.classList.remove('visually-hidden');
+            this.errorCorpsTarget.classList.remove('fr-hidden');
             this.errorCorpsTarget.innerHTML = "La date de fin d'un emploi fonctionnel doit être inférieure à la date maximale de fin de votre carrière.";
           
           }else if (dates_ef_invalid == false){
             event.preventDefault();
-            this.errorCorpsTarget.classList.remove('visually-hidden');
+            this.errorCorpsTarget.classList.remove('fr-hidden');
             this.errorCorpsTarget.innerHTML = "Les dates et durées de projections d'emplois fonctionnels doivent suivre un ordre croissant et ne peuvent pas se recouper.";
           
           
           }else {
-            this.errorCorpsTarget.classList.add('visually-hidden');
+            this.errorCorpsTarget.classList.add('fr-hidden');
             // on eleve tous les forms
             const form_targets = [this.ageTarget,this.corpsTarget,this.gradeTarget,this.echelonTarget,this.dureeTarget,this.grade2Target,this.grade3Target,this.grade4Target,this.debutProjetTarget, this.finProjetTarget,
             this.emploifTarget,this.emploifEchelonTarget,this.dureefEchelonTarget,this.finfEchelonTarget,this.debutfEmploiTarget];
@@ -766,16 +772,16 @@ export default class extends Controller {
             this.resultEmploifTarget, this.resultEchelonfTarget,this.resultDureefTarget,this.resultFinfTarget,this.resultDebutfTarget];
             
             [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14].forEach((indice)=>{
-              form_targets[indice].classList.add('visually-hidden');
-              result_targets[indice].classList.remove('visually-hidden');
+              form_targets[indice].classList.add('fr-hidden');
+              result_targets[indice].classList.remove('fr-hidden');
               if (form_targets[indice].value == ""){
                 result_targets[indice].innerHTML = '-';
               }else{
                 result_targets[indice].innerHTML = form_targets[indice].value;
               }
             })
-            this.boutonDispoTarget.classList.remove('visually-hidden');
-            this.boutonSituationTarget.classList.remove('visually-hidden');
+            this.boutonDispoTarget.classList.remove('fr-hidden');
+            this.boutonSituationTarget.classList.remove('fr-hidden');
 
             //add select inactive
             const form_inactive = [this.dureeTitleTarget,this.grade2TitleTarget,this.grade3TitleTarget,this.grade4TitleTarget];
@@ -788,21 +794,21 @@ export default class extends Controller {
               } 
             })
 
-            if (this.contentdispoTarget.classList.contains('visually-hidden')){
-              this.boutonDispoTarget.classList.add('visually-hidden');
-              this.finProjetTarget.classList.remove('visually-hidden');
-              this.debutProjetTarget.classList.remove('visually-hidden');
-              this.resultfinProjetTarget.classList.add('visually-hidden');
-              this.resultdebutProjetTarget.classList.add('visually-hidden');
+            if (this.contentdispoTarget.classList.contains('fr-hidden')){
+              this.boutonDispoTarget.classList.add('fr-hidden');
+              this.finProjetTarget.classList.remove('fr-hidden');
+              this.debutProjetTarget.classList.remove('fr-hidden');
+              this.resultfinProjetTarget.classList.add('fr-hidden');
+              this.resultdebutProjetTarget.classList.add('fr-hidden');
             }else if (this.finProjetTarget.value == ''){
-              this.contentdispoTarget.classList.add('visually-hidden');
-              this.boutonprojetTarget.classList.remove('visually-hidden');
+              this.contentdispoTarget.classList.add('fr-hidden');
+              this.boutonprojetTarget.classList.remove('fr-hidden');
               this.debutProjetTarget.selectedIndex =0;
               this.finProjetTarget.selectedIndex =0;
             }
 
-            this.EditEFTarget.classList.remove('visually-hidden');
-            this.EditGradesTarget.classList.remove('visually-hidden');
+            this.EditEFTarget.classList.remove('fr-hidden');
+            this.EditGradesTarget.classList.remove('fr-hidden');
             const content_targets = [this.content1Target,this.content2Target,this.content3Target,this.content4Target,this.content5Target,this.content6Target];
             const emploif_targets = [this.emploif1Target,this.emploif2Target,this.emploif3Target,this.emploif4Target,this.emploif5Target,this.emploif6Target];
             const debut_targets = [this.debutf1Target,this.debutf2Target,this.debutf3Target,this.debutf4Target,this.debutf5Target,this.debutf6Target];
@@ -812,14 +818,14 @@ export default class extends Controller {
             const result_duree_targets = [this.resultDureef1Target,this.resultDureef2Target,this.resultDureef3Target,this.resultDureef4Target,this.resultDureef5Target,this.resultDureef6Target];
           
             [5,4,3,2,1,0].forEach((indice)=>{
-              if (content_targets[indice].classList.contains('visually-hidden') == false){
+              if (content_targets[indice].classList.contains('fr-hidden') == false){
                 if (emploif_targets[indice].value != ''){
-                emploif_targets[indice].classList.add('visually-hidden');
-                debut_targets[indice].classList.add('visually-hidden');
-                duree_targets[indice].classList.add('visually-hidden');
-                result_emploif_targets[indice].classList.remove('visually-hidden');
-                result_debut_targets[indice].classList.remove('visually-hidden');
-                result_duree_targets[indice].classList.remove('visually-hidden');
+                emploif_targets[indice].classList.add('fr-hidden');
+                debut_targets[indice].classList.add('fr-hidden');
+                duree_targets[indice].classList.add('fr-hidden');
+                result_emploif_targets[indice].classList.remove('fr-hidden');
+                result_debut_targets[indice].classList.remove('fr-hidden');
+                result_duree_targets[indice].classList.remove('fr-hidden');
                 result_emploif_targets[indice].innerHTML = emploif_targets[indice].value;
                 result_debut_targets[indice].innerHTML = debut_targets[indice].value;
                 result_duree_targets[indice].innerHTML = duree_targets[indice].value + " ans";
@@ -833,37 +839,37 @@ export default class extends Controller {
 
     reset_dispo(event){
       event.preventDefault();
-      this.boutonDispoTarget.classList.add('visually-hidden');
+      this.boutonDispoTarget.classList.add('fr-hidden');
       const form_targets = [this.debutProjetTarget, this.finProjetTarget];
       const result_targets = [this.resultdebutProjetTarget, this.resultfinProjetTarget];
       [0,1].forEach((indice)=>{
-          form_targets[indice].classList.remove('visually-hidden');
-          result_targets[indice].classList.add('visually-hidden');
+          form_targets[indice].classList.remove('fr-hidden');
+          result_targets[indice].classList.add('fr-hidden');
       })
     }
 
     reset_situation(event){
       event.preventDefault();
-        this.errorTarget.classList.add('visually-hidden');
-        this.errorCorpsTarget.classList.add('visually-hidden');
-        this.boutonSituationTarget.classList.add('visually-hidden');
+        this.errorTarget.classList.add('fr-hidden');
+        this.errorCorpsTarget.classList.add('fr-hidden');
+        this.boutonSituationTarget.classList.add('fr-hidden');
       
         const form_targets = [this.ageTarget,this.corpsTarget,this.gradeTarget,this.echelonTarget,this.dureeTarget];
         const result_targets = [this.resultAgeTarget,this.resultCorpsTarget,this.resultGradeTarget,this.resultEchelonTarget,this.resultDureeTarget];
         [0,1,2,3,4].forEach((indice)=>{
-          form_targets[indice].classList.remove('visually-hidden');
-          result_targets[indice].classList.add('visually-hidden');
+          form_targets[indice].classList.remove('fr-hidden');
+          result_targets[indice].classList.add('fr-hidden');
         })
 
         const result_emploi_f = [this.resultEmploifTarget, this.resultEchelonfTarget,this.resultDureefTarget,this.resultFinfTarget,this.resultDebutfTarget]
         const emploi_f = [this.emploifTarget,this.emploifEchelonTarget, this.dureefEchelonTarget, this.finfEchelonTarget, this.debutfEmploiTarget];
         // on remet champ emploi 
-        emploi_f[0].classList.remove('visually-hidden');
-        result_emploi_f[0].classList.add('visually-hidden');
+        emploi_f[0].classList.remove('fr-hidden');
+        result_emploi_f[0].classList.add('fr-hidden');
         if (emploi_f[0].value != "Aucun"){
         [1,2,3,4].forEach((indice) => {
-              emploi_f[indice].classList.remove('visually-hidden');
-              result_emploi_f[indice].classList.add('visually-hidden');    
+              emploi_f[indice].classList.remove('fr-hidden');
+              result_emploi_f[indice].classList.add('fr-hidden');    
           });
         }
     }
@@ -871,8 +877,8 @@ export default class extends Controller {
        const form_targets = [this.grade2Target,this.grade3Target,this.grade4Target];
         const result_targets = [this.resultdate1Target,this.resultdate2Target,this.resultdate3Target];
         [0,1,2].forEach((indice)=>{
-          form_targets[indice].classList.remove('visually-hidden');
-          result_targets[indice].classList.add('visually-hidden');
+          form_targets[indice].classList.remove('fr-hidden');
+          result_targets[indice].classList.add('fr-hidden');
         }) 
     }
 
@@ -887,33 +893,33 @@ export default class extends Controller {
         const result_duree_targets = [this.resultDureef1Target,this.resultDureef2Target,this.resultDureef3Target,this.resultDureef4Target,this.resultDureef5Target,this.resultDureef6Target];
 
         [0,1,2,3,4,5].forEach((indice)=> {
-            emploif_targets[indice].classList.remove('visually-hidden');
-            debut_targets[indice].classList.remove('visually-hidden');
-            duree_targets[indice].classList.remove('visually-hidden');
-            result_emploif_targets[indice].classList.add('visually-hidden');
-            result_debut_targets[indice].classList.add('visually-hidden');
-            result_duree_targets[indice].classList.add('visually-hidden');
+            emploif_targets[indice].classList.remove('fr-hidden');
+            debut_targets[indice].classList.remove('fr-hidden');
+            duree_targets[indice].classList.remove('fr-hidden');
+            result_emploif_targets[indice].classList.add('fr-hidden');
+            result_debut_targets[indice].classList.add('fr-hidden');
+            result_duree_targets[indice].classList.add('fr-hidden');
         })
     
     }
 
     togglegrades(e){
         e.preventDefault();
-        this.errorCorpsTarget.classList.add('visually-hidden');
-        this.boutongradesTarget.classList.add('visually-hidden');
-        this.contentgradesTarget.classList.remove('visually-hidden');
+        this.errorCorpsTarget.classList.add('fr-hidden');
+        this.boutongradesTarget.classList.add('fr-hidden');
+        this.contentgradesTarget.classList.remove('fr-hidden');
         const result_targets = [this.resultdate1Target,this.resultdate2Target,this.resultdate3Target];
         const grades = [this.grade2Target,this.grade3Target,this.grade4Target];
         [0,1,2].forEach((indice)=> {
-            result_targets[indice].classList.add('visually-hidden');
-            grades[indice].classList.remove('visually-hidden');
+            result_targets[indice].classList.add('fr-hidden');
+            grades[indice].classList.remove('fr-hidden');
         })
     }
     deleteGrades(e){
         e.preventDefault();
-        this.errorCorpsTarget.classList.add('visually-hidden');
-        this.boutongradesTarget.classList.remove('visually-hidden');
-        this.contentgradesTarget.classList.add('visually-hidden');
+        this.errorCorpsTarget.classList.add('fr-hidden');
+        this.boutongradesTarget.classList.remove('fr-hidden');
+        this.contentgradesTarget.classList.add('fr-hidden');
         this.grade2Target.selectedIndex =0;
         this.grade3Target.selectedIndex =0;
         this.grade4Target.selectedIndex =0;
