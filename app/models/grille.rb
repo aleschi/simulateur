@@ -11,6 +11,7 @@ class Grille < ApplicationRecord
 	    row2 = data.row(2)
 	    row_data2 = Hash[[headers, row2].transpose]
 	    Grille.where('corps = ?',row_data2["Corps"]).destroy_all 
+	    
 
 	  	data.each_with_index do |row, idx|
 	    	next if idx == 0 # skip header
@@ -26,9 +27,10 @@ class Grille < ApplicationRecord
 	            	@grille.duree = nil 
 	            end 
 	            @grille.annee = row_data["Annee"].to_i  
-	         	@grille.type_emploi = "non fonctionnel"
 	            @grille.echelon = row_data["Echelon"].to_i          
 	            @grille.indice = row_data["Indice"].to_f
+	            @grille.grade_reclasse = row_data["Grade recl"].to_f
+	            @grille.echelon_reclasse = row_data["Echelon recl"].to_f
 	            @grille.save
 	            
 	        end

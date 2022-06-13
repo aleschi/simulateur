@@ -19,6 +19,7 @@ class Reclassement < ApplicationRecord
 	            @reclassement = Reclassement.new 
 	            @reclassement.echelon = row_data["Echelon"].to_i          
 	            @reclassement.indice = row_data["Indice"].to_i
+	            @reclassement.grade = row_data["Grade"].to_i
 	           	@reclassement.save
 	            
 	        end

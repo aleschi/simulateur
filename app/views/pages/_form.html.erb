@@ -2,22 +2,22 @@
 	<div data-controller="toggle">
 
 	<%= form_with(url: search_grilles_path, method: :post, data: {'filter-target': "form", action: "turbo:before-fetch-request->filter#submitForm change->filter#change_form"}) do |f|%>
-	
-	
+		
 	<h2>Votre situation en 2023 <button class="fr-hidden bouton_i" data-filter-target="boutonSituation" type="button" data-action="click->filter#reset_situation"> <%= image_tag 'edit.svg'%></button></h2>	
 	<p class="fr-text--sm">En cas de changement de grade envisagé en 2023, renseignez directement ce nouveau grade.</p>
+
 	<div class="fr-select-group fr-my-2w "><label for="corps" class="fr-label">Corps*</label><%= f.select :corps, @corps.map {|c| [c,c]},{prompt: "- sélectionner -"}, {data: {action: 'change->filter#corpsChange','filter-target': 'corps' },required: true, id:"corps",class:"fr-select"}%>
 		<div class=" bold" data-filter-target='resultCorps'></div>
+		
 	</div>
 	
 
 	<div class="fr-select-group">
 		<div class="align_flex w100" >
-			<div class="w50 pr">
-				
+			<div class="w50 pr">				
 				<label for="grade" class="fr-label" >Grade*</label><%= f.select :grade, [],{prompt: "- sélectionner -"}, {data: {action: 'change->filter#gradesChange','filter-target': 'grade'},required: true, id: "grade", class:"fr-select"}%>
 				<div class=" bold" data-filter-target='resultGrade'></div>
-		
+					
 			</div>
 			<div class="w50 pl">
 				
@@ -152,7 +152,7 @@
 		</div>
 	</div>
 
-	<div class="fr-error-text fr-hidden" data-filter-target="errorCorps" data-toggle-target="errorCorps" data-filter-target="errorCorps" role="alert"> </div>
+	<div class="fr-error-text fr-hidden" data-filter-target="errorCorps" data-toggle-target="errorCorps" role="alert"> </div>
 
 	<div class="fr-my-3w"><%= f.submit "Valider", class: "fr-btn bouton_inactive", data: {action: 'click->filter#submitForm','filter-target': "submitBouton"}, aria: { label: "Valider le formlulaire pour lancer la simulation"} %></div>
 

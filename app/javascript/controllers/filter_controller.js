@@ -606,9 +606,14 @@ export default class extends Controller {
         // Tell the browser to find any required fields
         let requiredFieldSelectors = 'select:required';
         let requiredFields = this.formTarget.querySelectorAll(requiredFieldSelectors);
-        
-        requiredFields.forEach((field) => {
+        let selectFields = this.formTarget.querySelectorAll('select');
 
+        selectFields.forEach((field) => {
+            field.classList.remove('fr-select--error');
+            field.parentNode.classList.remove('fr-select-group--error');
+        });
+
+        requiredFields.forEach((field) => {
           // For each required field, check to see if the value is empty
           // if so, we focus the field and set our value to false
           if (!field.disabled && !field.value.trim()) {
@@ -618,8 +623,7 @@ export default class extends Controller {
           }
         });
 
-        if (this.emploifTarget.value != "Aucun" && this.emploifTarget.value != ""){
-      
+        if (this.emploifTarget.value != "Aucun" && this.emploifTarget.value != ""){      
           if (this.emploifEchelonTarget.value == "" || this.finfEchelonTarget.value == "" || this.debutfEmploiTarget.value == ""){
             isValid = false;
           }
@@ -667,7 +671,53 @@ export default class extends Controller {
         let isValid = this.validateForm(this.formTarget);
         // If our form is invalid, prevent default on the event
         // so that the form is not submitted
+        const required_fields = [this.corpsTarget,this.gradeTarget,this.ageTarget,this.echelonTarget];
+    
         if (!isValid) {
+            required_fields.forEach((field) => {
+                if (!field.disabled && !field.value.trim()) {
+                    field.classList.add('fr-select--error');
+                    field.parentNode.classList.add('fr-select-group--error');
+                }
+            })
+            if (this.emploifTarget.value != "Aucun" && this.emploifTarget.value != ""){      
+              if (this.emploifEchelonTarget.value == ""){
+                this.emploifEchelonTarget.classList.add('fr-select--error');
+                this.emploifEchelonTarget.parentNode.classList.add('fr-select-group--error'); 
+              }
+              if (this.finfEchelonTarget.value == "" ){
+                this.finfEchelonTarget.classList.add('fr-select--error');
+                this.finfEchelonTarget.parentNode.classList.add('fr-select-group--error'); 
+              }
+              if (this.debutfEmploiTarget.value == ""){
+                this.debutfEmploiTarget.classList.add('fr-select--error');
+                this.debutfEmploiTarget.parentNode.classList.add('fr-select-group--error'); 
+              }
+              if (this.dureeTitle2Target.classList.contains('select_inactive') == false && this.dureefEchelonTarget.value == ""){
+                this.dureefEchelonTarget.classList.add('fr-select--error');
+                this.dureefEchelonTarget.parentNode.classList.add('fr-select-group--error');  
+              }
+            }
+            if (this.dureeTitleTarget.classList.contains('select_inactive') == false && this.dureeTarget.value == ""){
+                this.dureeTarget.classList.add('fr-select--error');
+                this.dureeTarget.parentNode.classList.add('fr-select-group--error');
+            }
+
+            const emploif_targets = [this.emploif1Target,this.emploif2Target,this.emploif3Target,this.emploif4Target,this.emploif5Target,this.emploif6Target];
+            const debut_targets = [this.debutf1Target,this.debutf2Target,this.debutf3Target,this.debutf4Target,this.debutf5Target,this.debutf6Target];
+            const duree_targets = [this.dureef1Target,this.dureef2Target,this.dureef3Target,this.dureef4Target,this.dureef5Target,this.dureef6Target];
+            [0,1,2,3,4,5].forEach((indice)=>{
+              if (emploif_targets[indice].selectedIndex != 0){
+                if (debut_targets[indice].selectedIndex == 0 ){
+                    debut_targets[indice].classList.add('fr-select--error');
+                    debut_targets[indice].parentNode.classList.add('fr-select-group--error');
+                }
+                if (duree_targets[indice].selectedIndex == 0){
+                    duree_targets[indice].classList.add('fr-select--error');
+                    duree_targets[indice].parentNode.classList.add('fr-select-group--error');
+                }
+              }
+            })
 
           this.errorCorpsTarget.classList.remove('fr-hidden');
           this.errorCorpsTarget.innerHTML = "Vous devez remplir tous les champs obligatoires*";
@@ -677,15 +727,17 @@ export default class extends Controller {
         } else {
           // check dates ok 
           const age = parseInt(this.ageTarget.value);
-          const dates = [parseInt(this.grade2Target.value), parseInt(this.grade3Target.value), parseInt(this.grade4Target.value), parseInt(this.debutf1Target.value),parseInt(this.debutf2Target.value),parseInt(this.debutf3Target.value),parseInt(this.debutf4Target.value),parseInt(this.debutf5Target.value),parseInt(this.debutf6Target.value), parseInt(this.debutProjetTarget.value), parseInt(this.finProjetTarget.value)];
+          const dates = [this.grade2Target, this.grade3Target, this.grade4Target, this.debutf1Target,this.debutf2Target,this.debutf3Target,this.debutf4Target,this.debutf5Target,this.debutf6Target, this.debutProjetTarget, this.finProjetTarget];
           let date_invalid = true;
           let projet_invalid = true;
           let emploi_invalid = true;
           let dates_ef_invalid = true;
 
-          dates.forEach((date) => {
-            if (date >= 2023+67-age){
-              date_invalid = false;
+          dates.forEach((date,indice) => {
+            if (parseInt(date.value) >= 2023+67-age){
+                date_invalid = false;
+                dates[indice].classList.add('fr-select--error');
+                dates[indice].parentNode.classList.add('fr-select-group--error');
             }
           })
 
@@ -698,34 +750,58 @@ export default class extends Controller {
             [0,1,2,3,4,5].forEach((indice)=>{
               if (debut_targets[indice].value != '' && duree_targets[indice].value  != '' ){
                 if ( ( parseInt(this.debutProjetTarget.value) <= parseInt(debut_targets[indice].value) && parseInt(debut_targets[indice].value) <= parseInt(this.finProjetTarget.value)) || ( parseInt(debut_targets[indice].value)  <= parseInt(this.debutProjetTarget.value) && parseInt(this.debutProjetTarget.value) <= parseInt(debut_targets[indice].value) +parseInt(duree_targets[indice].value) ) || (parseInt(debut_targets[indice].value)  <= parseInt(this.finProjetTarget.value) && parseInt(this.finProjetTarget.value) <= parseInt(debut_targets[indice].value) +parseInt(duree_targets[indice].value)) ){
-                  projet_invalid = false;
+                    projet_invalid = false;
+                    this.debutProjetTarget.classList.add('fr-select--error');
+                    this.debutProjetTarget.parentNode.classList.add('fr-select-group--error');
+                    this.finProjetTarget.classList.add('fr-select--error');
+                    this.finProjetTarget.parentNode.classList.add('fr-select-group--error'); 
+                    debut_targets[indice].classList.add('fr-select--error');
+                    debut_targets[indice].parentNode.classList.add('fr-select-group--error');
+                    duree_targets[indice].classList.add('fr-select--error');
+                    duree_targets[indice].parentNode.classList.add('fr-select-group--error'); 
                 }
               }
             });
             if (this.finfEchelonTarget.value != ""){
               if (parseInt(this.debutProjetTarget.value) <= parseInt(this.finfEchelonTarget.value)){
                 projet_invalid = false;
+                this.debutProjetTarget.classList.add('fr-select--error');
+                this.debutProjetTarget.parentNode.classList.add('fr-select-group--error');
+                this.finfEchelonTarget.classList.add('fr-select--error');
+                this.finfEchelonTarget.parentNode.classList.add('fr-select-group--error');
               }
             };
             //promo interdite pdt dispo
             [0,1,2].forEach((indice)=>{            
               if (promo_targets[indice].value != ""){
                 if ((parseInt(this.debutProjetTarget.value) <= parseInt(promo_targets[indice].value)) &&  (parseInt(promo_targets[indice].value)<= parseInt(this.finProjetTarget.value))){
-                  projet_invalid = false;      
+                    projet_invalid = false;  
+                    promo_targets[indice].classList.add('fr-select--error');
+                    promo_targets[indice].parentNode.classList.add('fr-select-group--error'); 
+                    this.debutProjetTarget.classList.add('fr-select--error');
+                    this.debutProjetTarget.parentNode.classList.add('fr-select-group--error');
+                    this.finProjetTarget.classList.add('fr-select--error');
+                    this.finProjetTarget.parentNode.classList.add('fr-select-group--error');     
                 }
               }
             })
           }
           if (this.finfEchelonTarget.value != ""){
             if (67-age < this.finfEchelonTarget.value-2023){
-              emploi_invalid = false
+                emploi_invalid = false;
+                this.finfEchelonTarget.classList.add('fr-select--error');
+                this.finfEchelonTarget.parentNode.classList.add('fr-select-group--error');
             }
           }
           //verifie fin des ef avant fin carrière
           [0,1,2,3,4,5].forEach((indice)=>{
             if (debut_targets[indice].value != ''){
                 if (67-age < parseInt(debut_targets[indice].value) + parseInt(duree_targets[indice].value) - 2023 ){
-                    emploi_invalid = false
+                    emploi_invalid = false;
+                    debut_targets[indice].classList.add('fr-select--error');
+                    debut_targets[indice].parentNode.classList.add('fr-select-group--error');
+                    duree_targets[indice].classList.add('fr-select--error');
+                    duree_targets[indice].parentNode.classList.add('fr-select-group--error');
                 }
             }
           });
@@ -733,13 +809,17 @@ export default class extends Controller {
           [0,1,2,3,4].forEach((indice)=>{
             if (debut_targets[indice+1].value != ''){
                 if (parseInt(debut_targets[indice].value) + parseInt(duree_targets[indice].value) > parseInt(debut_targets[indice+1].value)){
-                    dates_ef_invalid = false
+                    dates_ef_invalid = false;
+                    debut_targets[indice+1].classList.add('fr-select--error');
+                    debut_targets[indice+1].parentNode.classList.add('fr-select-group--error');
                 }
             }
           });
           if (debut_targets[0].value != '' && this.finfEchelonTarget.value !=''){
             if (parseInt(this.finfEchelonTarget.value) >= parseInt(debut_targets[0].value)){
-                dates_ef_invalid = false
+                dates_ef_invalid = false;
+                debut_targets[0].classList.add('fr-select--error');
+                debut_targets[0].parentNode.classList.add('fr-select-group--error');
             }
           }
 

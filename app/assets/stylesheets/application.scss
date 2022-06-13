@@ -126,7 +126,9 @@ p{
 .select_inactive{
   color: var(--text-disabled-grey) !important;
 }
-
+.fr-select-error {
+    color: #ce0500;
+}
 .texte_light{
   font-weight: lighter;
 }
