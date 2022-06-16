@@ -24,6 +24,15 @@
                             <li>
                                 <button class="fr-link fr-fi-theme-fill fr-link--icon-left" aria-controls="fr-theme-modal" data-fr-opened="false">Paramètres d'affichage</button>
                             </li>
+                            <% if user_signed_in? %>
+                                <li>
+                                    <%= link_to "Se déconnecter", destroy_user_session_path, data: { "turbo-method": :delete }, class:"fr-link fr-fi-logout-box-r-line" %>
+                                </li>
+                            <% else %>       
+                                <li>
+                                    <a class="fr-link fr-fi-lock-line" href="/connexion">Se connecter</a>
+                                </li>
+                            <% end %>       
                         </ul>
                     </div>
                 </div>

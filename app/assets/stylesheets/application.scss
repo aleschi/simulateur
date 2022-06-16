@@ -25,6 +25,9 @@ a{
 .fr-header__brand:hover, .fr-footer__brand:hover{
   background-color:transparent !important;
 }
+.fr-link {
+    color: var(--text-action-high-blue-france) !important;
+}
 .fr-text-lg{
   font-size:18px;
 }
@@ -155,4 +158,7 @@ p{
 .highcharts-title, .highcharts-subtitle, .highcharts-no-data, .btn-plus{
   color:var(--text-title-grey) !important;
   fill:var(--text-title-grey) !important;
+}
+.tc{
+  text-align: center;
 }

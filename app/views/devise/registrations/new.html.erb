@@ -1,0 +1,36 @@
+
+<div class="fr-container">    
+  <div class="fr-grid-row fr-grid-row--gutters">
+    <div class="fr-col-lg-6 fr-col-offset-lg-3">
+       
+      
+      <div class="">
+        <h1 class="fr-my-5w">Inscription</h1>
+        <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+          <%= render "devise/shared/error_messages", resource: resource %>
+
+          <div class="fr-input-group ">
+                <label class="fr-label" for="form-field1">Adresse mail</label>
+            <%= f.email_field :email, autofocus: true, autocomplete: "email" ,class:"fr-input", id: "form-field1" %>
+          </div>
+          <div class="fr-input-group ">
+                <label class="fr-label" for="form-field2">Mot de passe</label>
+            <% if @minimum_password_length %>
+            <em>(<%= @minimum_password_length %> characters minimum)</em>
+            <% end %><br />
+            <%= f.password_field :password, autocomplete: "new-password" ,class:"fr-input", id: "form-field2" %>
+          </div>
+          <div class="fr-input-group ">
+                <label class="fr-label" for="form-field3">Confirmation mot de passe</label>
+
+            <%= f.password_field :password_confirmation, autocomplete: "new-password" ,class:"fr-input", id: "form-field3" %>
+          </div>
+          <div class="">
+            <%= f.submit "Inscription", class:"fr-btn" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+

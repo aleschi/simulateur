@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  devise_for :users, :path => "",
+    :path_names =>  {:sign_in => "connexion", :sign_out => "logout"},
+    controllers: {sessions: 'sessions'}
   root 'pages#accueil'
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
@@ -38,7 +41,8 @@ Rails.application.routes.draw do
   
   post 'search_grilles', to: 'grilles#search_grilles'
 
-  get '/hg2et5zbk05ea', to: 'pages#index'
+  #get '/hg2et5zbk05ea', to: 'pages#index'
+  get '/simulateur', to: 'pages#index'
 
   get '/mentions-legales', to: 'pages#mentions_legales'
   get '/donnees-personnelles', to: 'pages#donnees_personnelles'
