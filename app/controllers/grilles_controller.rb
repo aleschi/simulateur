@@ -9,7 +9,7 @@ class GrillesController < ApplicationController
     #initialisation des paramètres 
     @fonctions = ["Sous-préfet / sous-préfète", "Préfet / Préfète", "Fonctions diplomatiques", "Missions d'inspections générales","Emplois supérieurs de l'administration fiscale" ]
   	@age = params[:age].to_i
-  	@duree_carriere = 67 - @age
+  	@duree_carriere = 67 - @age + 1
     @corps = params[:corps]
     @debut_dispo=0
     @fin_dispo=0
@@ -110,7 +110,11 @@ class GrillesController < ApplicationController
     (2..4).each do |i|
       if !params["grade#{i}"].nil? && params["grade#{i}"] != '' 
         @grade = i
+        @grade3 = i
         @annee_grade = params["grade#{i}"].to_i - 2023 
+        if @grade < @grade_reclasse
+          @grade3 = @grade_reclasse
+        end 
 
         if @duree_carriere - @annee_grade > 0 #vérifie promo avant retraite
           #check dimension array vont jusqua promo de grade 
@@ -129,7 +133,7 @@ class GrillesController < ApplicationController
           @liste_indices=PromoGrade(@corps,@grade,@liste_indices,@annee_grade)
           @liste_indices2=PromoGrade(@corps,@grade,@liste_indices2,@annee_grade)
           
-          @liste_indices_emploi3=PromoGrade3(@liste_indices_emploi3,@annee_grade, @grade,@intervalle)
+          @liste_indices_emploi3=PromoGrade3(@liste_indices_emploi3,@annee_grade, @grade3,@intervalle)
         
         end
       end
@@ -161,10 +165,13 @@ class GrillesController < ApplicationController
           @i1=@liste_indices[@start_emploi-1]
           @i2=@liste_indices_emploi.max
           @indice_emploi = [@i1,@i2].max #max des indices
+          if @indice_emploi > Emploi.where(nom: params["type_emploi#{i}"]).order('indice ASC').last.indice
+            @indice_emploi = Emploi.where(nom: params["type_emploi#{i}"]).order('indice ASC').last.indice
+          end 
           @liste_e = Emploi.where(nom: params["type_emploi#{i}"]).where("indice >= ?",@indice_emploi).order('indice ASC') 
           @annee_e = Emploi.where(nom: params["type_emploi#{i}"]).where("indice >= ?",@indice_emploi).order('indice ASC').first.annee 
           @echelon_e = Emploi.where(nom: params["type_emploi#{i}"]).where("indice >= ?",@indice_emploi).order('indice ASC').first.echelon 
-          @indice_e = Emploi.where(nom: params["type_emploi#{i}"]).where("indice >= ?",@indice_emploi).order('indice ASC').first.echelon 
+          @indice_e = Emploi.where(nom: params["type_emploi#{i}"]).where("indice >= ?",@indice_emploi).order('indice ASC').first.indice 
           @liste_indices_emploi_new = [@indice_e]
           #saut de ligne cases jaune   
           SautLigneE(@liste_e,@annee_e,@echelon_e,params["type_emploi#{i}"],@liste_indices_emploi_new) #saut ligne cases jaunes -> nouvelles liste indice emplois         
@@ -212,6 +219,9 @@ class GrillesController < ApplicationController
                 if @grade_a > 3
                   @grade_a=3
                 end
+                if @grade_a < @grade_reclasse
+                  @grade_a = @grade_reclasse
+                end 
                 @promo = true 
                 @liste_indices_emplois3_ae = @liste_indices_emploi3[@start_emploi..@liste_indices_emploi3.length-1]
                 @liste_indices_emploi3[@start_emploi..@liste_indices_emploi3.length-1]=ProgressionEfGrade(@liste_indices_emplois3_ae,@duree_emploi,@liste_indices_emplois3_moyenne_ae,@grade_a, @annee_grade-@start_emploi, @step)
@@ -249,6 +259,9 @@ class GrillesController < ApplicationController
                 if @grade > 3
                   @grade=3
                 end
+                if @grade < @grade_reclasse
+                  @grade = @grade_reclasse
+                end 
                 @liste_indices_emploi3=PromoGrade3(@liste_indices_emploi3,@annee_grade, @grade, @intervalle)
               end
             end
@@ -365,7 +378,6 @@ class GrillesController < ApplicationController
           if 30-age_emploi > 0 && i < 30-age_emploi #n'a pas encore 30 ans 
             liste_indices_moyenne_ae[i] = liste_indices_ae[i]
           else 
-            #liste_indices_moyenne_ae[i] = (((10-2*i)*liste_indices_ae[i]).to_f/12 + (2*(i+1)*liste_indices_ae[i+1]).to_f/12).round()
             liste_indices_moyenne_ae[i] = FormuleProgression(liste_indices_moyenne_ae,liste_indices_ae,i,step)
           end
         end 
