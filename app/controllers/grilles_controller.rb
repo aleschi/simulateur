@@ -6,7 +6,7 @@ class GrillesController < ApplicationController
   end
   
   def search_grilles
-    #initialisation
+    #initialisation des paramètres 
     @fonctions = ["Sous-préfet / sous-préfète", "Préfet / Préfète", "Fonctions diplomatiques", "Missions d'inspections générales","Emplois supérieurs de l'administration fiscale" ]
   	@age = params[:age].to_i
   	@duree_carriere = 67 - @age
@@ -22,11 +22,6 @@ class GrillesController < ApplicationController
     @array_ef = Array.new(@duree_carriere, 'non')
     @liste_indices_emploi = Array.new(@duree_carriere, 0) #courbe secondaire partie ef avant reforme 
     @liste_indices_emploi2 = Array.new(@duree_carriere, 0) #courbe secondaire partie ef apres reforme sans droit option 
-    #@grade_max = @grade # grade max 3 pour table AE/reclassement ou ef
-
-    #if @grade > 3 
-    #  @grade_max = 3
-    #end 
     @intervalle = 0
     #1/Courbe carriere principale (corps)
 
@@ -45,7 +40,11 @@ class GrillesController < ApplicationController
 
     #initialement dans un emploi fonctionnel 
     if !params[:type_emploi].nil? && params[:type_emploi] != "" && params[:type_emploi] != "Aucun" && params[:fin_emploif] != "" && params[:duree_emploif] != "" && params[:debut_emploif] != ""
-      
+      if params[:type_emploi] == "Directeur d'administration centrale / Directrice d'administration centrale"
+        @step = 8
+      else 
+        @step = 10 
+      end 
       @duree_emploi = params[:fin_emploif].to_i - 2023 + 1 #duree jusqua fin emploi - on prend en compte 2023
       @duree = params[:duree_emploif] #duree echelon
       @array_ef = Array.new(@duree_emploi, params[:type_emploi])+@array_ef[@duree_emploi..@duree_carriere-1] #maj array ef pour graphe
@@ -64,30 +63,34 @@ class GrillesController < ApplicationController
       @liste_indices_emploi[0..@duree_emploi-1] = @liste_indices_emploi_new[0..@duree_emploi-1] #on initialise avec les donnees ef jusqua a la fin emploi f puis 0 partout
       
    
-      #2eme courbe : on va chercher indice le plus proche au meme indice quil avait dans son emploi fonctionnel         
-      #avant @liste_indices_ae = Grille.where(corps: "AE", grade: @grade_max).where('indice >= ?',@indice_emploi).order('indice ASC').pluck(:indice)
-      @liste_indices_ae = Reclassement.where(grade: @grade_reclasse).where('indice >= ?',@indice_emploi).order('indice ASC').pluck(:indice)
-      
+      #2eme courbe : on va chercher indice le plus proche au meme indice quil avait dans son corps en gardant grade du corps principal        
+      @liste_indices_ae = Reclassement.where(grade: @grade_reclasse).where('indice >= ?',@indice_i).order('indice ASC').pluck(:indice)     
       if !@liste_indices_ae.last.nil? #indice emploi f pas trop eleve pour grade table AE sinon pb      
         @liste_indices_moyenne_ae = Array.new(@duree_emploi, 0)
-        ProgressionEf(@liste_indices_ae,@duree_emploi,@liste_indices_moyenne_ae)    
+        ProgressionEf(@liste_indices_ae,@duree_emploi,@liste_indices_moyenne_ae, @age, @step)    
         @liste_indices_emploi2[0..@duree_emploi-1] = @liste_indices_moyenne_ae 
       end
     
-      #3eme courbe: on va chercher indice le plus proche au meme indice quil avait dans son CORPS SANS EF dans table de reclassement puis on prend echelon correspondant et on fait derouler table jusqua a la fin
-      #avant @nouvel_echelon = Reclassement.where('indice >= ?',@indice_i).order('indice ASC').first.echelon
-      #avant @liste_indices_emploi3 = Grille.where(corps: "AE", grade: @grade_max).where('echelon >= ?',@nouvel_echelon).order('indice ASC').pluck(:indice)         
+      #3eme courbe: on va chercher indice le plus proche au meme indice quil avait dans son CORPS SANS EF dans table de reclassement puis on prend echelon correspondant et on fait derouler table jusqua a la fin       
       @liste_indices_emploi3 = Reclassement.where(grade: @grade_reclasse).where('echelon >= ?',@echelon_reclasse).order('indice ASC').pluck(:indice)
       if @liste_indices_emploi3.last.nil? #indice emploi f trop eleve pour grade table AE
         @liste_indices_emploi3 = Array.new(@duree_carriere, @indice_emploi)  
       else
         @liste_indices_moyenne_ae3 = Array.new(@duree_emploi, 0)
-        ProgressionEf(@liste_indices_emploi3,@duree_emploi,@liste_indices_moyenne_ae3) 
+        ProgressionEf(@liste_indices_emploi3,@duree_emploi,@liste_indices_moyenne_ae3, @age, @step) #pas de progression avant 30 ans 
         @liste_indices_emploi3[0..@duree_emploi-1] = @liste_indices_moyenne_ae3   
         #on doit garder intervalle pour la suite 
         if @liste_indices_emploi3.length-@duree_emploi > 0
           @liste_indices_moyenne_ae3_suite = Array.new(@liste_indices_emploi3.length-@duree_emploi, 0)
-          @intervalle = (2 * @duree_emploi).to_f/12
+          if 30 - @age > 0 #moins de 30 ans
+            if @duree_emploi - (30 - @age) > 0 
+              @intervalle = (2 * (@duree_emploi - (30 - @age))).to_f/12
+            else 
+              @intervalle = 0 
+            end 
+          else 
+            @intervalle = (2 * @duree_emploi).to_f/12
+          end
           ProgressionEfSuite(@liste_indices_emploi3,@duree_emploi,@liste_indices_moyenne_ae3_suite,@intervalle) 
           @liste_indices_emploi3[@duree_emploi..@liste_indices_emploi3.length-1] = @liste_indices_moyenne_ae3_suite
         end
@@ -98,9 +101,7 @@ class GrillesController < ApplicationController
         @liste_indices2 = @liste_indices2[0..@duree_emploi-1]+@liste_indices2[@duree_emploi+1..@liste_indices2.length-1]
       end
 
-    else #nest pas dans un ef on calcule 3eme courbe 
-      #@nouvel_echelon = Reclassement.where('indice >= ?',@indice_i).order('indice ASC').first.echelon
-      #@liste_indices_emploi3 = Grille.where(corps: "AE", grade: @grade_max).where('echelon >= ?',@nouvel_echelon).order('indice ASC').pluck(:indice) 
+    else #nest pas dans un ef on calcule 3eme courbe  
       @liste_indices_emploi3 = Reclassement.where(grade: @grade_reclasse).where('echelon >= ?', @echelon_reclasse).order('indice ASC').pluck(:indice) 
     end
 
@@ -128,7 +129,7 @@ class GrillesController < ApplicationController
           @liste_indices=PromoGrade(@corps,@grade,@liste_indices,@annee_grade)
           @liste_indices2=PromoGrade(@corps,@grade,@liste_indices2,@annee_grade)
           
-          @liste_indices_emploi3=PromoGrade3(@liste_indices_emploi3,@annee_grade, @grade)
+          @liste_indices_emploi3=PromoGrade3(@liste_indices_emploi3,@annee_grade, @grade,@intervalle)
         
         end
       end
@@ -144,9 +145,14 @@ class GrillesController < ApplicationController
     #nouvel emploi fonctionel  
     (1..6).each do |i|
       if !params["type_emploi#{i}"].nil? &&  params["type_emploi#{i}"] != "" && params["type_emploi#{i}"] != "Aucun" && params["duree_emploif#{i}"] != "" && params["debut_emploif#{i}"] != ""
+        if params["type_emploi#{i}"] == "Directeur d'administration centrale / Directrice d'administration centrale"
+          @step = 8
+        else 
+          @step = 10 
+        end 
         @duree_emploi = params["duree_emploif#{i}"].to_i 
         @start_emploi = params["debut_emploif#{i}"].to_i - 2023
-
+        @age_emploi = @age + @start_emploi
         @array_ef = @array_ef[0..@start_emploi-1]+Array.new(@duree_emploi, params["type_emploi#{i}"])+@array_ef[@start_emploi+@duree_emploi..@duree_carriere-1]
  
         #avant reforme
@@ -155,7 +161,13 @@ class GrillesController < ApplicationController
           @i1=@liste_indices[@start_emploi-1]
           @i2=@liste_indices_emploi.max
           @indice_emploi = [@i1,@i2].max #max des indices
-          @liste_indices_emploi_new = Emploi.where(nom: params["type_emploi#{i}"]).where("indice >= ?",@indice_emploi).order('indice ASC').pluck(:indice)          
+          @liste_e = Emploi.where(nom: params["type_emploi#{i}"]).where("indice >= ?",@indice_emploi).order('indice ASC') 
+          @annee_e = Emploi.where(nom: params["type_emploi#{i}"]).where("indice >= ?",@indice_emploi).order('indice ASC').first.annee 
+          @echelon_e = Emploi.where(nom: params["type_emploi#{i}"]).where("indice >= ?",@indice_emploi).order('indice ASC').first.echelon 
+          @indice_e = Emploi.where(nom: params["type_emploi#{i}"]).where("indice >= ?",@indice_emploi).order('indice ASC').first.echelon 
+          @liste_indices_emploi_new = [@indice_e]
+          #saut de ligne cases jaune   
+          SautLigneE(@liste_e,@annee_e,@echelon_e,params["type_emploi#{i}"],@liste_indices_emploi_new) #saut ligne cases jaunes -> nouvelles liste indice emplois         
           if !@liste_indices_emploi_new.last.nil?
           if @liste_indices_emploi_new.length < @duree_emploi
             @liste_indices_emploi_new = @liste_indices_emploi_new[0..@duree_emploi-1] + Array.new(@duree_emploi-@liste_indices_emploi_new.length, @liste_indices_emploi_new.last)
@@ -165,10 +177,7 @@ class GrillesController < ApplicationController
         end
 
         #apres reforme        
-        @grade = @array_grade[@start_emploi-1]  #on regarde a quel grade on est a ce moment la   
-        #if @grade > 3 #on bloque a 3 max pour grille AE
-        #  @grade = 3
-        #end 
+        @grade = @array_grade[@start_emploi-1]  #on regarde a quel grade on est a ce moment la    
 
         @liste_indices2=checkDim(@liste_indices2,@start_emploi)
         @i4=@liste_indices2[@start_emploi-1]
@@ -180,7 +189,7 @@ class GrillesController < ApplicationController
         
         if !@liste_indices_emplois2_ae.last.nil? #indice emploi f pas trop eleve pour grade table AE
           @liste_indices_emplois2_moyenne_ae = Array.new(@duree_emploi, 0)
-          ProgressionEf(@liste_indices_emplois2_ae,@duree_emploi,@liste_indices_emplois2_moyenne_ae)
+          ProgressionEf(@liste_indices_emplois2_ae,@duree_emploi,@liste_indices_emplois2_moyenne_ae, @age_emploi,@step)
           @liste_indices_emploi2[@start_emploi..@start_emploi+@duree_emploi-1] =  @liste_indices_emplois2_moyenne_ae 
           if @fonctions.include?(params["type_emploi#{i}"]) == true #1ere courbe ef comme 2eme pour nouveau ef
             @liste_indices_emploi[@start_emploi..@start_emploi+@duree_emploi-1] = @liste_indices_emplois2_moyenne_ae 
@@ -205,20 +214,29 @@ class GrillesController < ApplicationController
                 end
                 @promo = true 
                 @liste_indices_emplois3_ae = @liste_indices_emploi3[@start_emploi..@liste_indices_emploi3.length-1]
-                @liste_indices_emploi3[@start_emploi..@liste_indices_emploi3.length-1]=ProgressionEfGrade(@liste_indices_emplois3_ae,@duree_emploi,@liste_indices_emplois3_moyenne_ae,@grade_a, @annee_grade-@start_emploi)
+                @liste_indices_emploi3[@start_emploi..@liste_indices_emploi3.length-1]=ProgressionEfGrade(@liste_indices_emplois3_ae,@duree_emploi,@liste_indices_emplois3_moyenne_ae,@grade_a, @annee_grade-@start_emploi, @step)
               
               end
             end
         end
         if @promo.nil? #pas de promo pendant ef 
-          @liste_indices_emplois3_ae = @liste_indices_emploi3[@start_emploi..@start_emploi+@duree_emploi]
-          ProgressionEf(@liste_indices_emplois3_ae,@duree_emploi,@liste_indices_emplois3_moyenne_ae)
+          #@liste_indices_emplois3_ae = @liste_indices_emploi3[@start_emploi..@start_emploi+@duree_emploi]
+          @liste_indices_emplois3_ae = @liste_indices_emploi3[@start_emploi..@liste_indices_emploi3.length-1]
+          ProgressionEf(@liste_indices_emplois3_ae,@duree_emploi,@liste_indices_emplois3_moyenne_ae, @age_emploi, @step)
           @liste_indices_emploi3[@start_emploi..@start_emploi+@duree_emploi-1] = @liste_indices_emplois3_moyenne_ae  
         end      
         #suite après ef   
         if @liste_indices_emploi3.length-@start_emploi-@duree_emploi > 0
           @liste_indices_moyenne_ae3_suite = Array.new(@liste_indices_emploi3.length-@duree_emploi-@start_emploi, 0)
-          @intervalle = (2 * @duree_emploi).to_f/12
+          if 30 - @age_emploi > 0 #moins de 30 ans
+            if @duree_emploi - (30 - @age_emploi) > 0 
+              @intervalle = (2 * (@duree_emploi - (30 - @age_emploi))).to_f/12
+            else 
+              @intervalle = 0 
+            end 
+          else 
+            @intervalle = (2 * @duree_emploi).to_f/12
+          end
           ProgressionEfSuite(@liste_indices_emploi3,@start_emploi+@duree_emploi,@liste_indices_moyenne_ae3_suite,@intervalle) 
           @liste_indices_emploi3[@start_emploi+@duree_emploi..@liste_indices_emploi3.length-1] = @liste_indices_moyenne_ae3_suite
         
@@ -231,7 +249,7 @@ class GrillesController < ApplicationController
                 if @grade > 3
                   @grade=3
                 end
-                @liste_indices_emploi3=PromoGrade3(@liste_indices_emploi3,@annee_grade, @grade)
+                @liste_indices_emploi3=PromoGrade3(@liste_indices_emploi3,@annee_grade, @grade, @intervalle)
               end
             end
           end
@@ -309,6 +327,7 @@ class GrillesController < ApplicationController
         annee_i = annee_i + 1
       end     
     end
+    #return liste_indices
   end
   def SautLigneE(liste_e,annee_e,echelon_e,nom,liste_indices_emploi_new)
   #saut de ligne si 2 echelons possible meme annee ex DP-EHN
@@ -326,15 +345,29 @@ class GrillesController < ApplicationController
           annee_e = annee_e + 1
         end     
       end
+      #return liste_indices_emploi_new
     end
 
-    def ProgressionEf(liste_indices_ae,duree_emploi,liste_indices_moyenne_ae)
-        if liste_indices_ae.length < duree_emploi + 1 #on prend @duree_emploi+1 car on a besoin du dernier indice pour la relation de recurrence
-          liste_indices_ae = liste_indices_ae[0..duree_emploi] + Array.new(duree_emploi+1-liste_indices_ae.length, liste_indices_ae.last)
+    def FormuleProgression(liste_indices_moyenne_ae,liste_indices_ae, indice, step)
+      @an = ((12*indice-step).modulo(step)-step).abs().to_f
+      @indice = 12*indice/step
+      liste_indices_moyenne_ae[indice] = ((@an/12)*liste_indices_ae[@indice]+((12-@an)/12)*liste_indices_ae[@indice+1]).round()
+   
+      return liste_indices_moyenne_ae[indice]
+    end 
+
+    def ProgressionEf(liste_indices_ae,duree_emploi,liste_indices_moyenne_ae, age_emploi, step)
+        if liste_indices_ae.length < duree_emploi + 2 #on prend @duree_emploi+2 car on a besoin des derniers indices pour la relation de recurrence
+          liste_indices_ae = liste_indices_ae[0..duree_emploi] + Array.new(duree_emploi+2-liste_indices_ae.length, liste_indices_ae.last)
         end      
         liste_indices_ae[0..duree_emploi-1].each_with_index do |indice,i|
           #i demarre à 0
-          liste_indices_moyenne_ae[i] = (((10-2*i)*liste_indices_ae[i]).to_f/12 + (2*(i+1)*liste_indices_ae[i+1]).to_f/12).round()
+          if 30-age_emploi > 0 && i < 30-age_emploi #n'a pas encore 30 ans 
+            liste_indices_moyenne_ae[i] = liste_indices_ae[i]
+          else 
+            #liste_indices_moyenne_ae[i] = (((10-2*i)*liste_indices_ae[i]).to_f/12 + (2*(i+1)*liste_indices_ae[i+1]).to_f/12).round()
+            liste_indices_moyenne_ae[i] = FormuleProgression(liste_indices_moyenne_ae,liste_indices_ae,i,step)
+          end
         end 
     end
     def ProgressionEfSuite(liste_indices_emploi3,duree_emploi,liste_indices_moyenne_ae3_suite,intervalle) 
@@ -373,26 +406,26 @@ class GrillesController < ApplicationController
           return liste_indices
     end
 
-    def PromoGrade3(liste_indices_emploi3,annee_grade, grade)
+    def PromoGrade3(liste_indices_emploi3,annee_grade, grade,intervalle)
           @indice_anciengrade3 = liste_indices_emploi3[annee_grade]
           if grade <= 3 #max 3
             @liste_indices_nouveau_grade3 = Reclassement.where(grade: grade).where("indice >= ?",@indice_anciengrade3).order('indice ASC').pluck(:indice)
-            #@liste_indices_emploi3 = @liste_indices_emploi3[0..@annee_grade-1]+@liste_indices_nouveau_grade3
             #garder intervalle
             @liste_indices_moyenne_ae3_suite = Array.new(@liste_indices_nouveau_grade3.length, 0)
-            ProgressionEfSuite(@liste_indices_nouveau_grade3,0,@liste_indices_moyenne_ae3_suite,@intervalle) 
+            ProgressionEfSuite(@liste_indices_nouveau_grade3,0,@liste_indices_moyenne_ae3_suite,intervalle) 
             liste_indices_emploi3[annee_grade..liste_indices_emploi3.length-1] = @liste_indices_moyenne_ae3_suite
           end
           return liste_indices_emploi3
     end
 
-    def ProgressionEfGrade(liste_indices_ae,duree_emploi,liste_indices_moyenne_ae,grade,annee)
-        if liste_indices_ae.length < duree_emploi + 1 #on prend @duree_emploi+1 car on a besoin du dernier indice pour la relation de recurrence
-          liste_indices_ae = liste_indices_ae[0..duree_emploi] + Array.new(duree_emploi+1-liste_indices_ae.length, liste_indices_ae.last)
+    def ProgressionEfGrade(liste_indices_ae,duree_emploi,liste_indices_moyenne_ae,grade,annee, step)
+        if liste_indices_ae.length < duree_emploi + 2 #on prend @duree_emploi+2 car on a besoin des derniers indices pour la relation de recurrence
+          liste_indices_ae = liste_indices_ae[0..duree_emploi] + Array.new(duree_emploi+2-liste_indices_ae.length, liste_indices_ae.last)
         end      
         liste_indices_ae[0..@duree_emploi-1].each_with_index do |indice,i|
           #i demarre à 0
-          liste_indices_moyenne_ae[i] = (((10-2*i)*liste_indices_ae[i]).to_f/12 + (2*(i+1)*liste_indices_ae[i+1]).to_f/12).round()
+          #liste_indices_moyenne_ae[i] = (((10-2*i)*liste_indices_ae[i]).to_f/12 + (2*(i+1)*liste_indices_ae[i+1]).to_f/12).round()
+          liste_indices_moyenne_ae[i] = FormuleProgression(liste_indices_moyenne_ae,liste_indices_ae,i,step)
           if i == annee-1
             @liste_indices_nouveau_grade3 = Reclassement.where(grade: grade).where("indice >= ?",liste_indices_moyenne_ae[i]).order('indice ASC').pluck(:indice)
             if @liste_indices_nouveau_grade3.length < duree_emploi - i - 1
