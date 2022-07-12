@@ -103,9 +103,15 @@ class GrillesController < ApplicationController
 
     else #nest pas dans un ef on calcule 3eme courbe  
       @liste_indices_emploi3 = Reclassement.where(grade: @grade_reclasse).where('echelon >= ?', @echelon_reclasse).order('indice ASC').pluck(:indice) 
+         
     end
 
-
+    #promo grade 3 au bout de 5 ans (2028) si grade transitoire
+    if @grade_reclasse == 2.5
+      @grade_reclasse = 3 
+      @liste_indices_emploi3=PromoGrade3(@liste_indices_emploi3,5, @grade_reclasse,@intervalle)
+    end
+    
     #calcul si changement de grade 
     (2..4).each do |i|
       if !params["grade#{i}"].nil? && params["grade#{i}"] != '' 
