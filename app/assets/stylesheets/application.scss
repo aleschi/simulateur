@@ -83,7 +83,7 @@ h1, h2{
 }
 
 .cbleu{
-  color:#000091;
+  color:var(--text-action-high-blue-france);
 }
 .bouton_inactive {
   background-color: var(--background-disabled-grey) !important;
@@ -98,13 +98,15 @@ h1, h2{
   text-decoration:none;
   position:absolute;
   right:0rem;
+  color:var(--text-action-high-blue-france);
+  &:hover{
+  background-color:transparent !important;
+  }
 }
 .bouton_i2{
-  height:1rem;
-  margin-left:0.25rem;
-  img{
-  height:1rem;
-  float:left;
+  color: var(--text-action-high-blue-france);
+  &:hover{
+  background-color:transparent !important;
   }
 }
 

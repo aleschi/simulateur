@@ -47,7 +47,7 @@ export default class extends Controller {
                 data: data,
                 pointStart: 2023,
                 pointInterval: 1,
-                color: "#000091",
+                color: 'var(--text-action-high-blue-france)',
                 type: 'spline',  
                 lineWidth: 5,
                 dashStyle: 'ShortDot',
@@ -66,7 +66,7 @@ export default class extends Controller {
                 data: data,
                 pointStart: 2023,
                 pointInterval: 1,
-                color: "#000091",
+                color: 'var(--text-action-high-blue-france)',
                 type: 'spline',  
                 lineWidth: 5,
                 dashStyle: 'ShortDot',
@@ -110,11 +110,12 @@ export default class extends Controller {
                 style: {
                 fontSize: '15px',
                 fontWeight: "900",
-               
+                color: 'var(--text-title-grey)'
                 }
             },
             subtitle:{
                 text: "Les valeurs des graphes sont données à titre indicatif",
+                style: {color: 'var(--text-title-grey)'}, 
             },
             tooltip: {
                 shared: true,
@@ -133,6 +134,9 @@ export default class extends Controller {
             },
             xAxis:{
             	tickInterval: 1,
+                labels: {
+                    style: {color: 'var(--text-title-grey)'},
+                },
                 //type: 'datetime',
                 //softMin: Date.UTC(2023),
                 plotBands: [{
@@ -144,7 +148,7 @@ export default class extends Controller {
                     textAlign: 'center',
                     verticalAlign: 'top',
                     style: {
-                      color:'#000',
+                      color:'var(--text-title-grey)',
                       fontWeight: 'light',
                       fontStyle: 'italic',
                     },
@@ -155,13 +159,18 @@ export default class extends Controller {
                 }],
             },
             yAxis: { 
-            title: {
+                labels: {
+                    style: {color: 'var(--text-title-grey)'},
+                },
+                title: {
                 text: "indices",
-                
+                style: {color: 'var(--text-title-grey)'}, 
                 }
             },
             legend: {
                 symbolWidth: 40,
+                itemStyle: {"color": 'var(--text-title-grey)', "cursor": "pointer", "fontSize": "12px", "fontWeight": "bold", "textOverflow": "ellipsis"},
+                itemHoverStyle: {"color": 'var(--text-title-grey)'},
             },
             plotOptions: {
             	spline: {
@@ -247,10 +256,12 @@ export default class extends Controller {
                 style: {
                 fontSize: '15px',
                 fontWeight: "900",
+                color: 'var(--text-title-grey)',
                 }
             },
             subtitle:{
                 text: "Les valeurs des graphes sont données à titre indicatif",
+                style: {color: 'var(--text-title-grey)'}, 
             },
             tooltip: {
                 shared: true,
@@ -270,6 +281,9 @@ export default class extends Controller {
                 tickInterval: 1,
                 //type: 'datetime',
                 //softMin: Date.UTC(2023),
+                labels: {
+                    style: {color:'var(--text-title-grey)'},
+                },
                 plotBands: [{
                     borderColor:'#F0F0F0',
                     borderWidth: 0,
@@ -279,7 +293,7 @@ export default class extends Controller {
                     textAlign: 'center',
                     verticalAlign: 'top',
                     style: {
-                      color:'#000',
+                      color:'var(--text-title-grey)',
                       fontWeight: 'light',
                       fontStyle: 'italic',
                     },
@@ -290,10 +304,18 @@ export default class extends Controller {
                 }],
             },
             yAxis: { 
-            title: {
+                labels: {
+                    style: {color: 'var(--text-title-grey)'},
+                },
+                title: {
                 text: "Écart",
-                
+                style: {color: 'var(--text-title-grey)'}, 
                 }
+            },
+            legend: {
+                symbolWidth: 40,
+                itemStyle: {"color": 'var(--text-title-grey)', "cursor": "pointer", "fontSize": "12px", "fontWeight": "bold", "textOverflow": "ellipsis"},
+                itemHoverStyle: {"color": 'var(--text-title-grey)'},
             },
             plotOptions: {
                 column: {
