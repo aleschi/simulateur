@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
     static get targets() {
-  return [ 'form','submitBouton', "grade2", "grade3", "grade4",'grade2Title','grade3Title','grade4Title',
+  return ['form','submitBouton', "grade2", "grade3", "grade4",'grade2Title','grade3Title','grade4Title',
      'emploif','emploifEchelon','dureefEchelon','finfEchelon','debutfEmploi',
     
      "error","EditEF","EditGrades",
@@ -912,6 +912,11 @@ export default class extends Controller {
               }
               }
             })
+            const top = document.documentElement;
+            if (top.clientWidth > 991){
+            top.scrollTop = 100;
+            console.log(top.clientWidth);
+            }
           } 
         
         }

@@ -1,6 +1,6 @@
 <% content_for :title do %>Effectuez votre simulation - Simulae <% end %>
 
-<main role="main" class="containtAll">
+<main role="main" class="containtAll" >
 	<div class="fr-container">
 		<nav role="navigation" class="fr-breadcrumb" aria-label="vous êtes ici :">
 			    <button class="fr-breadcrumb__button " aria-expanded="false" aria-controls="breadcrumb-1">Voir le fil d’Ariane</button>
@@ -16,8 +16,8 @@
 			    </div>
 		</nav>
 		<div class="fr-grid-row fr-grid-row--gutters">
-			<div class="fr-col-lg-12">
-			<h1> Simulez votre nouvelle rémunération <span class="pright"> <%= link_to simulateur_path, class:" fr-btn fr-btn--icon-left" do %><span class="fr-fi-refresh-line fr-fi--sm fr-mr-3v" aria-hidden="true"></span>Réinitialiser la simulation<%end%></span></h1>
+			<div class="fr-col-12 fr-col-lg-12">
+			<h1> Simulez votre nouvelle rémunération <span class="pright"> <%= link_to simulateur_path, class:" fr-btn fr-btn--icon-left" do %><span class="fr-fi-refresh-line fr-fi--sm fr-mr-1v" aria-hidden="true"></span>Réinitialiser la simulation<%end%></span></h1>
 			<p class="fr-text--sm">Tous les champs comportant un astérisque (*) sont à remplir obligatoirement.</p>
 			<p class="fr-text--sm">Les courbes s'afficheront lorsque vous aurez renseigné et validé les informations sur votre situation dans le formulaire de gauche ci-dessous.</p>
 			
@@ -30,10 +30,10 @@
 <div class="fr-container">
 	<% if !@corps.nil? && !@emplois_f2.nil?%>
 	<div class="fr-grid-row fr-grid-row--gutters">
-		<div class="fr-col-lg-5">
+		<div class="fr-col-12 fr-col-lg-5">
 			<%= render 'form'%>
 		</div>
-		<div class="fr-col-lg-7">
+		<div class="fr-col-12 fr-col-lg-7">
 			<div id="graphe" class="graphe">				
 				<%= render 'graphe'%>
 			</div>

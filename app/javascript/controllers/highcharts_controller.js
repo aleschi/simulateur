@@ -56,7 +56,7 @@ export default class extends Controller {
                 data: data3,
                 pointStart: 2023,
                 pointInterval: 1,
-                color: "#E18876",
+                color: "#CE614A",
                 type: 'spline',  
                 lineWidth: 4,
                 },];
@@ -76,7 +76,7 @@ export default class extends Controller {
                 data: data3,
                 pointStart: 2023,
                 pointInterval: 1,
-                color: "#E18876",
+                color: "#CE614A",
                 type: 'spline',  
                 lineWidth: 4,
                 },];
@@ -196,7 +196,7 @@ export default class extends Controller {
                 data: sub3,
                 pointStart: 2023,
                 pointInterval: 1,
-                color: "#6D1247",
+                color: "#CE614A",
                 type: 'column',  
                
               },{
@@ -214,7 +214,7 @@ export default class extends Controller {
                 data: sub3,
                 pointStart: 2023,
                 pointInterval: 1,
-                color: "#6D1247",
+                color: "#CE614A",
                 type: 'column',  
                
               },]
