@@ -1,4 +1,4 @@
-/*! DSFR v1.4.0 | SPDX-License-Identifier: MIT | License-Filename: LICENSE.md | restricted use (see terms and conditions) */
+/*! DSFR v1.7.0 | SPDX-License-Identifier: MIT | License-Filename: LICENSE.md | restricted use (see terms and conditions) */
 
 (function () {
   'use strict';
@@ -70,7 +70,7 @@
     prefix: 'fr',
     namespace: 'dsfr',
     organisation: '@gouvfr',
-    version: '1.4.0'
+    version: '1.7.0'
   };
 
   var LogLevel = function LogLevel (level, light, dark, logger) {
@@ -559,6 +559,7 @@
   };
 
   prototypeAccessors$3.html.get = function () {
+    if (!this.node || !this.node.outerHTML) { return ''; }
     var end = this.node.outerHTML.indexOf('>');
     return this.node.outerHTML.substring(0, end + 1);
   };
@@ -1211,9 +1212,16 @@
     }
   };
 
+  var supportAspectRatio = function () {
+    if (!window.CSS) { return false; }
+    return CSS.supports('aspect-ratio: 16 / 9');
+  };
+
   var support = {};
 
   support.supportLocalStorage = supportLocalStorage;
+
+  support.supportAspectRatio = supportAspectRatio;
 
   var TransitionSelector = {
     NONE: ns.selector('transition-none')
@@ -1289,9 +1297,13 @@
   internals.property = property;
   internals.ns = ns;
   internals.register = engine.register;
+  internals.state = state;
 
   Object.defineProperty(internals, 'preventManipulation', {
     get: function () { return options.preventManipulation; }
+  });
+  Object.defineProperty(internals, 'stage', {
+    get: function () { return state.getModule('stage'); }
   });
 
   inspector.info(("version " + (config.version)));
@@ -1390,7 +1402,7 @@
     this._nexts = [];
   };
 
-  var prototypeAccessors$1 = { proxy: { configurable: true },isRendering: { configurable: true },isResizing: { configurable: true },isScrollLocked: { configurable: true },isLoading: { configurable: true },isSwappingFont: { configurable: true },isMouseMoving: { configurable: true },style: { configurable: true },hasFocus: { configurable: true },isLegacy: { configurable: true } };
+  var prototypeAccessors$1 = { proxy: { configurable: true },isRendering: { configurable: true },isResizing: { configurable: true },isScrollLocked: { configurable: true },isLoading: { configurable: true },isSwappingFont: { configurable: true },isMouseMoving: { configurable: true },style: { configurable: true },classNames: { configurable: true },hasFocus: { configurable: true },isLegacy: { configurable: true } };
   var staticAccessors = { instanceClassName: { configurable: true } };
 
   staticAccessors.instanceClassName.get = function () {
@@ -1684,6 +1696,10 @@
 
   Instance.prototype.hasClass = function hasClass$1 (className) {
     return hasClass(this.node, className);
+  };
+
+  prototypeAccessors$1.classNames.get = function () {
+    return getClassNames(this.node);
   };
 
   Instance.prototype.setAttribute = function setAttribute (attributeName, value) {
@@ -2184,7 +2200,8 @@
   }(DisclosureButton));
 
   var CollapseSelector = {
-    COLLAPSE: ns.selector('collapse')
+    COLLAPSE: ns.selector('collapse'),
+    COLLAPSING: ns.selector('collapsing')
   };
 
   /**
@@ -2213,6 +2230,7 @@
     };
 
     Collapse.prototype.transitionend = function transitionend (e) {
+      this.removeClass(CollapseSelector.COLLAPSING);
       if (!this.disclosed) {
         if (this.isLegacy) { this.style.maxHeight = ''; }
         else { this.style.removeProperty('--collapse-max-height'); }
@@ -2230,6 +2248,7 @@
       if (this.disclosed) { return; }
       this.unbound();
       this.request(function () {
+        this$1$1.addClass(CollapseSelector.COLLAPSING);
         this$1$1.adjust();
         this$1$1.request(function () {
           Disclosure.prototype.disclose.call(this$1$1, withhold);
@@ -2242,6 +2261,7 @@
 
       if (!this.disclosed) { return; }
       this.request(function () {
+        this$1$1.addClass(CollapseSelector.COLLAPSING);
         this$1$1.adjust();
         this$1$1.request(function () {
           Disclosure.prototype.conceal.call(this$1$1, withhold, preventFocus);
@@ -2497,6 +2517,17 @@
         this.svg.setAttribute('id', this.imgID);
       }
 
+      // gestion de la dépréciation
+      var name = this.imgURL.match(/[ \w-]+\./)[0];
+      if (name) {
+        name = name.slice(0, -1);
+
+        if (['dark', 'light', 'system'].includes(name)) {
+          this.svg.innerHTML = this.svg.innerHTML.replaceAll('id="artwork-', ("id=\"" + name + "-artwork-"));
+          this.svg.innerHTML = this.svg.innerHTML.replaceAll('"#artwork-', ("\"#" + name + "-artwork-"));
+        }
+      }
+
       if (this.imgClass && typeof this.imgClass !== 'undefined') {
         this.svg.setAttribute('class', this.imgClass);
       }
@@ -2531,6 +2562,138 @@
     INJECT_SVG: ("[" + (ns.attr('inject-svg')) + "]")
   };
 
+  var Artwork = /*@__PURE__*/(function (Instance) {
+    function Artwork () {
+      Instance.apply(this, arguments);
+    }
+
+    if ( Instance ) Artwork.__proto__ = Instance;
+    Artwork.prototype = Object.create( Instance && Instance.prototype );
+    Artwork.prototype.constructor = Artwork;
+
+    var prototypeAccessors = { proxy: { configurable: true } };
+    var staticAccessors = { instanceClassName: { configurable: true } };
+
+    staticAccessors.instanceClassName.get = function () {
+      return 'Artwork';
+    };
+
+    Artwork.prototype.init = function init () {
+      if (this.isLegacy) {
+        this.replace();
+      }
+    };
+
+    prototypeAccessors.proxy.get = function () {
+      var scope = this;
+      return Object.assign.call(this, Instance.prototype.proxy, {
+        replace: scope.replace.bind(scope)
+      });
+    };
+
+    Artwork.prototype.fetch = function fetch () {
+      var this$1$1 = this;
+
+      this.xlink = this.node.getAttribute('xlink:href');
+      var splitUrl = this.xlink.split('#');
+      this.svgUrl = splitUrl[0];
+      this.svgName = splitUrl[1];
+
+      var xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        var parser = new DOMParser();
+        var xmlDoc = parser.parseFromString(xhr.responseText, 'text/html');
+        this$1$1.realSvgContent = xmlDoc.getElementById(this$1$1.svgName);
+
+        if (this$1$1.realSvgContent) {
+          this$1$1.realSvgContent.classList.add(this$1$1.node.classList);
+          this$1$1.replace();
+        }
+      };
+      xhr.open('GET', this.svgUrl);
+      xhr.send();
+    };
+
+    Artwork.prototype.replace = function replace () {
+      if (!this.realSvgContent) {
+        this.fetch();
+        return;
+      }
+
+      this.node.parentNode.replaceChild(this.realSvgContent, this.node);
+    };
+
+    Object.defineProperties( Artwork.prototype, prototypeAccessors );
+    Object.defineProperties( Artwork, staticAccessors );
+
+    return Artwork;
+  }(Instance));
+
+  var ArtworkSelector = {
+    ARTWORK_USE: ((ns.selector('artwork')) + " use")
+  };
+
+  var ratiosImg = ['32x9', '16x9', '3x2', '4x3', '1x1', '3x4', '2x3'];
+  var ratiosVid = ['16x9', '4x3', '1x1'];
+
+  var ratioSelector = function (name, modifiers) {
+    return modifiers.map(function (modifier) { return ns.selector((name + "--" + modifier)); }).join(',');
+  };
+
+  var deprecatedRatioSelector = (ns.selector('responsive-img')) + ", " + (ratioSelector('responsive-img', ratiosImg)) + ", " + (ns.selector('responsive-vid')) + ", " + (ratioSelector('responsive-vid', ratiosVid));
+
+  var RatioSelector = {
+    RATIO: ((ns.selector('ratio')) + ", " + (ratioSelector('ratio', ratiosImg)) + ", " + deprecatedRatioSelector)
+  };
+
+  var api = window[config.namespace];
+
+  var Ratio = /*@__PURE__*/(function (Instance) {
+    function Ratio () {
+      Instance.apply(this, arguments);
+    }
+
+    if ( Instance ) Ratio.__proto__ = Instance;
+    Ratio.prototype = Object.create( Instance && Instance.prototype );
+    Ratio.prototype.constructor = Ratio;
+
+    var staticAccessors = { instanceClassName: { configurable: true } };
+
+    staticAccessors.instanceClassName.get = function () {
+      return 'Ratio';
+    };
+
+    Ratio.prototype.init = function init () {
+      if (!api.internals.support.supportAspectRatio()) {
+        this.ratio = 16 / 9;
+        for (var className in this.classNames) {
+          if (this.registration.selector.indexOf(this.classNames[className]) > 0) {
+            var ratio = this.classNames[className].split('ratio-');
+            if (ratio[1]) {
+              this.ratio = ratio[1].split('x')[0] / ratio[1].split('x')[1];
+            }
+          }
+        }
+        this.isRendering = true;
+        this.update();
+      }
+    };
+
+    Ratio.prototype.render = function render () {
+      var width = this.getRect().width;
+      if (width !== this.currentWidth) { this.update(); }
+    };
+
+    Ratio.prototype.update = function update () {
+      this.currentWidth = this.getRect().width;
+      this.style.height = this.currentWidth / this.ratio + 'px';
+    };
+
+    Object.defineProperties( Ratio, staticAccessors );
+
+    return Ratio;
+  }(Instance));
+
   api$1.core = {
     Instance: Instance,
     Breakpoints: Breakpoints,
@@ -2551,13 +2714,16 @@
     Toggle: Toggle,
     EquisizedsGroup: EquisizedsGroup,
     InjectSvg: InjectSvg,
-    InjectSvgSelector: InjectSvgSelector
+    InjectSvgSelector: InjectSvgSelector,
+    Artwork: Artwork,
+    ArtworkSelector: ArtworkSelector,
+    Ratio: Ratio,
+    RatioSelector: RatioSelector
   };
 
   api$1.internals.register(api$1.core.CollapseSelector.COLLAPSE, api$1.core.Collapse);
   api$1.internals.register(api$1.core.InjectSvgSelector.INJECT_SVG, api$1.core.InjectSvg);
-
-  var api = window[config.namespace];
+  api$1.internals.register(api$1.core.RatioSelector.RATIO, api$1.core.Ratio);
 
   var SchemeValue = {
     SYSTEM: 'system',
@@ -3489,7 +3655,7 @@
     NavigationItem.prototype.calculate = function calculate () {
       var collapse = this.element.getDescendantInstances(api.core.Collapse.instanceClassName, null, true)[0];
       if (collapse && this.isBreakpoint(api.core.Breakpoints.LG) && collapse.element.node.matches(NavigationSelector.MENU)) {
-        var right = this.element.node.parentElement.getBoundingClientRect().right;
+        var right = this.element.node.parentElement.getBoundingClientRect().right; // todo: ne fonctionne que si la nav fait 100% du container
         var width = collapse.element.node.getBoundingClientRect().width;
         var left = this.element.node.getBoundingClientRect().left;
         this.isRightAligned = left + width > right;
@@ -3549,13 +3715,19 @@
 
     Navigation.prototype.down = function down (e) {
       if (!this.isBreakpoint(api.core.Breakpoints.LG) || this.index === -1 || !this.current) { return; }
-      this.position = this.current.element.node.contains(e.target) ? NavigationMousePosition.INSIDE : NavigationMousePosition.OUTSIDE;
-      this.request(this.getPosition.bind(this));
+      this.position = this.current.node.contains(e.target) ? NavigationMousePosition.INSIDE : NavigationMousePosition.OUTSIDE;
+      this.requestPosition();
     };
 
     Navigation.prototype.focusOut = function focusOut (e) {
       if (!this.isBreakpoint(api.core.Breakpoints.LG)) { return; }
       this.out = true;
+      this.requestPosition();
+    };
+
+    Navigation.prototype.requestPosition = function requestPosition () {
+      if (this.isRequesting) { return; }
+      this.isRequesting = true;
       this.request(this.getPosition.bind(this));
     };
 
@@ -3567,15 +3739,21 @@
             break;
 
           case NavigationMousePosition.INSIDE:
-            if (this.current) { this.current.focus(); }
+            if (this.current && !this.current.node.contains(document.activeElement)) { this.current.focus(); }
             break;
 
           default:
             if (this.index > -1 && !this.current.hasFocus) { this.index = -1; }
         }
       }
+
+      this.request(this.requested.bind(this));
+    };
+
+    Navigation.prototype.requested = function requested () {
       this.position = NavigationMousePosition.NONE;
       this.out = false;
+      this.isRequesting = false;
     };
 
     prototypeAccessors.index.get = function () { return superclass.prototype.index; };
@@ -3961,6 +4139,7 @@
 
     TabsList.prototype.resize = function resize () {
       this.isScrolling = this.node.scrollWidth > this.node.clientWidth + SCROLL_OFFSET$1;
+      this.setProperty('--tab-list-height', ((this.getRect().height) + "px"));
     };
 
     TabsList.prototype.dispose = function dispose () {
@@ -4161,6 +4340,130 @@
 
   api.internals.register(api.tag.TagSelector.TAG_PRESSABLE, api.core.Toggle);
 
+  var DownloadSelector = {
+    DOWNLOAD_ASSESS_FILE: ("" + (api.internals.ns.attr.selector('assess-file'))),
+    DOWNLOAD_DETAIL: ("" + (api.internals.ns.selector('download__detail')))
+  };
+
+  var AssessFile = /*@__PURE__*/(function (superclass) {
+    function AssessFile () {
+      superclass.apply(this, arguments);
+    }
+
+    if ( superclass ) AssessFile.__proto__ = superclass;
+    AssessFile.prototype = Object.create( superclass && superclass.prototype );
+    AssessFile.prototype.constructor = AssessFile;
+
+    var staticAccessors = { instanceClassName: { configurable: true } };
+
+    staticAccessors.instanceClassName.get = function () {
+      return 'AssessFile';
+    };
+
+    AssessFile.prototype.init = function init () {
+      this.lang = this.getLang(this.node);
+      this.href = this.getAttribute('href');
+
+      this.hreflang = this.getAttribute('hreflang');
+      this.file = {};
+      this.detail = this.querySelector(DownloadSelector.DOWNLOAD_DETAIL);
+      this.update();
+    };
+
+    AssessFile.prototype.getFileLength = function getFileLength () {
+      var this$1$1 = this;
+
+      if (this.href === undefined) {
+        this.length = -1;
+        return;
+      }
+
+      fetch(this.href, { method: 'HEAD', mode: 'cors' }).then(function (response) {
+        this$1$1.length = response.headers.get('content-length') || -1;
+        if (this$1$1.length === -1) {
+          console.warn('Impossible de détecter le poids du fichier ' + this$1$1.href + '\nErreur de récupération de l\'en-tête HTTP : "content-length"');
+        }
+        this$1$1.update();
+      });
+    };
+
+    AssessFile.prototype.update = function update () {
+      // TODO V2: implémenter async
+      if (this.isLegacy) { this.length = -1; }
+
+      if (!this.length) {
+        this.getFileLength();
+        return;
+      }
+
+      var details = [];
+      if (this.detail) {
+        if (this.href) {
+          var extension = this.parseExtension(this.href);
+          if (extension) { details.push(extension.toUpperCase()); }
+        }
+
+        if (this.length !== -1) {
+          details.push(this.bytesToSize(this.length));
+        }
+
+        if (this.hreflang) {
+          details.push(this.getLangDisplayName(this.hreflang));
+        }
+
+        this.detail.innerHTML = details.join(' - ');
+      }
+    };
+
+    AssessFile.prototype.getLang = function getLang (elem) {
+      if (elem.lang) { return elem.lang; }
+      if (document.documentElement === elem) { return window.navigator.language; }
+      return this.getLang(elem.parentElement);
+    };
+
+    AssessFile.prototype.parseExtension = function parseExtension (url) {
+      var regexExtension = /\.(\w{1,9})(?:$|[?#])/;
+      return url.match(regexExtension)[0].replace('.', '');
+    };
+
+    AssessFile.prototype.getLangDisplayName = function getLangDisplayName (locale) {
+      if (this.isLegacy) { return locale; }
+      var displayNames = new Intl.DisplayNames([this.lang], { type: 'language' });
+      var name = displayNames.of(locale);
+      return name.charAt(0).toUpperCase() + name.slice(1);
+    };
+
+    AssessFile.prototype.bytesToSize = function bytesToSize (bytes) {
+      if (bytes === -1) { return null; }
+
+      var sizeUnits = ['octets', 'ko', 'Mo', 'Go', 'To'];
+      if (this.getAttribute(api.internals.ns.attr('assess-file')) === 'bytes') {
+        sizeUnits = ['bytes', 'KB', 'MB', 'GB', 'TB'];
+      }
+
+      var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1000)), 10);
+      if (i === 0) { return (bytes + " " + (sizeUnits[i])); }
+
+      var size = bytes / (Math.pow( 1000, i ));
+      var roundedSize = Math.round((size + Number.EPSILON) * 100) / 100; // arrondi a 2 décimal
+      var stringSize = String(roundedSize).replace('.', ',');
+
+      return (stringSize + " " + (sizeUnits[i]));
+    };
+
+    Object.defineProperties( AssessFile, staticAccessors );
+
+    return AssessFile;
+  }(api.core.Instance));
+
+  api.download = {
+    DownloadSelector: DownloadSelector,
+    AssessFile: AssessFile
+
+  };
+
+  api.internals.register(api.download.DownloadSelector.DOWNLOAD_ASSESS_FILE, api.download.AssessFile);
+
   var HeaderSelector = {
     HEADER: api.internals.ns.selector('header'),
     TOOLS_LINKS: api.internals.ns.selector('header__tools-links'),
@@ -4188,21 +4491,25 @@
       var header = this.queryParentSelector(HeaderSelector.HEADER);
       this.toolsLinks = header.querySelector(HeaderSelector.TOOLS_LINKS);
       this.menuLinks = header.querySelector(HeaderSelector.MENU_LINKS);
+      var copySuffix = '_copy';
 
       var toolsHtml = this.toolsLinks.innerHTML.replace(/  +/g, ' ');
       var menuHtml = this.menuLinks.innerHTML.replace(/  +/g, ' ');
+      // Pour éviter de dupliquer des id, on ajoute un suffixe aux id et aria-controls duppliqués.
+      var toolsHtmlDuplicateId = toolsHtml.replace(/ id="(.*?)"/gm, ' id="$1' + copySuffix + '"');
+      toolsHtmlDuplicateId = toolsHtmlDuplicateId.replace(/ aria-controls="(.*?)"/gm, ' aria-controls="$1' + copySuffix + '"');
 
-      if (toolsHtml === menuHtml) { return; }
+      if (toolsHtmlDuplicateId === menuHtml) { return; }
 
       switch (api.mode) {
         case api.Modes.ANGULAR:
         case api.Modes.REACT:
         case api.Modes.VUE:
-          api.inspector.warn(("header__tools-links content is different from header__menu-links content.\nAs you're using a dynamic framework, you should handle duplication of this content yourself, please refer to documentation: \n" + (api.header.doc)));
+          api.inspector.warn(("header__tools-links content is different from header__menu-links content.\nAs you're using a dynamic framework, you should handle duplication of this content yourself, please refer to documentation:\n" + (api.header.doc)));
           break;
 
         default:
-          this.menuLinks.innerHTML = this.toolsLinks.innerHTML;
+          this.menuLinks.innerHTML = toolsHtmlDuplicateId;
       }
     };
 
@@ -4395,6 +4702,7 @@
 
   /* legacy code here */
   api$1.internals.legacy.setLegacy();
+  api$1.internals.register(api$1.core.ArtworkSelector.ARTWORK_USE, api$1.core.Artwork);
 
 })();
 //# sourceMappingURL=dsfr.nomodule.js.map

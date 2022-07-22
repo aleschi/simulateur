@@ -49,5 +49,7 @@ Rails.application.routes.draw do
   get '/accessibilite', to: 'pages#accessibilite'
   post 'select_filter' => 'pages#select_filter'
 
-  get '/*path', to: 'pages#accueil'
+  get '/*path', to: 'pages#error_404'
+  match "/404", to: 'pages#error_404', via: :all
+  match "/500", to: 'pages#error_500', via: :all
 end
