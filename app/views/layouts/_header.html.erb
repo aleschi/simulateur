@@ -25,15 +25,15 @@
                 </div>
                 <div class="fr-header__tools">
                     <div class="fr-header__tools-links ">
-                        <ul class="fr-links-group">
+                        <ul class="fr-btns-group">
                             
                             <% if user_signed_in? %>
                                 <li>
-                                    <%= link_to "Se déconnecter", destroy_user_session_path, data: { "turbo-method": :delete }, class:"fr-link fr-fi-logout-box-r-line" %>
+                                    <%= link_to "Se déconnecter", destroy_user_session_path, data: { "turbo-method": :delete }, class:"fr-btn fr-fi-logout-box-r-line" %>
                                 </li>
                             <% else %>       
                                 <li>
-                                    <a class="fr-link fr-fi-lock-line" href="/connexion">Se connecter</a>
+                                    <a class="fr-btn fr-fi-lock-line" href="/connexion">Se connecter</a>
                                 </li>
                             <% end %>       
                         </ul>
