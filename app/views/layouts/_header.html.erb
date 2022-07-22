@@ -10,10 +10,15 @@
                                 <br>de l'économie,<br>des finances<br>et de la souveraineté<br> industrielle et numérique
                             </p>
                         </div>
+                        <div class="fr-header__navbar">
+                            <button class="fr-btn--menu fr-btn" data-fr-opened="false" aria-controls="fr-menu-modal" aria-haspopup="menu" id="button-477" title="Menu">
+                                Menu
+                            </button>
+                        </div>
                     </div>
                     <div class="fr-header__service">
                         <a href="/" title="Accueil - SIMULAE">
-                          <p class="fr-header__service-title">SIMULAE <span class="fr-badge fr-badge--success fr-badge--no-icon">BETA</span></p>
+                          <p class="fr-header__service-title">SIMULAE <span class="fr-badge fr-badge--sm fr-badge--green-emeraude">BÊTA</span></p>
                         </a>
                         <p class="fr-header__service-tagline">Simulateur de la réforme de la haute fonction publique</p>
                     </div>
@@ -21,9 +26,7 @@
                 <div class="fr-header__tools">
                     <div class="fr-header__tools-links ">
                         <ul class="fr-links-group">
-                            <li>
-                                <button class="fr-link fr-fi-theme-fill fr-link--icon-left" aria-controls="fr-theme-modal" data-fr-opened="false">Paramètres d'affichage</button>
-                            </li>
+                            
                             <% if user_signed_in? %>
                                 <li>
                                     <%= link_to "Se déconnecter", destroy_user_session_path, data: { "turbo-method": :delete }, class:"fr-link fr-fi-logout-box-r-line" %>
@@ -42,8 +45,8 @@
  
     <div class="fr-header__menu fr-modal" id="fr-menu-modal" aria-labelledby="fr-btn-menu-mobile">
         <div class="fr-container">
-            <button class="fr-link--close fr-link" aria-controls="fr-menu-modal">Fermer</button>
-            <div class="fr-header__menu-links"><ul class="fr-links-group"><li><button type="button" classs="fr-link fr-fi-theme-fill fr-link--icon-left" aria-controls="fr-theme-modal">Paramètres d'affichage</button></li></ul></div>
+            <button class="fr-btn--close fr-btn" aria-controls="fr-menu-modal" title="Fermer">Fermer</button>
+            <div class="fr-header__menu-links"></div>
             <nav class="fr-nav" id="fr-navigation" role="navigation" aria-label="Menu principal"></nav>
         </div>
     </div>
