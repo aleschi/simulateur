@@ -380,6 +380,8 @@ export default class extends Controller {
             });
             this.changeEchelon()
         }
+
+        this.validateForm();
         
     }
 
