@@ -3,7 +3,7 @@
 
 	<%= form_with(url: search_grilles_path, method: :post, data: {'filter-target': "form", action: "turbo:before-fetch-request->filter#submitForm change->filter#change_form"}) do |f|%>
 		
-	<h2>Votre situation en 2023 <button class="fr-hidden bouton_i" data-filter-target="boutonSituation" type="button" data-action="click->filter#reset_situation"> <span class="fr-icon-edit-line fr-fi--lg" aria-hidden="true"></span></button></h2>	
+	<h2>Votre situation en 2023 <button class="fr-hidden bouton_i" data-filter-target="boutonSituation" type="button" data-action="click->filter#reset_situation" title="modifier la situation 2023"> <span class="fr-icon-edit-line fr-fi--lg" aria-hidden="true"></span></button></h2>	
 	<p class="fr-text--sm">En cas de changement de grade envisagé en 2023, renseignez directement ce nouveau grade.</p>
 
 	<div class="fr-select-group fr-my-2w "><label for="corps" class="fr-label">Corps*</label><%= f.select :corps, @corps.map {|c| [c,c]},{prompt: "- sélectionner -"}, {data: {action: 'change->filter#corpsChange','filter-target': 'corps' },required: true, id:"corps",class:"fr-select"}%>
@@ -80,9 +80,9 @@
 	<div class="fr-text--sm">Vous pouvez simuler des promotions de grades (lorsqu'elles sont possibles), jusqu’à 6 emplois fonctionnels et 1 disponibilité.</div>
 
 
-	<div class="fr-my-2w fr-hidden" data-filter-target="boutongrades"><button  data-action="filter#togglegrades" class="btn-plus"> <span class="fr-fi-add-circle-fill cbleu fr-fi--sm" aria-hidden="true"></span> Ajouter une promotion de grade</button></div>
+	<div class="fr-my-2w fr-hidden" data-filter-target="boutongrades"><button  data-action="filter#togglegrades" class="btn-plus" title="Ajouter une promotion de grade"> <span class="fr-fi-add-circle-fill cbleu fr-fi--sm" aria-hidden="true"></span> Ajouter une promotion de grade</button></div>
 	<div class="fr-my-2w fr-hidden" data-filter-target="contentgrades">
-		<div class="fr-text-lg bold">Projections de promotion de grade <button class="fr-hidden bouton_i2" data-filter-target="EditGrades" type="button" data-action="click->filter#resetGrades"><span class="fr-icon-edit-line" aria-hidden="true"></span></button><button class="bouton_i2" type="button" data-action="click->filter#deleteGrades"><span class="fr-icon-delete-line" aria-hidden="true"></span></button></div>
+		<div class="fr-text-lg bold">Projections de promotion de grade <button class="fr-hidden bouton_i2" data-filter-target="EditGrades" type="button" data-action="click->filter#resetGrades" title="modifier les promotions de grade"><span class="fr-icon-edit-line" aria-hidden="true"></span></button><button class="bouton_i2" type="button" data-action="click->filter#deleteGrades" title="supprimer les promotions de grade"><span class="fr-icon-delete-line" aria-hidden="true"></span></button></div>
 		<div class="fr-select-group fr-my-2w">
 			<div class="align_flex w100">
 				<div class="w3">				
@@ -102,11 +102,11 @@
 	</div>
 	
 
-	<div class="fr-text-lg bold fr-hidden" data-toggle-target="titreEf">Projections d'emplois fonctionnels <button class="fr-hidden bouton_i2" data-filter-target="EditEF" type="button" data-action="click->filter#editEf"><span class="fr-icon-edit-line" aria-hidden="true"></span></div>		
+	<div class="fr-text-lg bold fr-hidden" data-toggle-target="titreEf">Projections d'emplois fonctionnels <button class="fr-hidden bouton_i2" data-filter-target="EditEF" type="button" data-action="click->filter#editEf" title="modifier les emplois fonctionnels"><span class="fr-icon-edit-line" aria-hidden="true"></span></div>		
 	<% (1..6).each do |i|%>
 	<div class="fr-my-2w fr-hidden" data-toggle-target="content<%=i%>" data-filter-target="content<%=i%>">
 
-		<div>Projection <%=i %>  <button data-action="toggle#toggle2" data-value="<%=i%>" class='bouton_i2'><span class="fr-icon-delete-line fr-fi--sm" aria-hidden="true" data-value="<%=i%>"></span></button></div>
+		<div>Projection <%=i %>  <button data-action="toggle#toggle2" data-value="<%=i%>" class='bouton_i2' title="supprimer l'emploi fonctionnel"><span class="fr-icon-delete-line fr-fi--sm" aria-hidden="true" data-value="<%=i%>" ></span></button></div>
 		
 		<div class="fr-select-group">
 			<label for="ef<%=i%>" class="fr-label">Nature de l'emploi fonctionnel exercé*</label><%= f.select "type_emploi#{i}", @emplois_f2.map {|e| [e,e]},{ prompt: "- sélectionner -"},{data:{action: 'change->filter#emploifChange2', value: i.to_s, 'toggle-target': 'emploif'+i.to_s,'filter-target': 'emploif'+i.to_s},id:'ef'+i.to_s, class:"fr-select"}%>
@@ -132,12 +132,12 @@
 	<% end %>
 
 	<div class="fr-error-text fr-hidden" data-toggle-target="error" data-filter-target="error" role="alert"> </div>
-	<div class="fr-my-2w" data-toggle-target="bouton"><button data-action="toggle#toggle1" class="btn-plus"> <span class="fr-fi-add-circle-fill cbleu fr-fi--sm" aria-hidden="true"></span> Ajouter un emploi fonctionnel futur</button></div>		
+	<div class="fr-my-2w" data-toggle-target="bouton"><button data-action="toggle#toggle1" class="btn-plus" title="ajouter un emploi fonctionnel"> <span class="fr-fi-add-circle-fill cbleu fr-fi--sm" aria-hidden="true"></span> Ajouter un emploi fonctionnel futur</button></div>		
 
 
-	<div class="fr-my-2w" data-toggle-target="boutonprojet" data-filter-target="boutonprojet"><button  data-action="toggle#toggleprojet" class="btn-plus"> <span class="fr-fi-add-circle-fill cbleu fr-fi--sm" aria-hidden="true"></span> Ajouter une disponibilité</button></div>		
+	<div class="fr-my-2w" data-toggle-target="boutonprojet" data-filter-target="boutonprojet"><button  data-action="toggle#toggleprojet" class="btn-plus" title="ajouter une disponibilité"> <span class="fr-fi-add-circle-fill cbleu fr-fi--sm" aria-hidden="true"></span> Ajouter une disponibilité</button></div>		
 	<div class="fr-my-2w fr-hidden" data-toggle-target="contentdispo" data-filter-target="contentdispo">
-		<div class="fr-text-lg bold">Disponibilité <button class="fr-hidden bouton_i2" data-filter-target="boutonDispo" data-toggle-target="boutonDispo"  type="button" data-action="click->filter#reset_dispo" ><span class="fr-icon-edit-line" aria-hidden="true"></span><button class="fr-hidden bouton_i2" type="button" data-toggle-target="boutonTrashProjet" data-action="click->toggle#toggleprojet2"><span class="fr-icon-delete-line" aria-hidden="true"></span></button></div>
+		<div class="fr-text-lg bold">Disponibilité <button class="fr-hidden bouton_i2" data-filter-target="boutonDispo" data-toggle-target="boutonDispo"  type="button" data-action="click->filter#reset_dispo" title="réinitialiser la disponibilité"><span class="fr-icon-edit-line" aria-hidden="true"></span><button class="fr-hidden bouton_i2" type="button" data-toggle-target="boutonTrashProjet" data-action="click->toggle#toggleprojet2" title="supprimer la disponibilité"><span class="fr-icon-delete-line" aria-hidden="true"></span></button></div>
 		<div class="fr-select-group fr-my-2w">
 			<div class="align_flex w100">
 				<div class="w50 pr">			
