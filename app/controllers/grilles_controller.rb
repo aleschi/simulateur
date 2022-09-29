@@ -20,8 +20,10 @@ class GrillesController < ApplicationController
     @grade = params[:grade].to_i
     @echelon = params[:echelon].to_i 
     @mois = params[:duree].to_i
-    @annee_i = ((@mois-1)/12).to_i+Grille.where(corps: @corps, grade: @grade, echelon: @echelon).pluck(:annee).min #placer à ligne bonne annee
-    @mois_i = @mois-12*((@mois-1)/12).to_i #mois/12 donne entier 
+    @annee_depart = Grille.where(corps: @corps, grade: @grade, echelon: @echelon).pluck(:annee).uniq.min
+    @mois_depart = Grille.where(corps: @corps, grade: @grade, echelon: @echelon, annee: @annee_depart).pluck(:mois).min
+    @annee_i = ((@mois_depart-1+@mois-1)/12).to_i + Grille.where(corps: @corps, grade: @grade, echelon: @echelon).pluck(:annee).uniq.min #placer à ligne bonne annee    
+    @mois_i = @mois_depart-1+@mois-12*((@mois_depart-1+@mois-1)/12).to_i #mois/12 donne entier 
     @ligne_i = Grille.where(corps: @corps, grade: @grade, echelon: @echelon, annee: @annee_i, mois: @mois_i).first
     @grade_reclasse = @ligne_i.grade_reclasse
     @echelon_reclasse = @ligne_i.echelon_reclasse
@@ -47,9 +49,15 @@ class GrillesController < ApplicationController
       @annee_e = ((params[:duree_echelonf].to_i-1)/12).to_i+Emploi.where(nom: params[:type_emploi], echelon: params[:echelon_emploif].to_i).pluck(:annee).min
       @mois_e = params[:duree_echelonf].to_i-12*((params[:duree_echelonf].to_i-1)/12).to_i
       @indice_e = Emploi.where(nom: params[:type_emploi], echelon: params[:echelon_emploif].to_i, annee: @annee_e, mois: @mois_e).first.indice
-      
+      if @grade_reclasse == 1 
+        @indice_e_reclasse = ReclassementEmploi.where('indice_emploi >= ?', @indice_e).order(indice_emploi: :asc).first.indice_grade1
+      elsif @grade_reclasse == 2
+        @indice_e_reclasse = ReclassementEmploi.where('indice_emploi >= ?', @indice_e).order(indice_emploi: :asc).first.indice_grade2
+      else
+        @indice_e_reclasse = ReclassementEmploi.where('indice_emploi >= ?', @indice_e).order(indice_emploi: :asc).first.indice_grade_transitoire
+      end 
       @liste_indices_emploi = EmploiFonctionnel1(@liste_indices_emploi, params[:type_emploi],params[:echelon_emploif].to_i, params[:duree_echelonf].to_i, 0, @duree_emploi, nil, nil, 0)     
-      @liste_indices_emploi2 = EmploiFonctionnel2(@liste_indices_emploi2, params[:grade].to_i, @indice_e,@grade_reclasse, params[:niveau_emploi].to_i, 0, @duree_emploi, @duree_carriere, params[:duree_echelonf].to_i)
+      @liste_indices_emploi2 = EmploiFonctionnel2(@liste_indices_emploi2, params[:grade].to_i, @indice_e_reclasse,@grade_reclasse, params[:niveau_emploi].to_i, 0, @duree_emploi, @duree_carriere, 0)
     
     end
     
@@ -156,8 +164,10 @@ class GrillesController < ApplicationController
     end
 
     def CarrierePrincipale1(duree_carriere, corps, grade, echelon, mois, grade2, grade3, grade4, debut_dispo, fin_dispo,array_grade)
-      @annee_i = ((mois-1)/12).to_i+Grille.where(corps: corps, grade: grade, echelon: echelon).pluck(:annee).min #annee min à echelon choisi + nbr annee
-      @mois_i = mois-12*((mois-1)/12).to_i
+      @annee_depart = Grille.where(corps: corps, grade: grade, echelon: echelon).pluck(:annee).uniq.min
+      @mois_depart = Grille.where(corps: corps, grade: grade, echelon: echelon, annee: @annee_depart).pluck(:mois).min
+      @annee_i = ((@mois_depart-1+mois-1)/12).to_i + Grille.where(corps: corps, grade: grade, echelon: echelon).pluck(:annee).uniq.min #placer à ligne bonne annee    
+      @mois_i = @mois_depart-1+mois-12*((@mois_depart-1+mois-1)/12).to_i #mois/12 donne entier 
       @liste_indices = Grille.where(corps: corps, grade: grade).where("(echelon = ? AND annee = ? AND mois >= ?) OR (echelon = ? AND annee > ?) OR echelon > ?",echelon,@annee_i, @mois_i, echelon, @annee_i, echelon).order('indice ASC').pluck(:indice)      
       @liste_indices= checkDim(@liste_indices,duree_carriere) #dim liste indice jusqu'à fin carrière 
       @liste_indices = CheckPromo(@liste_indices,duree_carriere,grade2,grade3,grade4,0,duree_carriere, corps, grade, debut_dispo,fin_dispo, array_grade) #check promo + dispo       
@@ -167,9 +177,9 @@ class GrillesController < ApplicationController
     def EmploiFonctionnel1(liste_indices_emploi, type_emploi,echelon, duree_echelon, start, duree_emploi, emploi_futur, indice, count)
       #1ere courbe :avant reforme table emploi on prend premier indice correspondant et on fait defiler 
       if !type_emploi.nil?
-        @annee_e = ((duree_echelon-1)/12).to_i+Emploi.where(nom: type_emploi, echelon: echelon).pluck(:annee).min #se placer à la bonne année 
+        @annee_e = ((duree_echelon.to_i-1)/12).to_i + Emploi.where(nom: type_emploi, echelon: echelon).pluck(:annee).uniq.min #se placer à la bonne année 
         @mois_e = duree_echelon.to_i-12*((duree_echelon-1)/12).to_i #se placer au bon mois 
-        @liste_indices_emploi_new = Emploi.where(nom: type_emploi).where( "(echelon= ? AND annee = ? AND mois >= ?) OR (echelon = ? AND annee > ?) OR echelon > ?",echelon,@annee_e,duree_echelon, echelon, @annee_e, echelon).order('indice ASC').pluck(:indice)
+        @liste_indices_emploi_new = Emploi.where(nom: type_emploi).where("(echelon = ? AND annee = ? AND mois >= ?) OR (echelon = ? AND annee > ?) OR echelon > ?",echelon,@annee_e,@mois_e, echelon, @annee_e, echelon).order('indice ASC').pluck(:indice)
       elsif !emploi_futur.nil?
         @liste_indices_emploi_new = Emploi.where(nom: emploi_futur).where('indice >= ?', indice).order('indice ASC').pluck(:indice)
         @liste_indices_emploi_new = checkDim(@liste_indices_emploi_new, count + 1) #dim va jusqua count  
@@ -181,8 +191,10 @@ class GrillesController < ApplicationController
     end 
 
     def CarrierePrincipale2(duree_carriere, corps, grade, echelon, mois, grade2, grade3, grade4, debut_dispo, fin_dispo, type_emploi, niveau_emploi, debut_emploi, fin_emploi, array_grade)
-      @annee_i = ((mois-1)/12).to_i+Grille.where(corps: corps, grade: grade, echelon: echelon).pluck(:annee).min #placer à ligne bonne annee
-      @mois_i = mois-12*((mois-1)/12).to_i
+      @annee_depart = Grille.where(corps: corps, grade: grade, echelon: echelon).pluck(:annee).uniq.min
+      @mois_depart = Grille.where(corps: corps, grade: grade, echelon: echelon, annee: @annee_depart).pluck(:mois).min
+      @annee_i = ((@mois_depart-1+mois-1)/12).to_i + Grille.where(corps: corps, grade: grade, echelon: echelon).pluck(:annee).uniq.min #placer à ligne bonne annee    
+      @mois_i = @mois_depart-1+mois-12*((@mois_depart-1+mois-1)/12).to_i #mois/12 donne entier 
       @liste_indices2 = Grille.where(corps: corps, grade: grade).where("(echelon = ? AND annee = ? AND mois >= ?) OR (echelon = ? AND annee > ?) OR echelon > ?",echelon,@annee_i, @mois_i, echelon, @annee_i, echelon).order('indice ASC').pluck(:indice)      
       @liste_indices2 = checkDim(@liste_indices2,duree_carriere) #dim liste indice jusqu'à fin carrière 
       if !type_emploi.nil? && type_emploi != ""
@@ -214,10 +226,7 @@ class GrillesController < ApplicationController
     end
     
     def EmploiFonctionnel2(liste_indices_emploi, grade,indice, grade_reclasse2, niveau, start, duree_emploi, duree_carriere, anciennete)
-      #reclassement pour courbe 2 
-      if grade_reclasse2 > 2
-        grade_reclasse2 = 2
-      end 
+
       #2eme courbe : on va chercher indice le plus proche à indice max avec grade reclassé 
       indice = [indice,Reclassement.where(grade: grade_reclasse2).pluck(:indice).max].min #si jamais indice emploi plus grand que dernier indice dans table de reclassement   
       @liste_indices_ae = Reclassement.where(grade: grade_reclasse2).where('indice >= ?',indice).order('indice ASC').pluck(:indice)     
@@ -259,14 +268,14 @@ class GrillesController < ApplicationController
     def CheckPromo(liste_indices,duree_carriere,grade2,grade3,grade4,start_emploi,duree_emploi, corps, grade,debut_dispo,fin_dispo, array_grade)
       @new_grade = 0
       [grade2,grade3,grade4].each_with_index do |date_grade, i|
-        if date_grade != 0 && date_grade < start_emploi + duree_emploi #check promo avant fin de ef ou avant fin de carriere si pas de ef 
+        if date_grade > 0 && (date_grade.to_i - 2023)*12 < start_emploi + duree_emploi #check promo avant fin de ef ou avant fin de carriere si pas de ef 
           @new_grade = i+2
           @annee_grade = (date_grade.to_i - 2023)*12 #cas promo de grade apres fin carriere        
           if fin_dispo - debut_dispo >= 5 && fin_dispo < @annee_grade && array_grade[fin_dispo] == @new_grade-1 #check projet de dispo de plus de 5 ans avant promotions de grade alors reset courbe principale 
             liste_indices=Dispo(debut_dispo,fin_dispo,liste_indices, duree_carriere) 
           end 
           grade = @new_grade
-          liste_indices=PromoGrade(corps,grade,liste_indices,@annee_grade,duree_carriere)
+          liste_indices = PromoGrade(corps,@new_grade,liste_indices,@annee_grade,duree_carriere)
         end
       end     
       if fin_dispo - debut_dispo >= 5 && (@new_grade == 0 || @new_grade == array_grade[debut_dispo]) #dispo si aucune promo de grade ou apres derniere promo de grade
@@ -288,8 +297,11 @@ class GrillesController < ApplicationController
 
     def Courbe3(duree_carriere, corps, grade, echelon,duree, type_emploi, niveau_emploi,echelon_emploi, duree_echelon, debut_emploi,fin_emploi, date_grade2, debut_dispo, fin_dispo )     
       #3eme courbe: on va chercher indice le plus proche au meme indice quil avait dans son CORPS SANS EF dans table de reclassement puis on prend echelon correspondant et on fait derouler table jusqua a la fin       
-      @annee_i = ((duree-1)/12).to_i+Grille.where(corps: corps, grade: grade, echelon: echelon).pluck(:annee).min #placer à ligne bonne annee
-      @mois_i = duree-12*((duree-1)/12).to_i
+      @annee_depart = Grille.where(corps: corps, grade: grade, echelon: echelon).pluck(:annee).uniq.min
+      @mois_depart = Grille.where(corps: corps, grade: grade, echelon: echelon, annee: @annee_depart).pluck(:mois).min
+      @annee_i = ((@mois_depart-1+duree-1)/12).to_i + Grille.where(corps: corps, grade: grade, echelon: echelon).pluck(:annee).uniq.min #placer à ligne bonne annee    
+      @mois_i = @mois_depart-1+duree-12*((@mois_depart-1+duree-1)/12).to_i #mois/12 donne entier 
+
       @ligne_i = Grille.where(corps: corps, grade: grade, echelon: echelon, annee: @annee_i, mois: @mois_i).first
       @grade_reclasse = @ligne_i.grade_reclasse
       @echelon_reclasse = @ligne_i.echelon_reclasse

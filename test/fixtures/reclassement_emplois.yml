@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  indice_emploi: 1
+  indice_grade1: 1
+  indice_grade2: 1
+  indice_grade_transitoire: 1
+
+two:
+  indice_emploi: 1
+  indice_grade1: 1
+  indice_grade2: 1
+  indice_grade_transitoire: 1

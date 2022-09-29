@@ -16,9 +16,24 @@
                     
         </div>
         <% end %>
-  </div>
-  <div class="d24"></div>
-  <div><%= Reclassement.all.count%> données de reclassement</div>
+    </div>
+   
+    <div class="fr-my-4w"><%= Reclassement.all.count%> données de reclassement</div>
+    <h2>Reclassement emplois</h2>
+    <div>
+      <%= form_tag import_emploi_reclassements_path, multipart: true do %>
+        <div>
+          <label><%= file_field_tag  :file, accept: '.xlsx' %>
+          </label>
+          <div class="d24"></div> 
+          <div>
+            <%= submit_tag "Transmettre", class:"fr-btn" %>  
+          </div>
+                    
+        </div>
+        <% end %>
+    </div>
+    <div class="fr-my-4w"><%= ReclassementEmploi.all.count%> données de reclassement</div>
 </div>
 </div>
 </main>

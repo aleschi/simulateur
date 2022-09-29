@@ -626,7 +626,7 @@ export default class extends Controller {
                 //ef futur interdit pdt dispo
                 [0,1,2,3,4,5].forEach((indice)=>{
                   if (debut_targets[indice].value != '' && duree_targets[indice].value  != '' ){
-                    if ( ( parseInt(this.debutProjetTarget.value) <= parseInt(debut_targets[indice].value) && parseInt(debut_targets[indice].value) <= parseInt(this.finProjetTarget.value)) || ( parseInt(debut_targets[indice].value)  <= parseInt(this.debutProjetTarget.value) && parseInt(this.debutProjetTarget.value) <= parseInt(debut_targets[indice].value) +parseInt(duree_targets[indice].value) ) || (parseInt(debut_targets[indice].value)  <= parseInt(this.finProjetTarget.value) && parseInt(this.finProjetTarget.value) <= parseInt(debut_targets[indice].value) +parseInt(duree_targets[indice].value)) ){
+                    if ( ( parseInt(this.debutProjetTarget.value) <= parseInt(debut_targets[indice].value) && parseInt(debut_targets[indice].value) < parseInt(this.finProjetTarget.value)) || ( parseInt(debut_targets[indice].value)  <= parseInt(this.debutProjetTarget.value) && parseInt(this.debutProjetTarget.value) < parseInt(debut_targets[indice].value) +parseInt(duree_targets[indice].value) ) || (parseInt(debut_targets[indice].value)  < parseInt(this.finProjetTarget.value) && parseInt(this.finProjetTarget.value) <= parseInt(debut_targets[indice].value) +parseInt(duree_targets[indice].value)) ){
                         projet_invalid = false;
                         debut_targets[indice].classList.add('fr-select--error');
                         debut_targets[indice].parentNode.classList.add('fr-select-group--error');
@@ -637,7 +637,7 @@ export default class extends Controller {
                 });
                 // si ef actuel finit apres dispo 
                 if (this.finEfTarget.value != ""){
-                  if (parseInt(this.debutProjetTarget.value) <= parseInt(this.finEfTarget.value)){
+                  if (parseInt(this.debutProjetTarget.value) < parseInt(this.finEfTarget.value)){
                     projet_invalid = false;
                     this.finEfTarget.classList.add('fr-select--error');
                     this.finEfTarget.parentNode.classList.add('fr-select-group--error');
@@ -646,7 +646,7 @@ export default class extends Controller {
                 //promo interdite pdt dispo
                 [0,1,2].forEach((indice)=>{            
                   if (promo_targets[indice].value != ""){
-                    if ((parseInt(this.debutProjetTarget.value) <= parseInt(promo_targets[indice].value)) &&  (parseInt(promo_targets[indice].value)<= parseInt(this.finProjetTarget.value))){
+                    if ((parseInt(this.debutProjetTarget.value) <= parseInt(promo_targets[indice].value)) &&  (parseInt(promo_targets[indice].value)< parseInt(this.finProjetTarget.value))){
                         projet_invalid = false;  
                         promo_targets[indice].classList.add('fr-select--error');
                         promo_targets[indice].parentNode.classList.add('fr-select-group--error'); 

@@ -28,6 +28,7 @@ Rails.application.routes.draw do
   resources :reclassements do 
     collection do 
       post 'import' => 'reclassements#import'
+      post 'import_emploi' => 'reclassements#import_emploi'
      
     end
   end

@@ -15,7 +15,7 @@
 	        <tbody>
 				<% @liste_indices.each_with_index do |indice,i| %>
 				<tr>
-					<td><%= (Date.new(2023,1,1) + i.months).strftime("%B %Y") %></td>
+					<td><%= l(Date.new(2023,1,1) + i.months,format: "%B %Y") %></td>
 					<td><%= indice.to_i%></td>
 					<td><%= @liste_indices2[i].to_i%></td>
 					<td><%= @liste_indices3[i].to_i%></td>
