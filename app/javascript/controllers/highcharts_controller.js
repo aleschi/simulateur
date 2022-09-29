@@ -31,9 +31,21 @@ export default class extends Controller {
        
         const debut =this.data.get("debutdispo");
         const fin = this.data.get("findispo");
-        var series;
-        if (data.length != 0 && data2.length != 0 && data3.length != 0 ){
-            series = [{
+        var series = [];
+        if (data.length != 0){
+            series.push({
+                name: 'rémunération avant réforme',
+                data: data,
+                pointStart: 2023,
+                pointInterval: 1,
+                color: 'var(--text-action-high-blue-france)',
+                type: 'spline',  
+                lineWidth: 5,
+                dashStyle: 'ShortDot',
+            })
+        }
+        if (data2.length != 0){
+            series.push({
                 name: 'rémunération après réforme avec maintien dans le corps en extinction ',
                 data: data2,
                 pointStart: 2023,
@@ -41,48 +53,20 @@ export default class extends Controller {
                 color: "#169B62",
                 type: 'spline',  
                 lineWidth: 4,
-               
-              },{
-                name: 'rémunération avant réforme',
-                data: data,
-                pointStart: 2023,
-                pointInterval: 1,
-                color: 'var(--text-action-high-blue-france)',
-                type: 'spline',  
-                lineWidth: 5,
-                dashStyle: 'ShortDot',
-              },{
-                name: "rémunération après réforme avec droit d'option ",
-                data: data3,
-                pointStart: 2023,
-                pointInterval: 1,
-                color: "#CE614A",
-                type: 'spline',  
-                lineWidth: 4,
-                },];
-        } else if (data.length != 0 && data2.length == 0 && data3.length != 0){
-            series = [{
-                name: 'rémunération avant réforme',
-                data: data,
-                pointStart: 2023,
-                pointInterval: 1,
-                color: 'var(--text-action-high-blue-france)',
-                type: 'spline',  
-                lineWidth: 5,
-                dashStyle: 'ShortDot',
-                
-              },{
-                name: "rémunération après réforme avec droit d'option ",
-                data: data3,
-                pointStart: 2023,
-                pointInterval: 1,
-                color: "#CE614A",
-                type: 'spline',  
-                lineWidth: 4,
-                },];
-        } else {
-            series = [];
+            })
         }
+        if (data3.length != 0){
+            series.push({
+                name: "rémunération après réforme avec droit d'option ",
+                data: data3,
+                pointStart: 2023,
+                pointInterval: 1,
+                color: "#CE614A",
+                type: 'spline',  
+                lineWidth: 4,
+            })
+        }
+        
   
   		const options = {
             chart: {
@@ -106,7 +90,7 @@ export default class extends Controller {
                 noData: "Les courbes s'afficheront lorsque vous aurez <br>renseigné et validé les informations du formulaire."
             },
             title: {
-                text: "Simulations graphiques de la rémunération indiciaire",
+                text: "Rémunération indiciaire au 1er Janvier de chaque année ",
                 style: {
                 fontSize: '15px',
                 fontWeight: "900",
@@ -115,7 +99,7 @@ export default class extends Controller {
             },
             subtitle:{
                 text: "Les valeurs des graphes sont données à titre indicatif",
-                style: {color: 'var(--text-title-grey)'}, 
+                style: {color: 'var(--text-title-grey)', fontSize: '13px',}, 
             },
             tooltip: {
                 shared: true,
@@ -129,7 +113,7 @@ export default class extends Controller {
                     var ef = efs[indice];
                     return this.points.reduce(function (s, point) {
                         return s + '<br/>' + point.series.name + ': ' + point.y + '*56.2323€';
-                    }, '<b>' + this.x + '<br>Grade : '+grade+'<br>Emploi fonctionnel : '+ef +'</b>');
+                    }, '<b> Janvier ' + this.x + '<br>Grade : '+grade+'<br>Emploi fonctionnel : '+ef +'</b>');
                 },
             },
             xAxis:{
@@ -190,46 +174,38 @@ export default class extends Controller {
     	};
 
         
-        var series2;
-        if (data.length != 0 && data2.length != 0 && data3.length != 0 ){
-            series2 = [{
-                name: 'Écart Après Réforme - Avant Réforme  ',
+        var series2 = [];
+        if (data.length != 0 && data2.length != 0){
+            series2.push({
+                name: 'Écart Après Réforme sans opter - Avant Réforme  ',
                 data: sub1,
                 pointStart: 2023,
                 pointInterval: 1,
                 color: "#5770BE",
-                type: 'column',  
-                
-              },{
-                name: 'Écart Après Réforme avec droit option - Avant Réforme',
-                data: sub3,
-                pointStart: 2023,
-                pointInterval: 1,
-                color: "#CE614A",
-                type: 'column',  
-               
-              },{
-                name: "Écart Après Réforme avec droit option - Après Réforme",
+                type: 'column', 
+            })
+        }
+        /*if (data2.length != 0 && data3.length != 0){
+            series2.push({
+               name: "Écart Après Réforme avec droit option - Après Réforme",
                 data: sub2,
                 pointStart: 2023,
                 pointInterval: 1,
                 color: "#00949C",
                 type: 'column',  
-               
-                },]
-        } else if (data.length != 0 && data2.length == 0 && data3.length != 0){
-            series2 = [{
+            })
+        }*/
+        if (data3.length != 0 && data.length != 0){
+            series2.push({
                 name: 'Écart Après Réforme avec droit option - Avant Réforme',
                 data: sub3,
                 pointStart: 2023,
                 pointInterval: 1,
                 color: "#CE614A",
                 type: 'column',  
-               
-              },]
-        }else {
-            series2 = [];
+            })
         }
+        
 
         const options2 = {
             chart: {
@@ -252,7 +228,7 @@ export default class extends Controller {
                 noData: "Les courbes s'afficheront lorsque vous aurez <br>renseigné et validé les informations du formulaire.",
             },
             title: {
-                text: "Écarts indiciaires",
+                text: "Écarts indiciaires au 1er Janvier de chaque année",
                 style: {
                 fontSize: '15px',
                 fontWeight: "900",
@@ -261,7 +237,7 @@ export default class extends Controller {
             },
             subtitle:{
                 text: "Les valeurs des graphes sont données à titre indicatif",
-                style: {color: 'var(--text-title-grey)'}, 
+                style: {color: 'var(--text-title-grey)', fontSize: '13px',}, 
             },
             tooltip: {
                 shared: true,

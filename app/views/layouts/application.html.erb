@@ -14,8 +14,9 @@
     <%= javascript_importmap_tags %>
 
     <%= favicon_link_tag 'favicon.ico' %>
-    
+    <% if Rails.env.production?%>
     <script async defer data-website-id="ccee5ce6-f76e-45e4-98f4-40dc5bc68bfb" src="https://s.abla.io/abla.js"></script>
+    <% end %>
   </head>
 
   <body>

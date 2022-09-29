@@ -32,22 +32,6 @@ h1, h2{
 .w100{
 	width:100%;
 }
-.w50{
-  width:50%;
-}
-.w3{
-  width:33.33%;
-}
-.pcenter{
-  padding-left:0.5rem;
-  padding-right:0.5rem;
-}
-.pl{
-	padding-left:0.25rem;
-}
-.pr{
-	padding-right:0.25rem;
-}
 .align_flex{
   display: inline-flex;
   display: -webkit-inline-flex;
@@ -142,7 +126,12 @@ h1, h2{
 .highcharts-title, .highcharts-subtitle, .highcharts-no-data, .btn-plus{
   color:var(--text-title-grey) !important;
   fill:var(--text-title-grey) !important;
+  font-size: 1rem;
 }
 .tc{
   text-align: center;
+}
+.fr-results .fr-tag {
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
 }

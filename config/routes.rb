@@ -38,7 +38,13 @@ Rails.application.routes.draw do
      
     end
   end
-  
+  resources :niveaus do 
+    collection do 
+      post 'import' => 'niveaus#import'
+     
+    end
+  end
+
   post 'search_grilles', to: 'grilles#search_grilles'
 
   #get '/hg2et5zbk05ea', to: 'pages#index'
@@ -48,6 +54,7 @@ Rails.application.routes.draw do
   get '/donnees-personnelles', to: 'pages#donnees_personnelles'
   get '/accessibilite', to: 'pages#accessibilite'
   post 'select_filter' => 'pages#select_filter'
+  post '/select_niveau' => 'pages#select_niveau'
 
   get '/*path', to: 'pages#error_404'
   match "/404", to: 'pages#error_404', via: :all

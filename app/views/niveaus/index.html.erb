@@ -1,0 +1,25 @@
+<main role="main" class="containtAll">
+  <div class="fr-container fr-mt-7w">
+    <div class="fr-col-lg-10 fr-col-offset-lg-1">
+      <h1>Ajouter un nouveau document</h1>
+      <div class="d24"></div>
+
+     <div>
+      <%= form_tag import_niveaus_path, multipart: true do %>
+        <div>
+          <label><%= file_field_tag  :file, accept: '.xlsx' %>
+          </label>
+    
+          <div class="d24"></div> 
+          <div>
+            <%= submit_tag "Transmettre", id: "submit_btn", class:"fr-btn" %>  
+          </div>
+                    
+        </div>
+        <% end %>
+  </div>
+  <div class="d24"></div>
+  <div><%= Niveau.all.count%> données</div>
+</div>
+</div>
+</main>

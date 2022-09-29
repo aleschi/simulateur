@@ -14,12 +14,13 @@ class Reclassement < ApplicationRecord
 	    	next if idx == 0 # skip header
 	      	row_data = Hash[[headers, row].transpose]
 	      
-	        if !row_data["Indice"].nil? && !row_data["Indice"].blank? #on verifie que la colonne existe 
+	        if !row_data["IM"].nil? && !row_data["IM"].blank? #on verifie que la colonne existe 
 
 	            @reclassement = Reclassement.new 
 	            @reclassement.echelon = row_data["Echelon"].to_i          
-	            @reclassement.indice = row_data["Indice"].to_i
+	            @reclassement.indice = row_data["IM"].to_i
 	            @reclassement.grade = row_data["Grade"].to_f
+	            @reclassement.mois = row_data["Mois"].to_i
 	           	@reclassement.save
 	            
 	        end

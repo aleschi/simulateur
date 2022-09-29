@@ -17,27 +17,24 @@
 		</nav>
 		<div class="fr-grid-row fr-grid-row--gutters">
 			<div class="fr-col-12 fr-col-lg-12">
-			<h1> Simulez votre nouvelle rémunération <span class="pright"> <%= link_to simulateur_path, class:" fr-btn fr-btn--icon-left" do %><span class="fr-fi-refresh-line fr-fi--sm fr-mr-1v" aria-hidden="true"></span>Réinitialiser la simulation<%end%></span></h1>
-			<div class="fr-text--sm fr-mb-1v">Tous les champs comportant un astérisque (*) sont à remplir obligatoirement.<br>Les courbes s'afficheront lorsque vous aurez renseigné et validé les informations sur votre situation dans le formulaire de gauche ci-dessous.</div>
+				<h1> Simulez votre nouvelle rémunération <span class="pright"> <%= link_to simulateur_path, class:" fr-btn fr-btn--icon-left" do %><span class="fr-fi-refresh-line fr-fi--sm fr-mr-1v" aria-hidden="true"></span>Réinitialiser la simulation<%end%></span></h1>
+				<div class="fr-text--sm fr-m-0">Tous les champs comportant un astérisque (*) sont à remplir obligatoirement. Lorsqu'une année est renseignée, c'est la date du 1er janvier de l'année qui est prise en compte.</div>
 			
 			</div>
 		</div>
+
 	</div>
 
-	<hr class="fr-grid-row fr-col-xs-12 fr-col-12 fr-my-3w">
+	<hr class="fr-grid-row fr-col-xs-12 fr-col-12 fr-my-2w">
 
-<div class="fr-container">
-	<% if !@corps.nil? && !@emplois_f2.nil?%>
-	<div class="fr-grid-row fr-grid-row--gutters">
-		<div class="fr-col-12 fr-col-lg-5">
-			<%= render 'form'%>
+	<div class="fr-container">
+		<% if !@corps.nil? && !@emplois_f2.nil?%>
+		<div class="fr-grid-row fr-grid-row--gutters">
+			<div class="fr-col-12">
+				<%= render 'form'%>
+			</div>	
 		</div>
-		<div class="fr-col-12 fr-col-lg-7">
-			<div id="graphe" class="graphe">				
-				<%= render 'graphe'%>
-			</div>
-		</div>
+
+		<% end %>
 	</div>
-	<% end %>
-</div>
 </main>
