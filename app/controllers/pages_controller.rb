@@ -23,8 +23,8 @@ class PagesController < ApplicationController
       @emplois_f =  Emploi.all.order('created_at DESC').pluck(:nom).uniq
   		@emplois_f2 = Emploi.all.order('created_at DESC').pluck(:nom).uniq + ["Sous-préfet / sous-préfète", "Préfet / Préfète", "Fonctions diplomatiques", "Missions d'inspections générales","Emplois supérieurs de l'administration fiscale" ]
   	end
-    @debut_dispo=0
-    @fin_dispo=0
+    @graphe_debut_dispo=0
+    @graphe_fin_dispo=0
   end
 
   def mentions_legales

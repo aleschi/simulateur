@@ -17,7 +17,7 @@
 				<tr>
 					<td><%= l(Date.new(2023,1,1) + i.months,format: "%B %Y") %></td>
 					<td><%= indice.to_i%></td>
-					<td><%= @liste_indices2[i].to_i%></td>
+					<td><% if @liste_indices2[i].to_i == 0 %> / <%else%><%= @liste_indices2[i].to_i%><%end%></td>
 					<td><%= @liste_indices3[i].to_i%></td>
 					<td><%= @array_grade[i]%></td>
 					<td><%= @array_ef[i]%></td>

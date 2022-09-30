@@ -12,9 +12,13 @@ class GrillesController < ApplicationController
   	@duree_carriere = (67 - @age + 1)*12 #en mois     
     @debut_dispo=0
     @fin_dispo=0
+    @graphe_debut_dispo = 0
+    @graphe_fin_dispo = 0
     if params[:debut_projet] != '' && params[:fin_projet] != ''
       @debut_dispo = params[:debut_projet].to_i-2023
       @fin_dispo = params[:fin_projet].to_i-2023
+      @graphe_debut_dispo = params[:debut_projet].to_i
+      @graphe_fin_dispo = params[:fin_projet].to_i
     end
     @corps = params[:corps]
     @grade = params[:grade].to_i
@@ -116,8 +120,9 @@ class GrillesController < ApplicationController
   	#@liste_salaire= @liste_indices.collect { |n| (n * 56.2323).round(2) }
 
 
-    if @corps == "Administrateur / Administratice de l'Etat"
+    if @corps == "Administrateur / Administratrice de l’Etat"
       @liste_indices2 = []
+      @liste_indices2_annuel =  []
     end
 
     @array_grade_annuel = @array_grade.select.with_index{|x,i| i%12 == 0}
@@ -271,14 +276,14 @@ class GrillesController < ApplicationController
         if date_grade > 0 && (date_grade.to_i - 2023)*12 < start_emploi + duree_emploi #check promo avant fin de ef ou avant fin de carriere si pas de ef 
           @new_grade = i+2
           @annee_grade = (date_grade.to_i - 2023)*12 #cas promo de grade apres fin carriere        
-          if fin_dispo - debut_dispo >= 5 && fin_dispo < @annee_grade && array_grade[fin_dispo] == @new_grade-1 #check projet de dispo de plus de 5 ans avant promotions de grade alors reset courbe principale 
+          if fin_dispo - debut_dispo > 5 && fin_dispo < @annee_grade && array_grade[fin_dispo] == @new_grade-1 #check projet de dispo de plus de 5 ans avant promotions de grade alors reset courbe principale 
             liste_indices=Dispo(debut_dispo,fin_dispo,liste_indices, duree_carriere) 
           end 
           grade = @new_grade
           liste_indices = PromoGrade(corps,@new_grade,liste_indices,@annee_grade,duree_carriere)
         end
       end     
-      if fin_dispo - debut_dispo >= 5 && (@new_grade == 0 || @new_grade == array_grade[debut_dispo]) #dispo si aucune promo de grade ou apres derniere promo de grade
+      if fin_dispo - debut_dispo > 5 && (@new_grade == 0 || @new_grade == array_grade[debut_dispo]) #dispo si aucune promo de grade ou apres derniere promo de grade
         @liste_indices=Dispo(debut_dispo,fin_dispo,@liste_indices, duree_carriere) 
       end  
       liste_indices = checkDim(liste_indices,duree_carriere)
@@ -324,11 +329,11 @@ class GrillesController < ApplicationController
       
         if @grade_reclasse == 1 && date_grade2 != 0 && date_grade2 < fin_emploi #si promo au grade 2 pendant ef / autre promo pas possible car min 10 ans pour grade 3 
           @annee_grade = (date_grade2 - 2023)*12
-          @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, niveau_emploi, @annee_grade, 0, @counter_temps_niveau1 ) #progression acceleree jusqua promo de grade 
+          @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, niveau_emploi, @annee_grade, 0, @counter_temps_niveau1,duree_carriere ) #progression acceleree jusqua promo de grade 
           @liste_indices_emploi3 = PromoGrade3(duree_carriere, @liste_indices_emploi3,date_grade2,2)
-          @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, niveau_emploi, @duree_emploi-@annee_grade, @annee_grade, @counter_temps_niveau1 )#progression acceleree de promo de grade à fin emploi
+          @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, niveau_emploi, @duree_emploi-@annee_grade, @annee_grade, @counter_temps_niveau1,duree_carriere )#progression acceleree de promo de grade à fin emploi
         else 
-          @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, niveau_emploi, @duree_emploi, 0, @counter_temps_niveau1 )
+          @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, niveau_emploi, @duree_emploi, 0, @counter_temps_niveau1,duree_carriere )
         end
       else #reclassement à partir de indice dans le corps si pas ef + anciennete
         @liste_indices_emploi3 = Reclassement.where(grade: @grade_reclasse).where('echelon >= ?',@echelon_reclasse).order('indice ASC').pluck(:indice)
@@ -345,37 +350,37 @@ class GrillesController < ApplicationController
           # progression accelerée pendant ef uniquement            
           if @grade_reclasse == 1 && date_grade2 != 0 && date_grade2 < @start_emploi + @duree_emploi # si promo de grade 2 avant/pendant 
             if date_grade2 <=  @start_emploi   #promo avant ef
-              if fin_dispo - debut_dispo >= 5 && fin_dispo < date_grade2 && debut_dispo > @end #check projet de dispo de plus de 5 ans avant promotions de grade et avant ef (mais apres dernier ef)
+              if fin_dispo - debut_dispo > 5 && fin_dispo < date_grade2 && debut_dispo > @end #check projet de dispo de plus de 5 ans avant promotions de grade et avant ef (mais apres dernier ef)
                 liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,liste_indices_emploi3, duree_carriere) 
               end           
               @liste_indices_emploi3 = PromoGrade3(duree_carriere, @liste_indices_emploi3,date_grade2,2) #promo avant progression dans ef 
-              if fin_dispo - debut_dispo >= 5 &&  debut_dispo > date_grade2 && fin_dispo < @start_emploi  #apres promo de grade avant ef 
+              if fin_dispo - debut_dispo > 5 &&  debut_dispo > date_grade2 && fin_dispo < @start_emploi  #apres promo de grade avant ef 
                 liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
               end 
-              @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @duree_emploi, @start_emploi,@counter_temps_niveau1  )
+              @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @duree_emploi, @start_emploi,@counter_temps_niveau1,duree_carriere  )
               
             elsif @start_emploi < date_grade2 < @start_emploi + @duree_emploi #promo pendant ef / pas de dispo possible apres promo mais avant uniquement
               @annee_grade = (date_grade2 - 2023)*12
-              if fin_dispo - debut_dispo >= 5 && fin_dispo < date_grade2 && debut_dispo > @end #check projet de dispo de plus de 5 ans avant promotions de grade et avant ef (mais apres dernier ef)
+              if fin_dispo - debut_dispo > 5 && fin_dispo < date_grade2 && debut_dispo > @end #check projet de dispo de plus de 5 ans avant promotions de grade et avant ef (mais apres dernier ef)
                 liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,liste_indices_emploi3,duree_carriere) 
               end  
-              @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @annee_grade, 0, @counter_temps_niveau1 ) #progression acceleree jusqua promo de grade 
+              @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @annee_grade, 0, @counter_temps_niveau1,duree_carriere ) #progression acceleree jusqua promo de grade 
               @liste_indices_emploi3 = PromoGrade3(duree_carriere, @liste_indices_emploi3,date_grade2,2)
-              @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @duree_emploi-@annee_grade, @annee_grade, @counter_temps_niveau1 )#progression acceleree de promo de grade à fin emploi     
+              @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @duree_emploi-@annee_grade, @annee_grade, @counter_temps_niveau1,duree_carriere )#progression acceleree de promo de grade à fin emploi     
             end 
           elsif params["niveau_emploi#{i}"].to_i == 1 && @counter_temps_niveau1 <= 120 && @counter_temps_niveau1 + @duree_emploi > 120 #promo grade 3 au bout de 10 ans de niveau 1 donc pendant ef                          
               @date_niveau1 = 12*10 - @counter_temps_niveau1              
-              if fin_dispo - debut_dispo >= 5 && fin_dispo < @start_emploi && debut_dispo > @end#check si dispo avant 
+              if fin_dispo - debut_dispo > 5 && fin_dispo < @start_emploi && debut_dispo > @end#check si dispo avant 
                 @liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
               end 
-              @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @date_niveau1, 0, @counter_temps_niveau1 ) #progression acceleree jusqua promo de grade 
+              @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @date_niveau1, 0, @counter_temps_niveau1,duree_carriere ) #progression acceleree jusqua promo de grade 
               @liste_indices_emploi3 = PromoGrade3(duree_carriere, @liste_indices_emploi3,@date_niveau1,3)
-              @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @duree_emploi-@date_niveau1, @date_niveau1, @counter_temps_niveau1 )#progression acceleree de promo de grade à fin emploi                    
+              @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @duree_emploi-@date_niveau1, @date_niveau1, @counter_temps_niveau1,duree_carriere )#progression acceleree de promo de grade à fin emploi                    
           else  #pas de promo avant debut emploi ni pendant 
-            if fin_dispo - debut_dispo >= 5 && fin_dispo < @start_emploi && debut_dispo > @end #si dispo avant ef 
+            if fin_dispo - debut_dispo > 5 && fin_dispo < @start_emploi && debut_dispo > @end #si dispo avant ef 
               @liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
             end 
-            @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @duree_emploi, @start_emploi, @counter_temps_niveau1 )   
+            @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @duree_emploi, @start_emploi, @counter_temps_niveau1,duree_carriere )   
           end
           @end = @start_emploi + @duree_emploi
         end
@@ -388,18 +393,18 @@ class GrillesController < ApplicationController
       end       
    
       if @grade_reclasse == 1 && date_grade2 != 0 && date_grade2 > @end  # si promo de grade 2 si pas de ef ou si derriere dernier ef 
-        if fin_dispo - debut_dispo >= 5 && fin_dispo < date_grade2 && debut_dispo > @end #verif si dispo avant promo de grade
+        if fin_dispo - debut_dispo > 5 && fin_dispo < date_grade2 && debut_dispo > @end #verif si dispo avant promo de grade
           @liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
         end           
         @liste_indices_emploi3 = PromoGrade3(duree_carriere, @liste_indices_emploi3,date_grade2,2)    
-        if fin_dispo - debut_dispo >= 5 && debut_dispo > date_grade2 #verif si dispo apres promo de grade
+        if fin_dispo - debut_dispo > 5 && debut_dispo > date_grade2 #verif si dispo apres promo de grade
           @liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
         end  
       elsif date_grade2 == 0  && (params["type_emploi1"].nil? || params["type_emploi1"] == "")#pas de promo et pas d ef 
-        if fin_dispo - debut_dispo >= 5
+        if fin_dispo - debut_dispo > 5
           @liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
         end    
-      elsif fin_dispo - debut_dispo >= 5 && debut_dispo > @end && @end > 0 && date_grade2 == 0 #check si dispo apres dernier ef sans promo 
+      elsif fin_dispo - debut_dispo > 5 && debut_dispo > @end && @end > 0 && date_grade2 == 0 #check si dispo apres dernier ef sans promo 
         @liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere)
       end  
 
@@ -407,11 +412,14 @@ class GrillesController < ApplicationController
       
     end
 
-    def ProgressionAcceleree(liste_indice, niveau, duree_emploi, start, count_niveau)
+    def ProgressionAcceleree(liste_indice, niveau, duree_emploi, start, count_niveau, duree_carriere)
       @liste_indices_moyenne_ae = [] #liste des indice avec progression accelerée
+      @indice_decalle = 0
       if niveau == 3
-        while @liste_indices_moyenne_ae.length <= duree_emploi
+        @indice_decalle = duree_emploi + 2*(duree_emploi/16)
+        while @liste_indices_moyenne_ae.length < duree_emploi
         liste_indice[start..liste_indice.length-1].each_with_index do |indice,i|
+          
           if i.modulo(18) != 16 && i.modulo(18) != 17
             @liste_indices_moyenne_ae << indice
           end         
@@ -419,8 +427,10 @@ class GrillesController < ApplicationController
         end
      
       elsif niveau == 2
-        while @liste_indices_moyenne_ae.length <= duree_emploi
+        @indice_decalle = duree_emploi + 4*(duree_emploi/14)
+        while @liste_indices_moyenne_ae.length < duree_emploi
         liste_indice[start..liste_indice.length-1].each_with_index do |indice,i|
+          
           if i.modulo(18) != 16 && i.modulo(18) != 17 && i.modulo(18) != 15 && i.modulo(18) != 14
             @liste_indices_moyenne_ae << indice
           end         
@@ -428,8 +438,10 @@ class GrillesController < ApplicationController
         end
      
       elsif niveau == 1
-        while @liste_indices_moyenne_ae.length <= duree_emploi
+        @indice_decalle = duree_emploi + 6*(duree_emploi/12)
+        while @liste_indices_moyenne_ae.length < duree_emploi
         liste_indice[start..liste_indice.length-1].each_with_index do |indice,i|
+          
           if i.modulo(18) != 16 && i.modulo(18) != 17 && i.modulo(18) != 15 && i.modulo(18) != 14 && i.modulo(18) != 13 && i.modulo(18) != 12
             @liste_indices_moyenne_ae << indice
             count_niveau += 1
@@ -440,7 +452,8 @@ class GrillesController < ApplicationController
         @liste_indices_moyenne_ae = liste_indice[start..liste_indice.length-1]
       end
       @liste_indices_moyenne_ae = checkDim(@liste_indices_moyenne_ae, duree_emploi)
-      liste_indice[start..start+duree_emploi-1] = @liste_indices_moyenne_ae[0..duree_emploi-1]
+      liste_indice[start..liste_indice.length-1] = @liste_indices_moyenne_ae[0..duree_emploi-1] + liste_indice[start+@indice_decalle..liste_indice.length-1]
+      liste_indice = checkDim(liste_indice,duree_carriere )
       return liste_indice
     end
 

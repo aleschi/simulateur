@@ -805,7 +805,7 @@ export default class extends Controller {
             result.classList.add('fr-hidden');
         }else{
             result.classList.remove('fr-hidden');
-            result.innerHTML = " " + form.value;
+            result.innerHTML = form.value;
         }
     }
 
