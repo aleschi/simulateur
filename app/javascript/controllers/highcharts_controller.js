@@ -21,6 +21,7 @@ export default class extends Controller {
         const data3 = JSON.parse(this.data.get("donnees3"));
 
         const grades = JSON.parse(this.data.get("grades"));
+        const grades2 = JSON.parse(this.data.get("grades2"));
         const efs = JSON.parse(this.data.get("efs"));
 
         const sub1 = data2.map((v, i) => v - data[i]);
@@ -34,7 +35,7 @@ export default class extends Controller {
         var series = [];
         if (data.length != 0){
             series.push({
-                name: 'rémunération avant réforme',
+                name: 'Indice avant réforme',
                 data: data,
                 pointStart: 2023,
                 pointInterval: 1,
@@ -46,7 +47,7 @@ export default class extends Controller {
         }
         if (data2.length != 0){
             series.push({
-                name: 'rémunération après réforme avec maintien dans le corps en extinction ',
+                name: 'Indice après réforme avec maintien dans le corps en extinction ',
                 data: data2,
                 pointStart: 2023,
                 pointInterval: 1,
@@ -57,7 +58,7 @@ export default class extends Controller {
         }
         if (data3.length != 0){
             series.push({
-                name: "rémunération après réforme avec droit d'option ",
+                name: "Indice après réforme avec droit d'option ",
                 data: data3,
                 pointStart: 2023,
                 pointInterval: 1,
@@ -90,7 +91,7 @@ export default class extends Controller {
                 noData: "Les courbes s'afficheront lorsque vous aurez <br>renseigné et validé les informations du formulaire."
             },
             title: {
-                text: "Rémunération indiciaire au 1er Janvier de chaque année ",
+                text: "Suivi indiciaire au 1er Janvier de chaque année ",
                 style: {
                 fontSize: '15px',
                 fontWeight: "900",
@@ -110,10 +111,11 @@ export default class extends Controller {
                 formatter: function () {
                     var indice = this.x - 2023;
                     var grade = grades[indice];
+                    var grade2 = grades2[indice];
                     var ef = efs[indice];
                     return this.points.reduce(function (s, point) {
-                        return s + '<br/>' + point.series.name + ': ' + point.y + '*56.2323€';
-                    }, '<b> Janvier ' + this.x + '<br>Grade : '+grade+'<br>Emploi fonctionnel : '+ef +'</b>');
+                        return s + '<br/>' + '<span style="color:' + point.series.color + ';">' + point.series.name + '</span> : ' + point.y ;
+                    }, '<b> Janvier ' + this.x + '<br>Grade : '+grade+' / Grade reclasse : '+ grade2 +'<br>Emploi fonctionnel : '+ef +'</b>');
                 },
             },
             xAxis:{
@@ -147,7 +149,7 @@ export default class extends Controller {
                     style: {color: 'var(--text-title-grey)'},
                 },
                 title: {
-                text: "indices",
+                text: "Indice",
                 style: {color: 'var(--text-title-grey)'}, 
                 }
             },
@@ -247,10 +249,11 @@ export default class extends Controller {
                 formatter: function () {
                     var indice = this.x - 2023;
                     var grade = grades[indice];
+                    var grade2 = grades2[indice];
                     var ef = efs[indice];
                     return this.points.reduce(function (s, point) {
-                        return s + '<br/>' + point.series.name + ': ' + point.y ;
-                    }, '<b>' + this.x + '<br>Grade : '+grade+'<br>Emploi fonctionnel : '+ef +'</b>');
+                        return s + '<br/>' + '<span style="color:' + point.series.color + ';">' + point.series.name + '</span> : ' + point.y ;
+                    }, '<b>' + this.x + '<br>Grade : '+grade+' / Grade reclasse : '+ grade2 +'<br>Emploi fonctionnel : '+ef +'</b>');
                 },
             },
             xAxis:{

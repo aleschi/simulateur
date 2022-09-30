@@ -15,6 +15,8 @@ class PagesController < ApplicationController
     @array_ef_annuel=[]
     @array_grade=[]
     @array_grade_annuel=[]
+    @array_grade_reclasse=[]
+    @array_grade_reclasse_annuel=[]
   	if Grille.all.count > 0
   		@corps = Grille.where('corps != ?','AE').order('corps ASC').pluck(:corps).uniq
   	end

@@ -3,7 +3,7 @@
 	<%= form_with(url: search_grilles_path, method: :post, data: {'filter-target': "form", action: "turbo:before-fetch-request->filter#submitForm change->filter#change_form"}) do |f|%>
 		
 	<h2>Votre situation au 1er Janvier 2023 <span class="pright fr-hidden" data-filter-target="boutonSituation"><button class="fr-btn fr-btn--secondary" type="button" data-action="click->filter#reset_situation" title="modifier la situation 2023"> Modifier votre situation <span class="fr-icon-edit-line fr-fi--sm fr-ml-1v" aria-hidden="true"></span></button></span></h2>
-	
+
 	<div class="fr-grid-row fr-grid-row--gutters fr-hidden fr-results" data-filter-target="resultSituation">
 		<div class="fr-col-12">
 			<span class="fr-tag">Corps : <span data-filter-target='resultCorps'></span></span>
@@ -111,7 +111,15 @@
 	<div class="fr-error-text fr-hidden fr-mb-1v" data-filter-target="errorSituation" role="alert"></div>
 
 	<h2>Simulations situations futures <span class='texte_light italic'>(optionnel)</span><span class="pright fr-hidden" data-filter-target="buttonSimulation" ><button class="fr-btn fr-btn--secondary" type="button" data-action="click->filter#reset_simulation" title="modifier vos simulations futures"> Modifier vos simulations <span class="fr-icon-edit-line fr-fi--sm fr-ml-1v" aria-hidden="true"></span></button></span></h2>	
-	
+	<div class="fr-notice fr-notice--info fr-mb-2w">
+				    <div class="fr-container">
+				        <div class="fr-notice__body">
+				            <p class="fr-notice__title">
+				              Vous pouvez simuler des promotions de grades (lorsqu'elles sont possibles), jusqu’à 6 emplois fonctionnels et 1 disponibilité. La promotion au grade 3 ne s'applique pas en cas de droit d'option.
+				            </p>
+				        </div>
+				    </div>
+				</div>	
 
 	<div class="fr-grid-row fr-grid-row--gutters fr-hidden fr-results" data-filter-target="resultSimulation">
 		<div class="fr-col-12">
@@ -143,7 +151,7 @@
 			<div class="">
 			    <fieldset class="fr-fieldset fr-fieldset--inline">
 			        <legend class="fr-fieldset__legend fr-text--regular fr-mb-1w" id='radio-inline-legend'>
-			            Vous pouvez simuler des promotions de grades (lorsqu'elles sont possibles), jusqu’à 6 emplois fonctionnels et 1 disponibilité. Souhaitez vous effectuer une simulation ? 
+			            Souhaitez vous effectuer une simulation ? 
 			        </legend>
 			        <div class="fr-fieldset__content" >
 			            <div class="fr-radio-group">

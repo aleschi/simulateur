@@ -1,6 +1,6 @@
 <div>
-	<h2>Tableau mensuel de la rémunération indiciaire</h2>
-	<div class="fr-table">
+	<h2>Tableau mensuel du suivi indiciaire</h2>
+	<div class="fr-table fr-table--layout-fixed">
 	    <table>
 	    	<thead>
 	            <tr>
@@ -9,17 +9,19 @@
 	                <th scope="col">Indice - Après réforme sans opter </th>
 	                <th scope="col">Indice - Après réforme en optant</th>
 	                <th scope="col">Grade</th>
+	                <th scope="col">Grade - Après réforme en optant</th>
 	                <th scope="col">Emploi fonctionnel</th>
 	            </tr>
 	        </thead>
 	        <tbody>
 				<% @liste_indices.each_with_index do |indice,i| %>
 				<tr>
-					<td><%= l(Date.new(2023,1,1) + i.months,format: "%B %Y") %></td>
+					<td>1er <%= l(Date.new(2023,1,1) + i.months,format: "%B %Y") %></td>
 					<td><%= indice.to_i%></td>
 					<td><% if @liste_indices2[i].to_i == 0 %> / <%else%><%= @liste_indices2[i].to_i%><%end%></td>
 					<td><%= @liste_indices3[i].to_i%></td>
 					<td><%= @array_grade[i]%></td>
+					<td><% if @array_grade_reclasse[i]%1 != 0 %><%= @array_grade_reclasse[i]%><%else%><%= @array_grade_reclasse[i].to_i%><%end%></td>
 					<td><%= @array_ef[i]%></td>
 				</tr>
 				<% end %>
