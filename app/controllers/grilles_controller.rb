@@ -25,7 +25,7 @@ class GrillesController < ApplicationController
     @echelon = params[:echelon].to_i 
     @mois = params[:duree].to_i
     @annee_depart = Grille.where(corps: @corps, grade: @grade, echelon: @echelon).pluck(:annee).uniq.min
-    @mois_depart = Grille.where(corps: @corps, grade: @grade, echelon: @echelon, annee: @annee_depart).pluck(:mois).min
+    @mois_depart = Grille.where(corps: @corps, grade: @grade, echelon: @echelon, annee: @annee_depart).pluck(:mois).min #peut etre diff de 1
     @annee_i = ((@mois_depart-1+@mois-1)/12).to_i + Grille.where(corps: @corps, grade: @grade, echelon: @echelon).pluck(:annee).uniq.min #placer à ligne bonne annee    
     @mois_i = @mois_depart-1+@mois-12*((@mois_depart-1+@mois-1)/12).to_i #mois/12 donne entier 
     @ligne_i = Grille.where(corps: @corps, grade: @grade, echelon: @echelon, annee: @annee_i, mois: @mois_i).first
@@ -43,8 +43,8 @@ class GrillesController < ApplicationController
     @liste_indices_emploi = Array.new(@duree_carriere, 0) #courbe secondaire partie ef avant reforme 
     @liste_indices_emploi2 = Array.new(@duree_carriere, 0) #courbe secondaire partie ef apres reforme sans droit option 
 
-    @liste_indices = CarrierePrincipale1(@duree_carriere, @corps, @grade, @echelon, @mois, params[:grade2].to_i, params[:grade3].to_i, params[:grade4].to_i,@debut_dispo, @fin_dispo,@array_grade)    
-    @liste_indices2 = CarrierePrincipale2(@duree_carriere, @corps, @grade,@echelon, @mois, params[:grade2].to_i, params[:grade3].to_i, params[:grade4].to_i,@debut_dispo, @fin_dispo, params[:type_emploi], params[:niveau_emploi].to_i, params[:debut_emploif].to_i, params[:fin_emploif].to_i,@array_grade )
+    @liste_indices = CarrierePrincipale1(@duree_carriere, @corps, @grade, @echelon, @annee_i, @mois_i, params[:grade2].to_i, params[:grade3].to_i, params[:grade4].to_i,@debut_dispo, @fin_dispo,@array_grade)    
+    @liste_indices2 = CarrierePrincipale2(@duree_carriere, @corps, @grade,@echelon, @annee_i, @mois_i, params[:grade2].to_i, params[:grade3].to_i, params[:grade4].to_i,@debut_dispo, @fin_dispo, params[:type_emploi], params[:niveau_emploi].to_i, params[:debut_emploif].to_i, params[:fin_emploif].to_i,@array_grade )
 
     #initialement dans un emploi fonctionnel 
     if !params[:type_emploi].nil? && params[:type_emploi] != "" && params[:niveau_emploi] != "" && params[:echelon_emploif] != "" && params[:fin_emploif] != "" && params[:duree_echelonf] != "" && params[:debut_emploif] != ""  
@@ -68,7 +68,7 @@ class GrillesController < ApplicationController
         @array_ef = @array_ef[0..@start_emploi-1]+Array.new(@duree_emploi, params["type_emploi#{i}"])+@array_ef[@start_emploi+@duree_emploi..@duree_carriere-1]
         
         #courbe 2       
-        @grade = @array_grade[@start_emploi-1]  #on regarde a quel grade on est a ce moment la    
+        @grade = @array_grade[@start_emploi-1]  #on regarde a quel grade on est mois avant prise de ef  
         @indice1 = @liste_indices2[@start_emploi-1] #indice carriere principale mois avant prise de ef 
         @indice2=@liste_indices_emploi2.max #indice max de ef 
         @indice = [@indice1,@indice2].max #max des indices
@@ -93,8 +93,7 @@ class GrillesController < ApplicationController
     end
 
     @array_grade_reclasse = Array.new(@duree_carriere, 0) #pour suivre le grade à chaque instant
-    @liste_indices_emploi3 = Courbe3(@duree_carriere, @corps, params[:grade].to_i, params[:echelon].to_i, params[:duree].to_i, params[:type_emploi], params[:niveau_emploi].to_i, 
-    params[:echelon_emploif].to_i, params[:duree_echelonf].to_i, params[:debut_emploif].to_i,params[:fin_emploif].to_i, params[:grade2].to_i, @debut_dispo, @fin_dispo, @array_grade_reclasse)
+    @liste_indices_emploi3 = Courbe3(@duree_carriere, @corps, params[:grade].to_i, params[:echelon].to_i, params[:duree].to_i, params[:type_emploi], params[:niveau_emploi].to_i, params[:echelon_emploif].to_i, params[:duree_echelonf].to_i, params[:debut_emploif].to_i,params[:fin_emploif].to_i, params[:grade2].to_i, @debut_dispo, @fin_dispo, @array_grade_reclasse)
     
     if @liste_indices_emploi3 == false #pb indice trop haut simu impossible 
       redirect_to simulation_impossible_path 
@@ -170,12 +169,8 @@ class GrillesController < ApplicationController
       return liste
     end
 
-    def CarrierePrincipale1(duree_carriere, corps, grade, echelon, mois, grade2, grade3, grade4, debut_dispo, fin_dispo,array_grade)
-      @annee_depart = Grille.where(corps: corps, grade: grade, echelon: echelon).pluck(:annee).uniq.min
-      @mois_depart = Grille.where(corps: corps, grade: grade, echelon: echelon, annee: @annee_depart).pluck(:mois).min
-      @annee_i = ((@mois_depart-1+mois-1)/12).to_i + Grille.where(corps: corps, grade: grade, echelon: echelon).pluck(:annee).uniq.min #placer à ligne bonne annee    
-      @mois_i = @mois_depart-1+mois-12*((@mois_depart-1+mois-1)/12).to_i #mois/12 donne entier 
-      @liste_indices = Grille.where(corps: corps, grade: grade).where("(echelon = ? AND annee = ? AND mois >= ?) OR (echelon = ? AND annee > ?) OR echelon > ?",echelon,@annee_i, @mois_i, echelon, @annee_i, echelon).order('indice ASC').pluck(:indice)      
+    def CarrierePrincipale1(duree_carriere, corps, grade, echelon, annee_i, mois_i, grade2, grade3, grade4, debut_dispo, fin_dispo,array_grade)    
+      @liste_indices = Grille.where(corps: corps, grade: grade).where("(echelon = ? AND annee = ? AND mois >= ?) OR (echelon = ? AND annee > ?) OR echelon > ?",echelon,annee_i, mois_i, echelon, annee_i, echelon).order('indice ASC').pluck(:indice)      
       @liste_indices= checkDim(@liste_indices,duree_carriere) #dim liste indice jusqu'à fin carrière 
       @liste_indices = CheckPromo(@liste_indices,duree_carriere,grade2,grade3,grade4,0,duree_carriere, corps, grade, debut_dispo,fin_dispo, array_grade) #check promo + dispo       
       return @liste_indices
@@ -197,26 +192,22 @@ class GrillesController < ApplicationController
       return liste_indices_emploi
     end 
 
-    def CarrierePrincipale2(duree_carriere, corps, grade, echelon, mois, grade2, grade3, grade4, debut_dispo, fin_dispo, type_emploi, niveau_emploi, debut_emploi, fin_emploi, array_grade)
-      @annee_depart = Grille.where(corps: corps, grade: grade, echelon: echelon).pluck(:annee).uniq.min
-      @mois_depart = Grille.where(corps: corps, grade: grade, echelon: echelon, annee: @annee_depart).pluck(:mois).min
-      @annee_i = ((@mois_depart-1+mois-1)/12).to_i + Grille.where(corps: corps, grade: grade, echelon: echelon).pluck(:annee).uniq.min #placer à ligne bonne annee    
-      @mois_i = @mois_depart-1+mois-12*((@mois_depart-1+mois-1)/12).to_i #mois/12 donne entier 
-      @liste_indices2 = Grille.where(corps: corps, grade: grade).where("(echelon = ? AND annee = ? AND mois >= ?) OR (echelon = ? AND annee > ?) OR echelon > ?",echelon,@annee_i, @mois_i, echelon, @annee_i, echelon).order('indice ASC').pluck(:indice)      
+    def CarrierePrincipale2(duree_carriere, corps, grade, echelon, annee_i, mois_i, grade2, grade3, grade4, debut_dispo, fin_dispo, type_emploi, niveau_emploi, debut_emploi, fin_emploi, array_grade)
+      @liste_indices2 = Grille.where(corps: corps, grade: grade).where("(echelon = ? AND annee = ? AND mois >= ?) OR (echelon = ? AND annee > ?) OR echelon > ?",echelon,annee_i, mois_i, echelon, annee_i, echelon).order('indice ASC').pluck(:indice)      
       @liste_indices2 = checkDim(@liste_indices2,duree_carriere) #dim liste indice jusqu'à fin carrière 
       if !type_emploi.nil? && type_emploi != ""
         @bonification2 = Bonification2(niveau_emploi) #bonif en sortie de tout ef
         @duree_emploi = (fin_emploi - 2023)*12        
         @liste_indices2 = CheckPromo(@liste_indices2,duree_carriere,grade2,grade3,grade4,0,@duree_emploi, corps, grade, 0,0, array_grade) #check si promo de grade avant fin de ef + pas de dispo avant ef                   
         @liste_indices2 = @liste_indices2[0..@duree_emploi-1] + @liste_indices2[@duree_emploi+@bonification2..@liste_indices2.length-1]
-        @liste_indices2=checkDim(@liste_indices2,duree_carriere) #dim liste indice jusqu'à fin carrière         
+        @liste_indices2 = checkDim(@liste_indices2,duree_carriere) #dim liste indice jusqu'à fin carrière         
       end  
       
       (1..6).each do |i| #promo grade avant ef et bonification pour carriere principale à la fin des ef
         if !params["type_emploi#{i}"].nil? &&  params["type_emploi#{i}"] != "" && params["duree_emploif#{i}"] != "" && params["debut_emploif#{i}"] != "" && params["niveau_emploi#{i}"] != "" 
           @duree_emploi = params["duree_emploif#{i}"].to_i*12 
           @start_emploi = (params["debut_emploif#{i}"].to_i - 2023)*12
-          @bonif= Bonification2(params["niveau_emploi#{i}"])
+          @bonif = Bonification2(params["niveau_emploi#{i}"])
           @liste_indices2 = CheckPromo(@liste_indices2,duree_carriere,grade2,grade3,grade4,@start_emploi,@duree_emploi, corps, grade, debut_dispo,fin_dispo,array_grade) #si promo avant ef          
           @liste_indices2 = @liste_indices2[0..@duree_emploi+@start_emploi-1] + @liste_indices2[@start_emploi+@duree_emploi+@bonif..@liste_indices2.length-1]
           @liste_indices2 = checkDim(@liste_indices2,duree_carriere) #dim liste indice jusqu'à fin carrière 
@@ -228,7 +219,7 @@ class GrillesController < ApplicationController
         @liste_indices2 = CheckPromo(@liste_indices2,duree_carriere,grade2,grade3,grade4,0,duree_carriere, corps, grade, debut_dispo,fin_dispo,array_grade)          
       end 
 
-      @liste_indices2=checkDim(@liste_indices2,duree_carriere) #dim liste indice jusqu'à fin carrière 
+      @liste_indices2 = checkDim(@liste_indices2,duree_carriere) #dim liste indice jusqu'à fin carrière 
       return @liste_indices2
     end
     
@@ -238,7 +229,7 @@ class GrillesController < ApplicationController
       indice = [indice,Reclassement.where(grade: grade_reclasse2).pluck(:indice).max].min #si jamais indice emploi plus grand que dernier indice dans table de reclassement   
       @liste_indices_ae = Reclassement.where(grade: grade_reclasse2).where('indice >= ?',indice).order('indice ASC').pluck(:indice)     
       @liste_indices_ae = @liste_indices_ae[anciennete..@liste_indices_ae.length-1]
-      @liste_indices_ae=checkDim(@liste_indices_ae,duree_carriere)
+      @liste_indices_ae = checkDim(@liste_indices_ae,duree_carriere)
     
       @liste_indices_moyenne_ae = [] #liste des indice avec progression accelerée
       if niveau == 3
@@ -277,16 +268,16 @@ class GrillesController < ApplicationController
       [grade2,grade3,grade4].each_with_index do |date_grade, i|
         if date_grade > 0 && (date_grade.to_i - 2023)*12 < start_emploi + duree_emploi #check promo avant fin de ef ou avant fin de carriere si pas de ef 
           @new_grade = i+2
-          @annee_grade = (date_grade.to_i - 2023)*12 #cas promo de grade apres fin carriere        
+          @annee_grade = (date_grade.to_i - 2023)*12        
           if fin_dispo - debut_dispo > 5 && fin_dispo < @annee_grade && array_grade[fin_dispo] == @new_grade-1 #check projet de dispo de plus de 5 ans avant promotions de grade alors reset courbe principale 
-            liste_indices=Dispo(debut_dispo,fin_dispo,liste_indices, duree_carriere) 
+            liste_indices = Dispo(debut_dispo,fin_dispo,liste_indices, duree_carriere) 
           end 
           grade = @new_grade
           liste_indices = PromoGrade(corps,@new_grade,liste_indices,@annee_grade,duree_carriere)
         end
       end     
       if fin_dispo - debut_dispo > 5 && (@new_grade == 0 || @new_grade == array_grade[debut_dispo]) #dispo si aucune promo de grade ou apres derniere promo de grade
-        @liste_indices=Dispo(debut_dispo,fin_dispo,@liste_indices, duree_carriere) 
+        @liste_indices = Dispo(debut_dispo,fin_dispo,@liste_indices, duree_carriere) 
       end  
       liste_indices = checkDim(liste_indices,duree_carriere)
       return liste_indices
@@ -324,7 +315,7 @@ class GrillesController < ApplicationController
         @indice_e = Emploi.where(nom: type_emploi, echelon: echelon_emploi, annee: @annee_e, mois: @mois_e).first.indice       
         @indice_final = [@indice_e, @indice_i].max
         #ancienete emploi max 18 mois 
-        @anciennete_reclasse = [18, duree_echelon].min 
+        @anciennete_recl = [18, duree_echelon].min 
         #on va chercher indice reclassé
         if @grade_reclasse == 1 
           @indice_e_reclasse = ReclassementEmploi.where('indice_emploi >= ?', @indice_final).order(indice_emploi: :asc).first.indice_grade1
@@ -338,7 +329,7 @@ class GrillesController < ApplicationController
           return false
         end
 
-        @liste_indices_emploi3 = @liste_indices_emploi3[@anciennete_reclasse..@liste_indices_emploi3.length-1]
+        @liste_indices_emploi3 = @liste_indices_emploi3[@anciennete_recl..@liste_indices_emploi3.length-1]
         @liste_indices_emploi3 = checkDim(@liste_indices_emploi3,duree_carriere)   
         @duree_emploi = (fin_emploi.to_i - 2023)*12
       
@@ -369,18 +360,18 @@ class GrillesController < ApplicationController
             array_grade_reclasse[0..duree_carriere] = array_grade_reclasse[0..@annee_grade-1] + Array.new(duree_carriere-@annee_grade, 2)
             if date_grade2 <=  @start_emploi   #promo avant ef
               if fin_dispo - debut_dispo > 5 && fin_dispo < date_grade2 && debut_dispo > @end #check projet de dispo de plus de 5 ans avant promotions de grade et avant ef (mais apres dernier ef)
-                liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,liste_indices_emploi3, duree_carriere) 
+                liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,liste_indices_emploi3, duree_carriere) 
               end           
               @liste_indices_emploi3 = PromoGrade3(duree_carriere, @liste_indices_emploi3,date_grade2,2) #promo avant progression dans ef 
               if fin_dispo - debut_dispo > 5 &&  debut_dispo > date_grade2 && fin_dispo < @start_emploi  #apres promo de grade avant ef 
-                liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
+                liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
               end 
               @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @duree_emploi, @start_emploi,duree_carriere  )
               
             elsif @start_emploi < date_grade2 < @start_emploi + @duree_emploi #promo pendant ef / pas de dispo possible apres promo mais avant uniquement
               
               if fin_dispo - debut_dispo > 5 && fin_dispo < date_grade2 && debut_dispo > @end #check projet de dispo de plus de 5 ans avant promotions de grade et avant ef (mais apres dernier ef)
-                liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,liste_indices_emploi3,duree_carriere) 
+                liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,liste_indices_emploi3,duree_carriere) 
               end  
               @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @annee_grade-@start_emploi, @start_emploi,duree_carriere ) #progression acceleree jusqua promo de grade 
               @liste_indices_emploi3 = PromoGrade3(duree_carriere, @liste_indices_emploi3,date_grade2,2)
@@ -398,7 +389,7 @@ class GrillesController < ApplicationController
               @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @duree_emploi-@date_niveau1, @start_emploi+@date_niveau1,duree_carriere )#progression acceleree de promo de grade à fin emploi                    
           else  #pas de promo avant debut emploi ni pendant 
             if fin_dispo - debut_dispo > 5 && fin_dispo < @start_emploi && debut_dispo > @end #si dispo avant ef 
-              @liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
+              @liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
             end 
             @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @duree_emploi, @start_emploi,duree_carriere )   
           end
@@ -414,20 +405,20 @@ class GrillesController < ApplicationController
    
       if @grade_reclasse == 1 && date_grade2 != 0 && date_grade2 > @end  # si promo de grade 2 si pas de ef ou si derriere dernier ef 
         if fin_dispo - debut_dispo > 5 && fin_dispo < date_grade2 && debut_dispo > @end #verif si dispo avant promo de grade
-          @liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
+          @liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
         end
         array_grade_reclasse[0..duree_carriere] = array_grade_reclasse[0..(date_grade2 - 2023)*12-1] + Array.new(duree_carriere-(date_grade2 - 2023)*12, 2)           
         @liste_indices_emploi3 = PromoGrade3(duree_carriere, @liste_indices_emploi3,date_grade2,2)    
         if fin_dispo - debut_dispo > 5 && debut_dispo > date_grade2 #verif si dispo apres promo de grade
-          @liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
+          @liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
         end  
       elsif date_grade2 == 0  && (params["type_emploi1"].nil? || params["type_emploi1"] == "")#pas de promo et pas d ef 
         
         if fin_dispo - debut_dispo > 5
-          @liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
+          @liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
         end    
       elsif fin_dispo - debut_dispo > 5 && debut_dispo > @end && @end > 0 && date_grade2 == 0 #check si dispo apres dernier ef sans promo 
-        @liste_indices_emploi3=Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere)
+        @liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere)
       end  
      
       return @liste_indices_emploi3
@@ -510,7 +501,7 @@ class GrillesController < ApplicationController
         @dernier_indice_5 = liste_indices[@debut+5*12-1] #indice en décembre de l'annee avant 5 ans 
         @liste_indices_bloque = Array.new(@duree-5*12, @dernier_indice_5)
         liste_indices = liste_indices[0..@debut+5*12-1] + @liste_indices_bloque + liste_indices[@debut+5*12..liste_indices.length]
-        liste_indices= checkDim(liste_indices,duree_carriere)
+        liste_indices = checkDim(liste_indices,duree_carriere)
         return liste_indices
     end
 
