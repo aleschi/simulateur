@@ -23,8 +23,8 @@ COPY Gemfile Gemfile.lock ./
 RUN gem install bundler && \
 	#bundle lock --add-platform ruby && \
 	#bundle lock --add-platform x86_64-linux && \
-     bundle config set --local deployment 'true' && \
-     bundle config set --local without 'development test' && \
+    bundle config set --local deployment 'true' && \
+    bundle config set --local without 'development test' && \
     bundle install
 
 

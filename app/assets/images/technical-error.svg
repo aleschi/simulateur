@@ -1,5 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 80 80">
-
+    <style>
+        .fr-artwork-decorative {
+            fill: #cacafb;
+        }
+        .fr-artwork-minor {
+            fill: #e1000f;
+        }
+        .fr-artwork-major {
+            fill: #000091;
+        }
+    </style>
     <g class="fr-artwork-decorative" id="artwork-decorative">
         <path d="M68 13c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zM41 76c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1zM15 10c-.6 0-1-.4-1-1s.4-1 1-1 1 .4 1 1-.4 1-1 1z"/>
     </g>
