@@ -226,8 +226,9 @@ class GrillesController < ApplicationController
     def EmploiFonctionnel2(liste_indices_emploi, grade,indice, grade_reclasse2, niveau, start, duree_emploi, duree_carriere, anciennete)
 
       #2eme courbe : on va chercher indice le plus proche à indice max avec grade reclassé 
-      indice = [indice,Reclassement.where(grade: grade_reclasse2).pluck(:indice).max].min #si jamais indice emploi plus grand que dernier indice dans table de reclassement   
-      @liste_indices_ae = Reclassement.where(grade: grade_reclasse2).where('indice >= ?',indice).order('indice ASC').pluck(:indice)     
+      #indice = [indice,Reclassement.where(grade: grade_reclasse2).pluck(:indice).max].min #si jamais indice emploi plus grand que dernier indice dans table de reclassement   
+      indice = [indice,Reclassement.where(grade: 2).pluck(:indice).max].min
+      @liste_indices_ae = Reclassement.where(grade: 2).where('indice >= ?',indice).order('indice ASC').pluck(:indice)     
       @liste_indices_ae = @liste_indices_ae[anciennete..@liste_indices_ae.length-1]
       @liste_indices_ae = checkDim(@liste_indices_ae,duree_carriere)
     
@@ -461,6 +462,7 @@ class GrillesController < ApplicationController
         end 
         end
       else 
+        @indice_decalle = duree_emploi 
         @liste_indices_moyenne_ae = liste_indice[start..liste_indice.length-1]
       end
       @liste_indices_moyenne_ae = checkDim(@liste_indices_moyenne_ae, duree_emploi)
