@@ -54,11 +54,12 @@ Rails.application.routes.draw do
   get '/mentions-legales', to: 'pages#mentions_legales'
   get '/donnees-personnelles', to: 'pages#donnees_personnelles'
   get '/accessibilite', to: 'pages#accessibilite'
+  get '/plan-du-site', to: 'pages#plan'
   post 'select_filter' => 'pages#select_filter'
   post '/select_niveau' => 'pages#select_niveau'
   get '/simulation-impossible', to: 'pages#error_500'
   get '/*path', to: 'pages#error_404'
   match "/404", to: 'pages#error_404', via: :all
   match "/500", to: 'pages#error_500', via: :all
-  
+
 end

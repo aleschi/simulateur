@@ -9,16 +9,16 @@
 			<span class="fr-tag">Corps : <span data-filter-target='resultCorps'></span></span>
 			<span class="fr-tag">Grade : <span data-filter-target='resultGrade'></span></span>
 			<span class="fr-tag">Âge : <span data-filter-target='resultAge'></span></span>
-			<span class="fr-tag">Echelon : <span data-filter-target='resultEchelon'></span></span>
+			<span class="fr-tag">Échelon : <span data-filter-target='resultEchelon'></span></span>
 			<span class="fr-tag">Durée : <span data-filter-target='resultDuree'></span>	</span>
-			<span class="fr-tag">Emploi fonctionel : <span data-filter-target='resultToggleEmploi'></span></span>
+			<span class="fr-tag">Emploi fonctionnel : <span data-filter-target='resultToggleEmploi'></span></span>
 			<span class="fr-hidden" data-filter-target="resultSituationEmploi">
 				<span class="fr-tag">Nature : <span data-filter-target='resultEmploif'></span></span>
 				<span class="fr-tag">Niveau : <span data-filter-target='resultNiveauEf'></span></span>
-				<span class="fr-tag">Echelon : <span data-filter-target='resultEchelonEf'></span></span>
+				<span class="fr-tag">Échelon : <span data-filter-target='resultEchelonEf'></span></span>
 				<span class="fr-tag">Durée à cet échelon : <span data-filter-target='resultDureeEchelonEf'></span></span>
 				<span class="fr-tag">Début emploi : <span data-filter-target='resultDebutEf'></span>	</span>
-				<span class="fr-tag">fin emploi : <span data-filter-target='resultFinEf'></span>	</span>
+				<span class="fr-tag">Fin emploi : <span data-filter-target='resultFinEf'></span>	</span>
 			</span>
 		</div>
 	</div>
@@ -110,7 +110,7 @@
 	<hr class="fr-grid-row fr-col-xs-12 fr-col-12 fr-my-2w">
 	<div class="fr-error-text fr-hidden fr-mb-1v" data-filter-target="errorSituation" role="alert"></div>
 
-	<h2>Simulations situations futures <span class='texte_light italic'>(optionnel)</span><span class="pright fr-hidden" data-filter-target="buttonSimulation" ><button class="fr-btn fr-btn--secondary" type="button" data-action="click->filter#reset_simulation" title="modifier vos simulations futures"> Modifier vos simulations <span class="fr-icon-edit-line fr-fi--sm fr-ml-1v" aria-hidden="true"></span></button></span></h2>	
+	<h2>Vos situations futures <span class='texte_light italic'>(optionnel)</span><span class="pright fr-hidden" data-filter-target="buttonSimulation" ><button class="fr-btn fr-btn--secondary" type="button" data-action="click->filter#reset_simulation" title="modifier vos simulations futures"> Modifier vos simulations <span class="fr-icon-edit-line fr-fi--sm fr-ml-1v" aria-hidden="true"></span></button></span></h2>	
 	<div class="fr-notice fr-notice--info fr-mb-2w">
 				    <div class="fr-container">
 				        <div class="fr-notice__body">
@@ -129,13 +129,13 @@
 				<div class="fr-hidden" data-filter-target='resultShowEmploif<%=i%>'>
 					<span class="fr-tag">Emploi <%= i%> : <span data-filter-target='resultEmploif<%=i%>'></span></span>
 					<span class="fr-tag">Niveau : <span data-filter-target='resultNiveauEf<%=i%>'></span></span>
-					<span class="fr-tag">Début: <span data-filter-target='resultDebutEf<%=i%>'></span></span>
-					<span class="fr-tag">Durée : <span data-filter-target='resultDureeEf<%=i%>'></span> ans</span>
+					<span class="fr-tag">Début : <span data-filter-target='resultDebutEf<%=i%>'></span></span>
+					<span class="fr-tag">Durée : <span data-filter-target='resultDureeEf<%=i%>'></span> <span>ans</span></span>
 				</div>
 			<% end %>
 			<span class="fr-hidden" data-filter-target="resultDispo">
 				<span class="fr-tag">Début disponibilité : <span data-filter-target='resultdebutProjet'></span></span>
-				<span class="fr-tag">Fin disponibilé : <span data-filter-target='resultfinProjet'></span></span>
+				<span class="fr-tag">Fin disponibilité : <span data-filter-target='resultfinProjet'></span></span>
 			</span>
 			
 			<span class="fr-tag fr-hidden" data-filter-target='resultShowGrade2'>Promotion grade 2 : <span data-filter-target='resultGrade2'></span></span>
@@ -151,7 +151,7 @@
 			<div class="">
 			    <fieldset class="fr-fieldset fr-fieldset--inline">
 			        <legend class="fr-fieldset__legend fr-text--regular fr-mb-1w" id='radio-inline-legend'>
-			            Souhaitez vous effectuer une simulation ? 
+			            Souhaitez-vous effectuer une simulation ? 
 			        </legend>
 			        <div class="fr-fieldset__content" >
 			            <div class="fr-radio-group">

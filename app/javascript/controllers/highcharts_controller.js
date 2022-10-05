@@ -39,7 +39,7 @@ export default class extends Controller {
                 data: data,
                 pointStart: 2023,
                 pointInterval: 1,
-                color: 'var(--text-action-high-blue-france)',
+                color: 'var(--background-action-high-blue-cumulus)',
                 type: 'spline',  
                 lineWidth: 5,
                 dashStyle: 'ShortDot',
@@ -51,7 +51,7 @@ export default class extends Controller {
                 data: data2,
                 pointStart: 2023,
                 pointInterval: 1,
-                color: "#169B62",
+                color: "var(--background-action-high-green-bourgeon)",
                 type: 'spline',  
                 lineWidth: 4,
             })
@@ -62,7 +62,7 @@ export default class extends Controller {
                 data: data3,
                 pointStart: 2023,
                 pointInterval: 1,
-                color: "#CE614A",
+                color: "var(--background-action-high-purple-glycine)",
                 type: 'spline',  
                 lineWidth: 4,
             })
@@ -115,7 +115,7 @@ export default class extends Controller {
                     var ef = efs[indice];
                     return this.points.reduce(function (s, point) {
                         return s + '<br/>' + '<span style="color:' + point.series.color + ';">' + point.series.name + '</span> : ' + point.y ;
-                    }, '<b> Janvier ' + this.x + '<br>Grade : '+grade+' / Grade reclasse : '+ grade2 +'<br>Emploi fonctionnel : '+ef +'</b>');
+                    }, '<b> 1er Janvier ' + this.x + '<br>Grade : '+grade+' / Grade reclassé : '+ grade2 +'<br>Emploi fonctionnel : '+ef +'</b>');
                 },
             },
             xAxis:{
@@ -183,7 +183,7 @@ export default class extends Controller {
                 data: sub1,
                 pointStart: 2023,
                 pointInterval: 1,
-                color: "#5770BE",
+                color: "var(--background-action-high-green-bourgeon)",
                 type: 'column', 
             })
         }
@@ -203,7 +203,7 @@ export default class extends Controller {
                 data: sub3,
                 pointStart: 2023,
                 pointInterval: 1,
-                color: "#CE614A",
+                color: "var(--background-action-high-purple-glycine)",
                 type: 'column',  
             })
         }
@@ -253,7 +253,7 @@ export default class extends Controller {
                     var ef = efs[indice];
                     return this.points.reduce(function (s, point) {
                         return s + '<br/>' + '<span style="color:' + point.series.color + ';">' + point.series.name + '</span> : ' + point.y ;
-                    }, '<b>' + this.x + '<br>Grade : '+grade+' / Grade reclasse : '+ grade2 +'<br>Emploi fonctionnel : '+ef +'</b>');
+                    }, '<b> 1er Janvier ' + this.x + '<br>Grade : '+grade+' / Grade reclassé : '+ grade2 +'<br>Emploi fonctionnel : '+ef +'</b>');
                 },
             },
             xAxis:{
