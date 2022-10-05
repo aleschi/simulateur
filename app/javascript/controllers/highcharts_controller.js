@@ -39,10 +39,11 @@ export default class extends Controller {
                 data: data,
                 pointStart: 2023,
                 pointInterval: 1,
-                color: 'var(--background-action-high-blue-cumulus)',
+                color: 'var(--background-action-high-blue-france)',
                 type: 'spline',  
-                lineWidth: 5,
+                lineWidth: 6,
                 dashStyle: 'ShortDot',
+           
             })
         }
         if (data2.length != 0){
@@ -54,6 +55,7 @@ export default class extends Controller {
                 color: "var(--background-action-high-green-bourgeon)",
                 type: 'spline',  
                 lineWidth: 4,
+                
             })
         }
         if (data3.length != 0){
@@ -65,6 +67,7 @@ export default class extends Controller {
                 color: "var(--background-action-high-purple-glycine)",
                 type: 'spline',  
                 lineWidth: 4,
+            
             })
         }
         
