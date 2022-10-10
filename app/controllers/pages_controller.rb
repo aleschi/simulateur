@@ -64,13 +64,14 @@ class PagesController < ApplicationController
   	  	if !params[:echelons].nil? && !params[:echelons][0].nil? && params[:echelons][0] != ""
   	  		echelons = params[:echelons][0]
           #calcul duree a echelon du corps nombre , si sup a 3 max 36 mois 
-          @count_annee = Grille.where(corps: @corps, grade: grades, echelon: echelons).pluck(:annee).uniq.count 
-          @count_mois = @count_annee*12
-          if @count_annee >= 4
-            @count_annee = 4 
-            @count_mois = @count_annee*12+1 #4ans et plus
-          end 
-          
+          #@count_annee = Grille.where(corps: @corps, grade: grades, echelon: echelons).pluck(:annee).uniq.count 
+          #@count_mois = @count_annee*12
+          #if @count_annee >= 4
+          #  @count_annee = 4 
+          #  @count_mois = @count_annee*12+1 #4ans et plus
+          #end 
+          @count_mois = Grille.where(corps: @corps, grade: grades, echelon: echelons).count
+          @count_mois = [@count_mois, 48].min #max 4 ans
           durees = (1..@count_mois).to_a
         else
           durees = []
@@ -108,12 +109,14 @@ class PagesController < ApplicationController
 
   	if !params[:echelonf].nil? && !params[:echelonf][0].nil? && params[:echelonf][0] != ""
       #nombre année à l'échelon possible, si sup a 3 max 36 mois 
-      @count_annee = Emploi.where(nom: params[:emploif][0], echelon: params[:echelonf][0].to_i).pluck(:annee).uniq.count 
-      @count_mois = @count_annee*12
-      if @count_annee > 4
-        @count_annee = 4 
-        @count_mois = @count_annee*12+1 #on prend mois d'apres si jamais indice change 4 ans et + 
-      end 
+      #@count_annee = Emploi.where(nom: params[:emploif][0], echelon: params[:echelonf][0].to_i).pluck(:annee).uniq.count 
+      #@count_mois = @count_annee*12
+      #if @count_annee > 4
+      #  @count_annee = 4 
+      #  @count_mois = @count_annee*12+1 #on prend mois d'apres si jamais indice change 4 ans et + 
+      #end 
+      @count_mois = Emploi.where(nom: params[:emploif][0], echelon: params[:echelonf][0].to_i).count
+      @count_mois = [@count_mois, 48].min #max 4 ans
       
       dureeEf = (1..@count_mois).to_a
   		#dureeEf = Emploi.where(nom: params[:emploif][0], echelon: params[:echelonf][0].to_i).order('mois ASC').pluck(:mois).uniq
