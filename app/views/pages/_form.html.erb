@@ -8,17 +8,16 @@
 		<div class="fr-col-12">
 			<span class="fr-tag">Corps : <span data-filter-target='resultCorps'></span></span>
 			<span class="fr-tag">Grade : <span data-filter-target='resultGrade'></span></span>
-			<span class="fr-tag">Âge : <span data-filter-target='resultAge'></span></span>
 			<span class="fr-tag">Échelon : <span data-filter-target='resultEchelon'></span></span>
 			<span class="fr-tag">Durée : <span data-filter-target='resultDuree'></span>	</span>
+			<span class="fr-tag">Âge : <span data-filter-target='resultAge'></span></span>
 			<span class="fr-tag">Emploi fonctionnel : <span data-filter-target='resultToggleEmploi'></span></span>
 			<span class="fr-hidden" data-filter-target="resultSituationEmploi">
 				<span class="fr-tag">Nature : <span data-filter-target='resultEmploif'></span></span>
 				<span class="fr-tag">Niveau : <span data-filter-target='resultNiveauEf'></span></span>
 				<span class="fr-tag">Échelon : <span data-filter-target='resultEchelonEf'></span></span>
 				<span class="fr-tag">Durée à cet échelon : <span data-filter-target='resultDureeEchelonEf'></span></span>
-				<span class="fr-tag">Début emploi : <span data-filter-target='resultDebutEf'></span>	</span>
-				<span class="fr-tag">Fin emploi : <span data-filter-target='resultFinEf'></span>	</span>
+				<span class="fr-tag">Fin prévue : <span data-filter-target='resultFinEf'></span>	</span>
 			</span>
 		</div>
 	</div>
@@ -33,20 +32,20 @@
 			<div class="fr-select-group">				
 				<label for="grade" class="fr-label" >Grade*</label><%= f.select :grade, [],{prompt: "- sélectionner -"}, {data: {action: 'change->filter#gradesChange','filter-target': 'grade'},required: true, id: "grade", class:"fr-select"}%>
 			</div>
-		</div>
-		<div class="fr-col-12 fr-col-lg-2">
-			<div class="fr-select-group">
-				<label for="age" class="fr-label">Age*</label><%= f.select :age, (18..66).to_a.map { |a| [a.to_s + " ans",a]},{prompt: "- sélectionner -"},{data:{action: 'change->filter#validateForm','filter-target': "age"},required: true, id: "age", class:"fr-select"}%>
-			</div>
-		</div>
+		</div>		
 		<div class="fr-col-12 fr-col-lg-2">
 			<div class="fr-select-group">			
-				<label for="echelon" class="fr-label">Echelon*</label><%= f.select :echelon, [],{prompt: "- sélectionner -"}, {data: {action: 'change->filter#echelonsChange','filter-target': 'echelon'},required: true, id: "echelon", class:"fr-select"}%>
+				<label for="echelon" class="fr-label">Échelon*</label><%= f.select :echelon, [],{prompt: "- sélectionner -"}, {data: {action: 'change->filter#echelonsChange','filter-target': 'echelon'},required: true, id: "echelon", class:"fr-select"}%>
 			</div>
 		</div>
 		<div class="fr-col-12 fr-col-lg-3">
 			<div class="fr-select-group">				
-				<label for="duree" class="fr-label" data-filter-target='dureeTitle'>Durée passée à cet échelon*</label><%= f.select :duree, [],{prompt: "- sélectionner -"},{data: {'filter-target': 'duree', action: 'change->filter#validateForm'}, id:"duree", class:"fr-select"}%>	
+				<label for="duree" class="fr-label">Durée passée à cet échelon*</label><%= f.select :duree, [],{prompt: "- sélectionner -"},{data: {'filter-target': 'duree', action: 'change->filter#validateForm'},required: true, id:"duree", class:"fr-select"}%>	
+			</div>
+		</div>
+		<div class="fr-col-12 fr-col-lg-2">
+			<div class="fr-select-group">
+				<label for="age" class="fr-label">Âge*</label><%= f.select :age, (18..66).to_a.map { |a| [a.to_s + " ans",a]},{prompt: "- sélectionner -"},{data:{action: 'change->filter#validateForm','filter-target': "age"},required: true, id: "age", class:"fr-select"}%>
 			</div>
 		</div>
 	</div>
@@ -75,9 +74,9 @@
 	</div>
 
 	<div class="fr-grid-row fr-grid-row--gutters fr-hidden" data-filter-target="formEmploi">
-		<div class="fr-col-12 fr-col-lg-2">
+		<div class="fr-col-12 fr-col-lg-3">
 			<div class="fr-select-group">
-				<label for="typeef" class="fr-label">Nature de l'emploi*</label><%= f.select :type_emploi, @emplois_f.map {|e| [e,e]},{:prompt => '- sélectionner -'},{data:{action: 'change->filter#emploifChange','filter-target': 'emploif'},id:"typeef", class:"fr-select"}%>
+				<label for="typeef" class="fr-label">Nature de l'emploi*</label><%= f.select :type_emploi, @emplois_f.each_with_index.map {|e,ind| [e,@emplois_f2[ind]]},{:prompt => '- sélectionner -'},{data:{action: 'change->filter#emploifChange','filter-target': 'emploif'},id:"typeef", class:"fr-select"}%>
 			</div>
 		</div>
 		<div class="fr-col-12 fr-col-lg-2">
@@ -87,22 +86,18 @@
 		</div>
 		<div class="fr-col-12 fr-col-lg-2">
 			<div class="fr-select-group">				
-				<label for="echelonef" class="fr-label">Echelon*</label><%= f.select :echelon_emploif, [],{prompt: "- sélectionner -"},{data: {action: 'change->filter#echelonfChange', 'filter-target': 'echelonEf'}, class: "fr-select", id:"echelonef"}%>
+				<label for="echelonef" class="fr-label" data-filter-target='echelonEfTitle'>Échelon*</label><%= f.select :echelon_emploif, [],{prompt: "- sélectionner -"},{data: {action: 'change->filter#echelonfChange', 'filter-target': 'echelonEf'}, class: "fr-select", id:"echelonef"}%>
 			</div>
 		</div>
-		<div class="fr-col-12 fr-col-lg-2">	
+		<div class="fr-col-12 fr-col-lg-3">	
 			<div class="fr-select-group">	
-				<label for="dureeef" class="fr-label" data-filter-target='dureeEchelonEfTitle'>Durée à cet échelon*</label><%= f.select :duree_echelonf, [], {prompt: "- sélectionner -"},{data: {action: 'change->filter#validateForm','filter-target': 'dureeEchelonEf'}, class: "fr-select", id:"dureeef"}%>
+				<label for="dureeef" class="fr-label" data-filter-target='dureeEchelonEfTitle'>Durée passée à cet échelon*</label><%= f.select :duree_echelonf, [], {prompt: "- sélectionner -"},{data: {action: 'change->filter#validateForm','filter-target': 'dureeEchelonEf'}, class: "fr-select", id:"dureeef"}%>
 			</div>
 		</div>
+
 		<div class="fr-col-12 fr-col-lg-2">		
 			<div class="fr-select-group">			
-				<label for="debutef" class="fr-label" >Début de l'emploi*</label><%= f.select :debut_emploif, [["2022",2022],["2021",2021],["2020",2020],["2019",2019],["2018",2018]], {prompt: "- sélectionner -"},{data: {action: 'change->filter#debutEfChange','filter-target': 'debutEf'}, class: "fr-select",id:"debutef"}%>	
-			</div>
-		</div>
-		<div class="fr-col-12 fr-col-lg-2">		
-			<div class="fr-select-group">			
-				<label for="finef" class="fr-label">Fin prévue de l'emploi*</label><%= f.select :fin_emploif, [],{prompt: "- sélectionner -"},{data: {action: 'change->filter#validateForm','filter-target': 'finEf'}, class: "fr-select", id:"finef"}%>		
+				<label for="finef" class="fr-label">Fin prévue de l'emploi*</label><%= f.select :fin_emploif, [["2024",2024],["2025",2025],["2026",2026],["2027",2027],["2028",2028],["2029",2029]],{prompt: "- sélectionner -"},{data: {action: 'change->filter#validateForm','filter-target': 'finEf'}, class: "fr-select", id:"finef"}%>		
 			</div>
 		</div>
 	</div>
@@ -196,7 +191,7 @@
 					</div>
 					<div class="fr-col-12 fr-col-lg-3">
 						<div class="fr-select-group">				
-							<label for="dureeef<%=i%>" class="fr-label">Durée prévue*</label><%= f.select "duree_emploif#{i}", [['3 ans',3],['6 ans',6]], {prompt: "- sélectionner -"},{data: {action: 'change->filter#validateForm','filter-target': 'dureeEf'+i.to_s}, id:'dureeef'+i.to_s, class:"fr-select"}%>
+							<label for="dureeef<%=i%>" class="fr-label">Durée prévue*</label><%= f.select "duree_emploif#{i}", [['1 an',1],['2 ans',2],['3 ans',3],['4 ans',4],['5 ans',5],['6 ans',6]], {prompt: "- sélectionner -"},{data: {action: 'change->filter#validateForm','filter-target': 'dureeEf'+i.to_s}, id:'dureeef'+i.to_s, class:"fr-select"}%>
 						</div>
 					</div>
 				</div>			

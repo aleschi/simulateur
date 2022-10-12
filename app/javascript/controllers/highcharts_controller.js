@@ -91,7 +91,9 @@ export default class extends Controller {
                 printChart:"Imprimer le graphique",
                 viewFullscreen: "Voir en plein écran",
                 viewData: "Voir la table des données",
-                noData: "Les courbes s'afficheront lorsque vous aurez <br>renseigné et validé les informations du formulaire."
+                noData: "Les courbes s'afficheront lorsque vous aurez <br>renseigné et validé les informations du formulaire.",
+                hideData: "Cacher la table des données",
+                exitFullscreen: "Quitter le plein écran",
             },
             title: {
                 text: "Suivi indiciaire au 1er Janvier de chaque année ",
@@ -231,6 +233,8 @@ export default class extends Controller {
                 viewFullscreen: "Voir en plein écran",
                 viewData: "Voir la table des données",
                 noData: "Les courbes s'afficheront lorsque vous aurez <br>renseigné et validé les informations du formulaire.",
+                hideData: "Cacher la table des données",
+                exitFullscreen: "Quitter le plein écran" ,
             },
             title: {
                 text: "Écarts indiciaires au 1er Janvier de chaque année",

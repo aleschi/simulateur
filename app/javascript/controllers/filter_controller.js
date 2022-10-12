@@ -5,11 +5,11 @@ export default class extends Controller {
     static get targets() {
   return [
     'form','submitBouton','boutonSituation','errorCorps','errorSituation',
-    'formSituation','age','corps','grade','echelon','duree','dureeTitle',
+    'formSituation','age','corps','grade','echelon','duree',
     'resultSituation','resultAge','resultCorps','resultGrade','resultEchelon','resultDuree',
     
-    'contentToggleEmploi','radioButton','resultToggleEmploi','formEmploi','emploif','niveauEf','echelonEf','dureeEchelonEf','finEf','debutEf', 'dureeEchelonEfTitle', 
-    "resultSituationEmploi","resultEmploif","resultNiveauEf","resultEchelonEf","resultDureeEchelonEf","resultFinEf","resultDebutEf",
+    'contentToggleEmploi','radioButton','resultToggleEmploi','formEmploi','emploif','niveauEf','echelonEf','dureeEchelonEf','finEf', 'dureeEchelonEfTitle', 'echelonEfTitle',
+    "resultSituationEmploi","resultEmploif","resultNiveauEf","resultEchelonEf","resultDureeEchelonEf","resultFinEf",
 
     "error", "buttonDeleteEF",    
     "content1","content2","content3","content4","content5","content6", "bouton",
@@ -45,7 +45,6 @@ export default class extends Controller {
         this.resetChamp(this.gradeTarget);
         this.resetChamp(this.echelonTarget);
         this.resetChamp(this.dureeTarget);
-        this.dureeTitleTarget.classList.remove("select_inactive");
 
         const grades = [this.grade2Target,this.grade3Target,this.grade4Target];
         [0,1,2].forEach((indice)=>{
@@ -73,12 +72,14 @@ export default class extends Controller {
     }
     updateGrades(data){       
         const nom_grades = data.nom_grades;
-        data.grades.forEach((grade,index) => {
-            const option = document.createElement("option");
-            option.value = grade;
-            option.innerHTML = grade + ' - ' + nom_grades[index];
-            this.gradeTarget.appendChild(option);
-        })
+        if (data.grades != null){
+            data.grades.forEach((grade,index) => {
+                const option = document.createElement("option");
+                option.value = grade;
+                option.innerHTML = grade + ' - ' + nom_grades[index];
+                this.gradeTarget.appendChild(option);
+            })
+        }
 
         this.validateForm();
     }
@@ -89,7 +90,6 @@ export default class extends Controller {
         this.errorCorpsTarget.classList.add('fr-hidden');
         this.resetChamp(this.echelonTarget);
         this.resetChamp(this.dureeTarget);
-        this.dureeTitleTarget.classList.remove("select_inactive");
         const token = document.querySelector('meta[name="csrf-token"]').content;
         fetch(this.data.get("url"), { 
           method: 'POST', 
@@ -107,12 +107,14 @@ export default class extends Controller {
         })
     }
     updateEchelons(data){
-        data.echelons.forEach((echelon) => {
-            const option = document.createElement("option");
-            option.value = echelon;
-            option.innerHTML = echelon;
-            this.echelonTarget.appendChild(option);
-        })
+        if (data.echelons != null){
+            data.echelons.forEach((echelon) => {
+                const option = document.createElement("option");
+                option.value = echelon;
+                option.innerHTML = echelon;
+                this.echelonTarget.appendChild(option);
+            })
+        }
 
         this.validateForm();
     }
@@ -181,20 +183,15 @@ export default class extends Controller {
         })
     }
     updateDurees(data){
-        this.dureeTarget.innerHTML = "";
-        if (data.durees.length != 0){
-            this.dureeTitleTarget.classList.remove("select_inactive");
-            this.dureeTarget.disabled=false;
-            this.resetChamp(this.dureeTarget);
+        this.resetChamp(this.dureeTarget);
+
+        if (data.durees != null){
             data.durees.forEach((duree) => {
                 const option = document.createElement("option");
                 option.value = duree;
                 option.innerHTML = duree + " mois";       
                 this.dureeTarget.appendChild(option);
             })
-        }else{
-            this.dureeTitleTarget.classList.add("select_inactive");
-            this.dureeTarget.disabled=true;
         }
         this.validateForm();
 
@@ -307,23 +304,35 @@ export default class extends Controller {
         // on reset les champs     
         this.resetChamp(this.niveauEfTarget);
         this.resetChamp(this.echelonEfTarget);
-        this.resetChamp(this.dureeEchelonEfTarget);
-        this.resetChamp(this.finEfTarget);
-        
-        this.debutEfTarget.selectedIndex = 0;
-
-        data.echelonsf.forEach((echelon) => {
-            const option = document.createElement("option");
-            option.value = echelon;
-            option.innerHTML = echelon;
-            this.echelonEfTarget.appendChild(option);
-        })
-        data.niveauEf.forEach((niveau) => {
-            const opt = document.createElement("option");
-            opt.value = niveau;
-            opt.innerHTML = "Niveau "+ niveau;
-            this.niveauEfTarget.appendChild(opt);
-        })
+        this.resetChamp(this.dureeEchelonEfTarget);       
+        this.finEfTarget.selectedIndex = 0;
+        this.echelonEfTitleTarget.classList.remove("select_inactive");
+        this.echelonEfTarget.disabled = false;
+        this.dureeEchelonEfTitleTarget.classList.remove("select_inactive");
+        this.dureeEchelonEfTarget.disabled = false;
+        if (data.niveauEf != null){
+            data.niveauEf.forEach((niveau) => {
+                const opt = document.createElement("option");
+                opt.value = niveau;
+                opt.innerHTML = "Niveau "+ niveau;
+                this.niveauEfTarget.appendChild(opt);
+            })
+        }
+        if (data.echelonsf != null){
+            if (data.echelonsf.length != 0){              
+                data.echelonsf.forEach((echelon) => {
+                    const option = document.createElement("option");
+                    option.value = echelon;
+                    option.innerHTML = echelon;
+                    this.echelonEfTarget.appendChild(option);
+                })
+            } else {
+                this.echelonEfTitleTarget.classList.add("select_inactive");
+                this.echelonEfTarget.disabled = true;
+                this.dureeEchelonEfTitleTarget.classList.add("select_inactive");
+                this.dureeEchelonEfTarget.disabled = true;
+            }
+        }
         this.validateForm();
     }
 
@@ -350,43 +359,20 @@ export default class extends Controller {
     }
 
     updateDatesf(data){
-        this.dureeEchelonEfTarget.innerHTML = "";
-        if (data.dureeEf.length != 0){
-            this.dureeEchelonEfTitleTarget.classList.remove("select_inactive");
-            this.dureeEchelonEfTarget.disabled = false;
-            const option = document.createElement("option");
-            option.value = "";
-            option.innerHTML = "- sélectionner -";
-            this.dureeEchelonEfTarget.appendChild(option);
+        this.resetChamp(this.dureeEchelonEfTarget);
 
+        if (data.dureeEf != null){
             data.dureeEf.forEach((duree) => {
                 const option = document.createElement("option");
                 option.value = duree;      
                 option.innerHTML = duree + " mois";  
                 this.dureeEchelonEfTarget.appendChild(option);
             })
-        }else{
-            this.dureeEchelonEfTitleTarget.classList.add("select_inactive");
-            this.dureeEchelonEfTarget.disabled = true;
         }
+
         this.validateForm();
     }
 
-    debutEfChange(event){
-        this.errorCorpsTarget.classList.add('fr-hidden');  
-        const annee = getSelectedValues(event) 
-        const array = Array.from({length:6-(2023-annee)},(v,k)=>k+2023+1);
-        this.resetChamp(this.finEfTarget);
-        if ( annee != ""){
-            array.forEach((duree) => {
-                const option = document.createElement("option");
-                option.value = duree;
-                option.innerHTML = duree;
-                this.finEfTarget.appendChild(option);
-            })
-        }
-        this.validateForm();
-    }
  
    
     emploifChange2(event){
@@ -431,7 +417,7 @@ export default class extends Controller {
         if ( id == 1 ){
             //on prend fin emploi fonctionnel actuel si existe 
             if (this.finEfTarget.value != null && this.finEfTarget.value != "" && this.finEfTarget.value != undefined){
-                dates_arr = dates_arr.filter(date => date > parseInt(this.finEfTarget.value));              
+                dates_arr = dates_arr.filter(date => date >= parseInt(this.finEfTarget.value));              
             }
         }
         if ( id > 1 ){
@@ -497,17 +483,18 @@ export default class extends Controller {
 
           }
         });
-        if (this.dureeTitleTarget.classList.contains('select_inactive') == false && this.dureeTarget.value == ""){
-          isValid = false;
-        }
+
 
         if (this.radioButtonTarget.checked == true){      
-          if (this.emploifTarget.value == "" || this.niveauEfTarget.value == "" || this.echelonEfTarget.value == "" || this.finEfTarget.value == "" || this.debutEfTarget.value == ""){
-            isValid = false;
-          }
-          if (this.dureeEchelonEfTitleTarget.classList.contains('select_inactive') == false && this.dureeEchelonEfTarget.value == ""){
-            isValid = false;  
-          }
+            if (this.emploifTarget.value == "" || this.niveauEfTarget.value == "" || this.finEfTarget.value == ""){
+                isValid = false;
+            }
+            if (this.echelonEfTitleTarget.classList.contains('select_inactive') == false && this.echelonEfTarget.value == ""){
+                isValid = false; ;  
+            }  
+            if (this.dureeEchelonEfTitleTarget.classList.contains('select_inactive') == false && this.dureeEchelonEfTarget.value == ""){
+                isValid = false;  
+            }
         }
 
         const emploif_targets = [this.emploif1Target,this.emploif2Target,this.emploif3Target,this.emploif4Target,this.emploif5Target,this.emploif6Target];
@@ -555,19 +542,19 @@ export default class extends Controller {
                     field.parentNode.classList.add('fr-select-group--error');
                 }
             })
-            if (this.dureeTitleTarget.classList.contains('select_inactive') == false && this.dureeTarget.value == ""){
-                this.dureeTarget.classList.add('fr-select--error');
-                this.dureeTarget.parentNode.classList.add('fr-select-group--error');
-            }
             // 2/ si ef 
             if (this.radioButtonTarget.checked == true){
-                const ef_fields = [this.emploifTarget, this.niveauEfTarget, this.echelonEfTarget, this.finEfTarget, this.debutEfTarget];
+                const ef_fields = [this.emploifTarget, this.niveauEfTarget, this.finEfTarget];
                 ef_fields.forEach((field) => {
                     if (!field.disabled && !field.value.trim()) {
                         field.classList.add('fr-select--error');
                         field.parentNode.classList.add('fr-select-group--error');
                     }
-                })                     
+                })  
+                if (this.echelonEfTitleTarget.classList.contains('select_inactive') == false && this.echelonEfTarget.value == ""){
+                    this.echelonEfTarget.classList.add('fr-select--error');
+                    this.echelonEfTarget.parentNode.classList.add('fr-select-group--error');  
+                }                   
                 if (this.dureeEchelonEfTitleTarget.classList.contains('select_inactive') == false && this.dureeEchelonEfTarget.value == ""){
                     this.dureeEchelonEfTarget.classList.add('fr-select--error');
                     this.dureeEchelonEfTarget.parentNode.classList.add('fr-select-group--error');  
@@ -690,7 +677,7 @@ export default class extends Controller {
 
             // si début premier ef est avant fin ef actuel 
             if (debut_targets[0].value != '' && this.finEfTarget.value !=''){
-                if (parseInt(this.finEfTarget.value) >= parseInt(debut_targets[0].value)){
+                if (parseInt(this.finEfTarget.value) > parseInt(debut_targets[0].value)){
                     dates_ef_invalid = false;
                     debut_targets[0].classList.add('fr-select--error');
                     debut_targets[0].parentNode.classList.add('fr-select-group--error');
@@ -717,10 +704,10 @@ export default class extends Controller {
           }else {
             this.errorCorpsTarget.classList.add('fr-hidden');
             // met les resultats en texte
-            const form_targets = [this.ageTarget,this.corpsTarget,this.gradeTarget,this.echelonTarget,this.dureeTarget,this.grade2Target,this.grade3Target,this.grade4Target, this.debutProjetTarget, this.finProjetTarget,this.emploifTarget,this.niveauEfTarget, this.echelonEfTarget,this.dureeEchelonEfTarget,this.debutEfTarget,this.finEfTarget];
-            const result_targets = [this.resultAgeTarget,this.resultCorpsTarget,this.resultGradeTarget,this.resultEchelonTarget,this.resultDureeTarget,this.resultGrade2Target,this.resultGrade3Target,this.resultGrade4Target,this.resultdebutProjetTarget, this.resultfinProjetTarget,this.resultEmploifTarget, this.resultNiveauEfTarget,this.resultEchelonEfTarget,this.resultDureeEchelonEfTarget,this.resultDebutEfTarget,this.resultFinEfTarget];
+            const form_targets = [this.ageTarget,this.corpsTarget,this.gradeTarget,this.echelonTarget,this.dureeTarget,this.grade2Target,this.grade3Target,this.grade4Target, this.debutProjetTarget, this.finProjetTarget,this.emploifTarget,this.niveauEfTarget, this.echelonEfTarget,this.dureeEchelonEfTarget,this.finEfTarget];
+            const result_targets = [this.resultAgeTarget,this.resultCorpsTarget,this.resultGradeTarget,this.resultEchelonTarget,this.resultDureeTarget,this.resultGrade2Target,this.resultGrade3Target,this.resultGrade4Target,this.resultdebutProjetTarget, this.resultfinProjetTarget,this.resultEmploifTarget, this.resultNiveauEfTarget,this.resultEchelonEfTarget,this.resultDureeEchelonEfTarget,this.resultFinEfTarget];
             
-            [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15].forEach((indice)=>{
+            [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14].forEach((indice)=>{
               this.replaceHtml(form_targets[indice], result_targets[indice]);
             })
             
@@ -802,7 +789,8 @@ export default class extends Controller {
 
     replaceHtml(form, result){
         if (form.value == ""){
-            result.classList.add('fr-hidden');
+            //result.classList.add('fr-hidden');
+            result.innerHTML = "∅";
         }else{
             result.classList.remove('fr-hidden');
             result.innerHTML = form.value;
@@ -835,7 +823,7 @@ export default class extends Controller {
     }
 
     toggleEmploi(event){
-        const arr = [this.emploifTarget, this.niveauEfTarget, this.echelonEfTarget, this.dureeEchelonEfTarget, this.finEfTarget, this.debutEfTarget]
+        const arr = [this.emploifTarget, this.niveauEfTarget, this.echelonEfTarget, this.dureeEchelonEfTarget, this.finEfTarget]
         const checkedRadio = this.radioButtonTarget.checked;
         if (checkedRadio == true){
           this.formEmploiTarget.classList.remove('fr-hidden');
@@ -906,11 +894,11 @@ export default class extends Controller {
         })
         if (this.content1Target.classList.contains('fr-hidden')){
             // si ef select mais pas les dates 
-            if (this.emploifTarget.selectedIndex != 0 && (this.echelonEfTarget.selectedIndex == 0 || this.dureeEchelonEfTarget.selectedIndex == 0 || this.finEfTarget.selectedIndex == 0)){
+            if (this.emploifTarget.selectedIndex != 0 && ((this.echelonEfTitleTarget.classList.contains('select_inactive') == false && this.echelonEfTarget.selectedIndex == 0) || (this.dureeEchelonEfTitleTarget.classList.contains('select_inactive') == false && this.dureeEchelonEfTarget.selectedIndex == 0) || this.finEfTarget.selectedIndex == 0)){
               this.errorSituationTarget.classList.remove('fr-hidden');
               this.errorSituationTarget.innerHTML = "Veuillez sélectionner tous les champs ci-dessus";
             }else{           
-            this.errorSituationTarget.classList.add('fr-hidden');
+                this.errorSituationTarget.classList.add('fr-hidden');
                 this.content1Target.classList.remove('fr-hidden');
             }         
         }
