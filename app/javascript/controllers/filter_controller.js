@@ -923,7 +923,38 @@ export default class extends Controller {
             emploif_targets[indice-1].value = emploif_targets[indice].value;
             debut_targets[indice-1].value = debut_targets[indice].value;
             duree_targets[indice-1].value = duree_targets[indice].value;
-            niveau_targets[indice-1].value = niveau_targets[indice].value;
+
+            var niveau_1 = niveau_targets[indice].value;
+ 
+              
+            // mettre à jour les niveaux  
+            this.resetChamp(niveau_targets[indice-1]);  
+            const token = document.querySelector('meta[name="csrf-token"]').content;
+            const url = "/select_niveau";
+            const emploi = emploif_targets[indice-1].value;
+            const body = {emploi};
+            fetch(url, { 
+              method: 'POST', 
+              body: JSON.stringify(body),
+              credentials: "include",
+              dataType: 'script',
+              headers: {
+                "X-CSRF-Token": token,
+                "Content-Type": "application/json"
+              },
+            })
+            .then(response => response.json()/*response.text()*/)
+            .then(data => {                
+                data.niveauEf.forEach((niveau) => {
+                const opt = document.createElement("option");
+                opt.value = niveau;
+                opt.innerHTML = "Niveau "+ niveau;
+                opt.selected = parseInt(niveau) === parseInt(niveau_1);
+                niveau_targets[indice-1].appendChild(opt);
+                })
+            }) 
+
+            niveau_targets[indice-1].value = niveau_targets[indice].value; 
 
           }else{
             content_targets[indice-1].classList.add('fr-hidden');
