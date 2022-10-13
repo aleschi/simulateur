@@ -189,7 +189,7 @@ export default class extends Controller {
             data.durees.forEach((duree) => {
                 const option = document.createElement("option");
                 option.value = duree;
-                option.innerHTML = duree + " mois";       
+                option.innerHTML = (duree-1) + " mois";       
                 this.dureeTarget.appendChild(option);
             })
         }
@@ -365,7 +365,7 @@ export default class extends Controller {
             data.dureeEf.forEach((duree) => {
                 const option = document.createElement("option");
                 option.value = duree;      
-                option.innerHTML = duree + " mois";  
+                option.innerHTML = (duree-1) + " mois";  
                 this.dureeEchelonEfTarget.appendChild(option);
             })
         }
@@ -793,7 +793,12 @@ export default class extends Controller {
             result.innerHTML = "∅";
         }else{
             result.classList.remove('fr-hidden');
-            result.innerHTML = form.value;
+            if (form == this.dureeTarget || form == this.dureeEchelonEfTarget){
+                result.innerHTML = form.value-1;
+            } else{
+                result.innerHTML = form.value;
+            }
+            
         }
     }
 
