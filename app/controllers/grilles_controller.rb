@@ -427,14 +427,14 @@ class GrillesController < ApplicationController
               @liste_indices_emploi3 = PromoGrade3(duree_carriere, @liste_indices_emploi3,@start_emploi+@date_niveau1,3)
               @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @duree_emploi-@date_niveau1, @start_emploi+@date_niveau1,duree_carriere )#progression acceleree de promo de grade à fin emploi
             else 
-              if (12*7)-@counter_temps_niveau1 <= @annee_grade #passage au grade 3 direct au moment de la promo car a deja fait les 7 ans avant la promo 
+              if (12*7)-@counter_temps_niveau1 <= (@annee_grade - @start_emploi) #passage au grade 3 direct au moment de la promo car a deja fait les 7 ans avant la promo 
                 @promo = 3
               else 
                 @promo = 2
               end 
               @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @annee_grade-@start_emploi, @start_emploi,duree_carriere ) #progression acceleree jusqua promo de grade 
               @liste_indices_emploi3 = PromoGrade3(duree_carriere, @liste_indices_emploi3,@annee_grade,@promo)
-              @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @duree_emploi-@annee_grade, @annee_grade,duree_carriere )#progression acceleree de promo de grade à fin emploi     
+              @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @duree_emploi-(@annee_grade-@start_emploi), @annee_grade,duree_carriere )#progression acceleree de promo de grade à fin emploi     
             end
           elsif params["niveau_emploi#{i}"].to_i == 1 && @counter_temps_niveau1 < 84 && @counter_temps_niveau1 + @duree_emploi >= 84 #promo grade 3 au bout de 7 ans de niveau 1 donc pendant ef et grade au moins 2                                       
             @date_niveau1 = (12*7)-@counter_temps_niveau1 #duree en mois pour atteindre promo  
