@@ -3,10 +3,9 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
     static get targets() {
-  return [ 'form','error'];
-}
-  	connect() {   
-   
+      return [ 'form','error'];
+    }
+  	connect() {      
         
   	}
 
@@ -16,7 +15,7 @@ export default class extends Controller {
             this.errorTarget.classList.add('fr-error-text')
         } 
         else {
-            Turbo.visit("/simulateur")
+            //Turbo.visit("/simulateur")
         } 
     }
 

@@ -10,7 +10,10 @@ class SessionsController < Devise::SessionsController
 	    sign_in(resource_name, resource)
      
 	    yield resource if block_given?
-	    respond_with resource, location: after_sign_in_path_for(resource)
+	   #respond_with resource, location: after_sign_in_path_for(resource)
+     respond_to do |format|
+        format.turbo_stream {redirect_to simulateur_path} 
+      end 
 
 	  else 
 		invalid_login_attempt
@@ -25,6 +28,7 @@ class SessionsController < Devise::SessionsController
     #respond_to_on_destroy
     respond_to do |format|
       format.all { redirect_to root_path(format: :html) }
+      
     end
   end
  
