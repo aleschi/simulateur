@@ -114,9 +114,9 @@ class GrillesController < ApplicationController
 
         #si ef consecutif de plus de 5 ANS indice dans carrriere principale bloquée à indice dernier ef pour courbe 2  
         if @compteur_ef_succ >= 12*5
-          @liste_indices2[@start_emploi..@liste_indices2.length-1].each_with_index do |indice,i|
-            if indice < @liste_indices_emploi2[@start_emploi+@duree_emploi]
-              @liste_indices2[@start_emploi+i] = @liste_indices_emploi2[@start_emploi+@duree_emploi]
+          @liste_indices2[@start_emploi+@duree_emploi..@liste_indices2.length-1].each_with_index do |indice,i|
+            if indice < @liste_indices_emploi2[@start_emploi+@duree_emploi-1]
+              @liste_indices2[@start_emploi+@duree_emploi+i] = @liste_indices_emploi2[@start_emploi+@duree_emploi-1]
             end
           end
         end 
@@ -374,6 +374,7 @@ class GrillesController < ApplicationController
           @liste_indices_emploi3 = checkDim(@liste_indices_emploi3,duree_carriere)   
         end
         @duree_emploi = (fin_emploi.to_i - 2023)*12
+        @end = @duree_emploi
              
         @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, niveau_emploi, @duree_emploi, 0,duree_carriere, @annee_grade,@counter_temps_niveau1, array_grade_reclasse) 
         if niveau_emploi == 1
@@ -387,7 +388,7 @@ class GrillesController < ApplicationController
           @anciennete_emploi = 0
         end
         @count_i = @liste_indices_emploi3[0..@duree_emploi-1].count(@indice_sortie)#count de cet indice
-        @new_liste = Reclassement.where(grade: array_grade_reclasse[@duree_emploi]).where('indice >= ?', @indice_sortie).order(indice: :asc).pluck(:indice)#on reclasse à cet indice dans la table AE avec ancienneté à cet indice 
+        @new_liste = Reclassement.where(grade: array_grade_reclasse[@duree_emploi-1]).where('indice >= ?', @indice_sortie).order(indice: :asc).pluck(:indice)#on reclasse à cet indice dans la table AE avec ancienneté à cet indice 
         @liste_indices_emploi3[@duree_emploi..@liste_indices_emploi3.length-1] = @new_liste[@count_i+@anciennete_emploi..@new_liste.length-1]
         @liste_indices_emploi3 = checkDim(@liste_indices_emploi3,duree_carriere) 
       else #reclassement à partir de indice dans le corps si pas ef + anciennete
@@ -406,11 +407,11 @@ class GrillesController < ApplicationController
           @liste_indices_emploi3 = @liste_indices_emploi3[0..@start_emploi-1] + @liste_indices_emploi3[@start_emploi+@bonification_mois..@liste_indices_emploi3.length-1]
           @liste_indices_emploi3 = checkDim(@liste_indices_emploi3,duree_carriere)
           #check promo avant ef 
-          if date_grade2 > 0 && array_grade_reclasse[(date_grade2 - 2023)*12-1] == 1 && (date_grade2 - 2023)*12 <= @start_emploi && date_grade2 > @end #promo avant l'ef en question
-            if fin_dispo - debut_dispo > 5 && fin_dispo*12 < (date_grade2 - 2023)*12 && debut_dispo*12 > @end #check projet de dispo de plus de 5 ans avant promotions de grade et avant ef (mais apres dernier ef)
+          if @annee_grade > 0 && array_grade_reclasse[@annee_grade-1] == 1 && @annee_grade <= @start_emploi && @annee_grade > @end #promo avant l'ef en question
+            if fin_dispo - debut_dispo > 5 && fin_dispo*12 < @annee_grade && debut_dispo*12 > @end #check projet de dispo de plus de 5 ans avant promotions de grade et avant ef (mais apres dernier ef)
               liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,liste_indices_emploi3, duree_carriere) 
             end           
-            if @counter_temps_niveau1 >= 84 #(si jamais a deja fait 7 ans avant ef dans niveau passage de 1 à 3 direct au moment de la promo)
+            if @counter_temps_niveau1 >= 7*12 #(si jamais a deja fait 7 ans avant ef dans niveau passage de 1 à 3 direct au moment de la promo)
               @promo = 3
             else 
               @promo = 2
@@ -442,8 +443,8 @@ class GrillesController < ApplicationController
       end
      
    
-      if @grade_reclasse == 1 && date_grade2 > 0 && (date_grade2 - 2023)*12 > @end  # si promo de grade 2 si pas de ef ou si derriere dernier ef 
-        if fin_dispo - debut_dispo > 5 && fin_dispo*12 < (date_grade2 - 2023)*12 && debut_dispo*12 > @end #verif si dispo avant promo de grade
+      if @grade_reclasse == 1 && @annee_grade > 0 && @annee_grade >= @end  # si promo de grade 2 si pas de ef ou si derriere dernier ef 
+        if fin_dispo - debut_dispo > 5 && fin_dispo*12 < @annee_grade && debut_dispo*12 > @end #verif si dispo avant promo de grade
           @liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
         end
         if @counter_temps_niveau1 > 84
@@ -469,98 +470,129 @@ class GrillesController < ApplicationController
     end
 
     def ProgressionAcceleree(liste_indice, niveau, duree_emploi, start, duree_carriere, annee_grade2, counter_temps_niveau1, array_grade_reclasse)
-      @liste_indices_moyenne_ae = [] #liste des indice avec progression accelerée
       @indice_decalle = 0
       #grade 1 et echelon inf a 6 soit indice inf a 741 
       @index_start = 0
       if array_grade_reclasse[start] == 1 && liste_indice[start] < 741
         liste_indice[start..liste_indice.length-1].each_with_index do |indice,i|
           if indice < 741 && array_grade_reclasse[start+i]==1
-            @index_start += 1 #mois dou on va commencer la progression acceleree
+            @index_start += 1 #mois d'où on va commencer la progression acceleree
           end
         end
       end
+      @array_liste = liste_indice[start..liste_indice.length-1]
+      @nbr_indices = 0 
+      @saut_promo = false 
+      @saut_promo3 = false 
+
+      @saut = 0
       if niveau == 3
         @indice_decalle = duree_emploi + 2*((duree_emploi-@index_start)/16)
-        while @liste_indices_moyenne_ae.length < duree_emploi
-        liste_indice[start..liste_indice.length-1].each_with_index do |indice,i|
-          if i < @index_start
-            @liste_indices_moyenne_ae << indice
-          else
-            if (i-@index_start).modulo(18) != 16 && (i-@index_start).modulo(18) != 17
-              @liste_indices_moyenne_ae << indice
+        @array_liste.each_with_index do |indice,i|
+          if @nbr_indices < duree_emploi
+          @mois = i + 1     
+            if i >= @index_start && (@mois-@index_start).modulo(18) == 16
+              liste_indice.delete_at(start+(@mois-2*@saut)+1)
+              liste_indice.delete_at(start+(@mois-2*@saut))
+              @saut += 1  
             end
-          end
-          if annee_grade2 > 0 && array_grade_reclasse[annee_grade2-1] == 1 && @liste_indices_moyenne_ae.count == annee_grade2 - start #promo 2 pendant ef il faut concerver le decallage 
-            if counter_temps_niveau1 > 7*12 #a deja fait 7 ans avant en niveau 1 
-              @promo = 3
-              array_grade_reclasse[0..duree_carriere] = array_grade_reclasse[0..annee_grade2-1] + Array.new(duree_carriere-annee_grade2, 3)
-            else
-              @promo = 2
-            end
-            liste_indice = PromoGrade3(duree_carriere, liste_indice,annee_grade2,@promo)
-          end          
-        end 
+            if (@mois-@index_start).modulo(18) != 16 && (@mois-@index_start).modulo(18) != 17
+              @nbr_indices += 1
+            end        
+
+            if annee_grade2 > 0 && array_grade_reclasse[annee_grade2-1] == 1 && @nbr_indices == annee_grade2 - start && @saut_promo == false  #promo 2 pendant ef il faut concerver le decallage 
+              if counter_temps_niveau1 > 7*12 #a deja fait 7 ans avant en niveau 1 
+                @promo = 3
+                array_grade_reclasse[0..duree_carriere] = array_grade_reclasse[0..annee_grade2-1] + Array.new(duree_carriere-annee_grade2, 3)
+              else
+                @promo = 2
+              end
+              liste_indice = PromoGrade3(duree_carriere, liste_indice,annee_grade2, @promo) #on remet à jour liste indice et on redemarre la boucle 
+              liste_indice[annee_grade2..liste_indice.length-1] = liste_indice[annee_grade2+2..liste_indice.length-1] 
+              @saut_promo = true 
+            end          
+          end 
         end
      
       elsif niveau == 2
-        @indice_decalle = duree_emploi + 4*((duree_emploi-@index_start)/14)
-        while @liste_indices_moyenne_ae.length < duree_emploi
-        liste_indice[start..liste_indice.length-1].each_with_index do |indice,i|
-          if i < @index_start
-            @liste_indices_moyenne_ae << indice
-          else
-            if (i-@index_start).modulo(18) != 16 && (i-@index_start).modulo(18) != 17 && (i-@index_start).modulo(18) != 15 && (i-@index_start).modulo(18) != 14
-              @liste_indices_moyenne_ae << indice
+        @indice_decalle = duree_emploi + 4*((duree_emploi-@index_start)/14)        
+        @array_liste.each_with_index do |indice,i|
+          if @nbr_indices < duree_emploi
+            @mois = i + 1
+            if i >= @index_start &&  (@mois-@index_start).modulo(18) == 14
+              liste_indice.delete_at(start+(@mois-4*@saut)+3)
+              liste_indice.delete_at(start+(@mois-4*@saut)+2)
+              liste_indice.delete_at(start+(@mois-4*@saut)+1)
+              liste_indice.delete_at(start+(@mois-4*@saut))
+              @saut += 1  
             end
-          end  
-          if annee_grade2 > 0 && array_grade_reclasse[annee_grade2-1] == 1 && @liste_indices_moyenne_ae.count == annee_grade2 - start #promo 2 pendant ef il faut concerver le decallage 
-            if counter_temps_niveau1 > 7*12 #a deja fait 7 ans avant en niveau 1 
-              @promo = 3
-              array_grade_reclasse[0..duree_carriere] = array_grade_reclasse[0..annee_grade2-1] + Array.new(duree_carriere-annee_grade2, 3)
-            else
-              @promo = 2
-            end
-            liste_indice = PromoGrade3(duree_carriere, liste_indice,annee_grade2,@promo)
-          end         
-        end 
+            if (@mois-@index_start).modulo(18) != 16 && (@mois-@index_start).modulo(18) != 17 && (@mois-@index_start).modulo(18) != 15 && (@mois-@index_start).modulo(18) != 14
+              @nbr_indices += 1
+            end    
+         
+            if annee_grade2 > 0 && array_grade_reclasse[annee_grade2-1] == 1 && @nbr_indices == annee_grade2 - start  && @saut_promo == false #promo 2 pendant ef il faut concerver le decallage 
+              if counter_temps_niveau1 > 7*12 #a deja fait 7 ans avant en niveau 1 
+                @promo = 3
+                array_grade_reclasse[0..duree_carriere] = array_grade_reclasse[0..annee_grade2-1] + Array.new(duree_carriere-annee_grade2, 3)
+              else
+                @promo = 2
+              end
+              liste_indice = PromoGrade3(duree_carriere, liste_indice,annee_grade2,@promo)
+              liste_indice[annee_grade2..liste_indice.length-1] = liste_indice[annee_grade2+4..liste_indice.length-1] 
+              @saut_promo = true 
+            end         
+          end 
         end
      
       elsif niveau == 1
         @indice_decalle = duree_emploi + 6*((duree_emploi-@index_start)/12)
         @compteur = counter_temps_niveau1
-        while @liste_indices_moyenne_ae.length < duree_emploi
-        liste_indice[start..liste_indice.length-1].each_with_index do |indice,i|  
-          if i < @index_start
-            @liste_indices_moyenne_ae << indice
-            @compteur += 1
-          else       
-            if (i-@index_start).modulo(18) != 16 && (i-@index_start).modulo(18) != 17 && (i-@index_start).modulo(18) != 15 && (i-@index_start).modulo(18) != 14 && (i-@index_start).modulo(18) != 13 && (i-@index_start).modulo(18) != 12
-              @liste_indices_moyenne_ae << indice
-              @compteur += 1
-            end 
-          end
-          if annee_grade2 > 0 && array_grade_reclasse[annee_grade2-1] == 1 && @liste_indices_moyenne_ae.count == annee_grade2 - start #promo 2 pendant ef il faut concerver le decallage 
-            if counter_temps_niveau1 > 7*12 #a deja fait 7 ans avant en niveau 1 
-              @promo = 3
-              array_grade_reclasse[0..duree_carriere] = array_grade_reclasse[0..annee_grade2-1] + Array.new(duree_carriere-annee_grade2, 3)
-            else
-              @promo = 2
+        
+        @array_liste.each_with_index do |indice,i|
+          if @nbr_indices < duree_emploi  
+          @mois = i + 1    
+            if i >= @index_start && (@mois-@index_start).modulo(18) == 12              
+              liste_indice.delete_at(start+(@mois-6*@saut)+5) #decallage d'indice               
+              liste_indice.delete_at(start+(@mois-6*@saut)+4)
+              liste_indice.delete_at(start+(@mois-6*@saut)+3)
+              liste_indice.delete_at(start+(@mois-6*@saut)+2)
+              liste_indice.delete_at(start+(@mois-6*@saut)+1)
+              liste_indice.delete_at(start+(@mois-6*@saut))
+              @saut += 1    
             end
-            liste_indice = PromoGrade3(duree_carriere, liste_indice,annee_grade2,@promo)
+            
+            if (@mois-@index_start).modulo(18) != 16 && (@mois-@index_start).modulo(18) != 17 && (@mois-@index_start).modulo(18) != 15 && (@mois-@index_start).modulo(18) != 14 && (@mois-@index_start).modulo(18) != 13 && (@mois-@index_start).modulo(18) != 12 
+              @nbr_indices += 1
+              @compteur += 1
+            end
+            
+            if annee_grade2 > 0 && array_grade_reclasse[annee_grade2-1] == 1 && @nbr_indices == annee_grade2 - start && @saut_promo == false #promo 2 pendant ef il faut concerver le decallage 
+              if @compteur >= 7*12 #a deja fait 7 ans avant en niveau 1 
+                @promo = 3
+                array_grade_reclasse[0..duree_carriere] = array_grade_reclasse[0..annee_grade2-1] + Array.new(duree_carriere-annee_grade2, 3)
+              else
+                @promo = 2
+              end
+              
+              liste_indice = PromoGrade3(duree_carriere, liste_indice,annee_grade2,@promo) 
+              liste_indice[annee_grade2..liste_indice.length-1] = liste_indice[annee_grade2+6..liste_indice.length-1]
+              @saut_promo = true      
+            end 
+
+            if @compteur == 7*12 && array_grade_reclasse[start+@compteur-counter_temps_niveau1-1] == 2 && @saut_promo3 == false  #passage au grade 3 
+              @date1 = start+@compteur-counter_temps_niveau1
+              array_grade_reclasse[0..duree_carriere] = array_grade_reclasse[0..@date1-1] + Array.new(duree_carriere-@date1, 3)
+              liste_indice = PromoGrade3(duree_carriere, liste_indice,@date1,3) 
+              liste_indice[@date1..liste_indice.length-1] = liste_indice[@date1+6..liste_indice.length-1]   
+              @saut_promo3 = true
+
+            end         
           end 
-          if @compteur == 7*12 && array_grade_reclasse[start+@compteur-counter_temps_niveau1-1] == 2  #passage au grade 3 
-            @date1 = start+@compteur-counter_temps_niveau1
-            array_grade_reclasse[0..duree_carriere] = array_grade_reclasse[0..@date1-1] + Array.new(duree_carriere-date1, 3)
-            liste_indice = PromoGrade3(duree_carriere, liste_indice,date_niveau1,3)
-          end         
-        end 
-        end
+        end     
         
       else 
         @indice_decalle = duree_emploi 
-        @liste_indices_moyenne_ae = liste_indice[start..liste_indice.length-1]
-        if annee_grade2 > 0 && array_grade_reclasse[annee_grade2-1] == 1 && @liste_indices_moyenne_ae.count == annee_grade2 - start #promo 2 pendant ef il faut concerver le decallage 
+        if annee_grade2 > 0 && array_grade_reclasse[annee_grade2-1] == 1 && duree_emploi > annee_grade2 - start #promo 2 pendant ef il faut concerver le decallage 
             if counter_temps_niveau1 > 7*12 #a deja fait 7 ans avant en niveau 1 
               @promo = 3
               array_grade_reclasse[0..duree_carriere] = array_grade_reclasse[0..annee_grade2-1] + Array.new(duree_carriere-annee_grade2, 3)
@@ -570,8 +602,7 @@ class GrillesController < ApplicationController
             liste_indice = PromoGrade3(duree_carriere, liste_indice,annee_grade2,@promo)
         end  
       end
-      @liste_indices_moyenne_ae = checkDim(@liste_indices_moyenne_ae, duree_emploi)
-      liste_indice[start..liste_indice.length-1] = @liste_indices_moyenne_ae[0..duree_emploi-1] + liste_indice[start+@indice_decalle..liste_indice.length-1]
+      #liste_indice[start+duree_emploi..liste_indice.length-1] = liste_indice[start+@indice_decalle..liste_indice.length-1]
       liste_indice = checkDim(liste_indice,duree_carriere )
       return liste_indice
     end
@@ -579,12 +610,13 @@ class GrillesController < ApplicationController
     def PromoGrade3(duree_carriere, liste_indices_emploi3,date, grade)
         @annee_grade = date 
         @indice_sans_promo = liste_indices_emploi3[@annee_grade]
-        @count_indice = liste_indices_emploi3[0..@annee_grade].count(@indice_sans_promo) #reprise ancienneté 
+        @count_indice_ap = liste_indices_emploi3[0..@annee_grade-1].count(@indice_sans_promo) #reprise ancienneté 
         @liste_grade2 = Reclassement.where(grade: grade).where('indice >= ?',@indice_sans_promo).order('indice ASC').pluck(:indice)        
-        @liste_grade2 = checkDim(@liste_grade2,@count_indice)
-        @liste_grade2 = @liste_grade2[@count_indice-1..@liste_grade2.length-1]
+        @liste_grade2 = checkDim(@liste_grade2,@count_indice_ap)
+        @liste_grade2 = @liste_grade2[@count_indice_ap..@liste_grade2.length-1]
         @liste_grade2 = checkDim(@liste_grade2,duree_carriere-@annee_grade)
-        liste_indices_emploi3[@annee_grade..liste_indices_emploi3.length-1] = @liste_grade2   
+        liste_indices_emploi3[@annee_grade..liste_indices_emploi3.length-1] = @liste_grade2 
+
         return liste_indices_emploi3
     end
 
