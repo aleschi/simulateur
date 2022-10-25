@@ -255,30 +255,32 @@ class GrillesController < ApplicationController
       #2eme courbe : on va chercher indice le plus proche à indice max avec grade reclassé 
       #indice = [indice,Reclassement.where(grade: grade_reclasse2).pluck(:indice).max].min #si jamais indice emploi plus grand que dernier indice dans table de reclassement   
       indice = [indice,Reclassement.where(grade: 2).pluck(:indice).max].min
-      @liste_indices_ae = Reclassement.where(grade: 2).where('indice >= ?',indice).order('indice ASC').pluck(:indice)     
+      @liste_indices_ae = Reclassement.where(grade: 2).where('indice >= ?',indice).order('indice ASC').pluck(:indice)
+      @liste_indices_ae = checkDim(@liste_indices_ae,anciennete+1)     
       @liste_indices_ae = @liste_indices_ae[anciennete..@liste_indices_ae.length-1]
       @liste_indices_ae = checkDim(@liste_indices_ae,duree_carriere)
-    
+
+
       @liste_indices_moyenne_ae = [] #liste des indice avec progression accelerée
-      if niveau == 3
-        while @liste_indices_moyenne_ae.length <= duree_emploi
+      if niveau == 3     
         @liste_indices_ae.each_with_index do |indice,i|
-          if i.modulo(18) != 16 && i.modulo(18) != 17
-            @liste_indices_moyenne_ae << indice
-          end         
+          if @liste_indices_moyenne_ae.length <= duree_emploi
+            if i.modulo(18) != 16 && i.modulo(18) != 17
+              @liste_indices_moyenne_ae << indice
+            end         
+          end 
         end 
-        end 
-      elsif niveau == 2
-        while @liste_indices_moyenne_ae.length <= duree_emploi
+      elsif niveau == 2        
         @liste_indices_ae.each_with_index do |indice,i|
+        if @liste_indices_moyenne_ae.length <= duree_emploi
           if i.modulo(18) != 16 && i.modulo(18) != 17 && i.modulo(18) != 15 && i.modulo(18) != 14
             @liste_indices_moyenne_ae << indice
           end         
         end 
         end
       elsif niveau == 1
-        while @liste_indices_moyenne_ae.length <= duree_emploi
         @liste_indices_ae.each_with_index do |indice,i|
+        if @liste_indices_moyenne_ae.length <= duree_emploi
           if i.modulo(18) != 16 && i.modulo(18) != 17 && i.modulo(18) != 15 && i.modulo(18) != 14 && i.modulo(18) != 13 && i.modulo(18) != 12
             @liste_indices_moyenne_ae << indice
           end         
@@ -287,6 +289,7 @@ class GrillesController < ApplicationController
       else 
         @liste_indices_moyenne_ae = @liste_indices_ae
       end
+      @liste_indices_moyenne_ae = checkDim(@liste_indices_moyenne_ae,duree_emploi)
       liste_indices_emploi[start..start+duree_emploi-1] = @liste_indices_moyenne_ae[0..duree_emploi-1] 
       return liste_indices_emploi
     end
@@ -305,7 +308,7 @@ class GrillesController < ApplicationController
         end
       end     
       if fin_dispo - debut_dispo > 5 && (@new_grade == 0 || @new_grade == array_grade[debut_dispo*12]) #dispo si aucune promo de grade ou apres derniere promo de grade
-        @liste_indices = Dispo(debut_dispo,fin_dispo,@liste_indices, duree_carriere) 
+        liste_indices = Dispo(debut_dispo,fin_dispo,liste_indices, duree_carriere) 
       end  
       liste_indices = checkDim(liste_indices,duree_carriere)
       return liste_indices
@@ -403,13 +406,11 @@ class GrillesController < ApplicationController
           @duree_emploi = params["duree_emploif#{i}"].to_i*12 
           @start_emploi = (params["debut_emploif#{i}"].to_i - 2023)*12
 
-          @bonification_mois = BonificationEf(params["niveau_emploi#{i}"].to_i) #bonus en entrée
-          @liste_indices_emploi3 = @liste_indices_emploi3[0..@start_emploi-1] + @liste_indices_emploi3[@start_emploi+@bonification_mois..@liste_indices_emploi3.length-1]
-          @liste_indices_emploi3 = checkDim(@liste_indices_emploi3,duree_carriere)
+          
           #check promo avant ef 
-          if @annee_grade > 0 && array_grade_reclasse[@annee_grade-1] == 1 && @annee_grade <= @start_emploi && @annee_grade > @end #promo avant l'ef en question
-            if fin_dispo - debut_dispo > 5 && fin_dispo*12 < @annee_grade && debut_dispo*12 > @end #check projet de dispo de plus de 5 ans avant promotions de grade et avant ef (mais apres dernier ef)
-              liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,liste_indices_emploi3, duree_carriere) 
+          if @annee_grade > 0 && array_grade_reclasse[@annee_grade-1] == 1 && @annee_grade <= @start_emploi && @annee_grade >= @end #promo avant l'ef en question
+            if fin_dispo - debut_dispo > 5 && fin_dispo*12 < @annee_grade && debut_dispo*12 >= @end #check projet de dispo de plus de 5 ans avant promotions de grade et avant ef (mais apres dernier ef)
+              @liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3, duree_carriere) 
             end           
             if @counter_temps_niveau1 >= 7*12 #(si jamais a deja fait 7 ans avant ef dans niveau passage de 1 à 3 direct au moment de la promo)
               @promo = 3
@@ -417,20 +418,23 @@ class GrillesController < ApplicationController
               @promo = 2
             end 
             @liste_indices_emploi3 = PromoGrade3(duree_carriere, @liste_indices_emploi3,@annee_grade,@promo) #promo avant progression dans ef 
-            if fin_dispo - debut_dispo > 5 &&  debut_dispo*12 > (date_grade2 - 2023)*12 && fin_dispo*12 < @start_emploi  #apres promo de grade avant ef 
-              liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
+            if fin_dispo - debut_dispo > 5 &&  debut_dispo*12 > @annee_grade && fin_dispo*12 < @start_emploi  #apres promo de grade avant ef 
+              @liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
             end  
           else #on verifie juste si dispo avant ef 
-            if fin_dispo - debut_dispo > 5 && fin_dispo*12 < @start_emploi && debut_dispo*12 > @end #si dispo avant ef 
+            if fin_dispo - debut_dispo > 5 && fin_dispo*12 < @start_emploi && debut_dispo*12 >= @end #si dispo avant ef 
               @liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
             end 
           end 
+          @bonification_mois = BonificationEf(params["niveau_emploi#{i}"].to_i) #bonus en entrée
+          @liste_indices_emploi3 = @liste_indices_emploi3[0..@start_emploi-1] + @liste_indices_emploi3[@start_emploi+@bonification_mois..@liste_indices_emploi3.length-1]
+          @liste_indices_emploi3 = checkDim(@liste_indices_emploi3,duree_carriere)
           # pendant ef             
           @liste_indices_emploi3 = ProgressionAcceleree(@liste_indices_emploi3, params["niveau_emploi#{i}"].to_i, @duree_emploi, @start_emploi,duree_carriere, @annee_grade,@counter_temps_niveau1,array_grade_reclasse )         
           if params["niveau_emploi#{i}"].to_i == 1
             @counter_temps_niveau1 += @duree_emploi 
           end
-          @end = @start_emploi + @duree_emploi
+          @end = @start_emploi + @duree_emploi 
           #reclassement en sortie d'ef en fonction de l'ancienneté                   
           @indice_sortie = @liste_indices_emploi3[@end] #indice en sortie de ef 
           @count_i = @liste_indices_emploi3[0..@end-1].count(@indice_sortie)#count de cet indice
@@ -500,7 +504,7 @@ class GrillesController < ApplicationController
               @nbr_indices += 1
             end        
 
-            if annee_grade2 > 0 && array_grade_reclasse[annee_grade2-1] == 1 && @nbr_indices == annee_grade2 - start && @saut_promo == false  #promo 2 pendant ef il faut concerver le decallage 
+            if annee_grade2 > 0 && array_grade_reclasse[annee_grade2-1] == 1 && @nbr_indices == annee_grade2 - start && @saut_promo == false && @nbr_indices != duree_emploi #promo 2 pendant ef il faut concerver le decallage 
               if counter_temps_niveau1 > 7*12 #a deja fait 7 ans avant en niveau 1 
                 @promo = 3
                 array_grade_reclasse[0..duree_carriere] = array_grade_reclasse[0..annee_grade2-1] + Array.new(duree_carriere-annee_grade2, 3)
