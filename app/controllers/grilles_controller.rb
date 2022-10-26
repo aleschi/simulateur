@@ -222,8 +222,9 @@ class GrillesController < ApplicationController
       @liste_indices2 = Grille.where(corps: corps, grade: grade).where("(echelon = ? AND annee = ? AND mois >= ?) OR (echelon = ? AND annee > ?) OR echelon > ?",echelon,annee_i, mois_i, echelon, annee_i, echelon).order('indice ASC').pluck(:indice)      
       @liste_indices2 = checkDim(@liste_indices2,duree_carriere) #dim liste indice jusqu'à fin carrière 
       @start_emploi = 0 
+      @duree_emploi = 0 
       if !type_emploi.nil? && type_emploi != ""
-        @bonification2 = Bonification2(niveau_emploi) #bonif en sortie de tout ef
+        @bonification2 = Bonification2(niveau_emploi.to_i) #bonif en sortie de tout ef
         @duree_emploi = (fin_emploi - 2023)*12        
         @liste_indices2 = CheckPromo(@liste_indices2,duree_carriere,grade2,grade3,grade4,0,@duree_emploi, corps, grade, 0,0, array_grade) #check si promo de grade avant fin de ef + pas de dispo avant ef                   
         @liste_indices2 = @liste_indices2[0..@duree_emploi-1] + @liste_indices2[@duree_emploi+@bonification2..@liste_indices2.length-1]
@@ -232,9 +233,14 @@ class GrillesController < ApplicationController
       
       (1..6).each do |i| #promo grade avant ef et bonification pour carriere principale à la fin des ef
         if !params["type_emploi#{i}"].nil? &&  params["type_emploi#{i}"] != "" && params["duree_emploif#{i}"] != "" && params["debut_emploif#{i}"] != "" && params["niveau_emploi#{i}"] != "" 
+          grade2 = UpdatePromo(grade2, @start_emploi, @duree_emploi)
+          grade3 = UpdatePromo(grade3, @start_emploi, @duree_emploi)
+          grade4 = UpdatePromo(grade4, @start_emploi, @duree_emploi)
+
           @duree_emploi = params["duree_emploif#{i}"].to_i*12 
           @start_emploi = (params["debut_emploif#{i}"].to_i - 2023)*12
-          @bonif = Bonification2(params["niveau_emploi#{i}"])
+          @bonif = Bonification2(params["niveau_emploi#{i}"].to_i)
+
           @liste_indices2 = CheckPromo(@liste_indices2,duree_carriere,grade2,grade3,grade4,@start_emploi,@duree_emploi, corps, grade, debut_dispo,fin_dispo,array_grade) #si promo avant ef          
           @liste_indices2 = @liste_indices2[0..@duree_emploi+@start_emploi-1] + @liste_indices2[@start_emploi+@duree_emploi+@bonif..@liste_indices2.length-1]
           @liste_indices2 = checkDim(@liste_indices2,duree_carriere) #dim liste indice jusqu'à fin carrière 
@@ -242,13 +248,25 @@ class GrillesController < ApplicationController
       end
       
       #promo de grade si pas de ef ou apres dernier ef 
-      if params["type_emploi1"].nil? || params["type_emploi1"] == "" || (@start_emploi > 0 && ((grade2-2023)*12 >= @start_emploi + @duree_emploi || (grade3-2023)*12 >= @start_emploi + @duree_emploi || (grade4-2023)*12 >= @start_emploi + @duree_emploi)) 
+      if params["type_emploi1"].nil? || params["type_emploi1"] == ""
         @liste_indices2 = CheckPromo(@liste_indices2,duree_carriere,grade2,grade3,grade4,0,duree_carriere, corps, grade, debut_dispo,fin_dispo,array_grade)          
+      elsif @start_emploi > 0 && ((grade2-2023)*12 >= @start_emploi + @duree_emploi || (grade3-2023)*12 >= @start_emploi + @duree_emploi || (grade4-2023)*12 >= @start_emploi + @duree_emploi)
+        grade2 = UpdatePromo(grade2, @start_emploi, @duree_emploi)
+        grade3 = UpdatePromo(grade3, @start_emploi, @duree_emploi)
+        grade4 = UpdatePromo(grade4, @start_emploi, @duree_emploi)
+        @liste_indices2 = CheckPromo(@liste_indices2,duree_carriere,grade2,grade3,grade4,0,duree_carriere, corps, grade, debut_dispo,fin_dispo,array_grade)
       end 
 
       @liste_indices2 = checkDim(@liste_indices2,duree_carriere) #dim liste indice jusqu'à fin carrière 
       return @liste_indices2
     end
+
+    def UpdatePromo(grade, start_emploi, duree_emploi)
+      if grade.to_i > 0 && (grade.to_i - 2023)*12 < start_emploi + duree_emploi #on a deja fait checkpromo
+        grade = 0
+      end
+      return grade 
+    end 
     
     def EmploiFonctionnel2(liste_indices_emploi,indice, niveau, start, duree_emploi, duree_carriere, anciennete)
 
@@ -349,7 +367,7 @@ class GrillesController < ApplicationController
       end 
 
       if !type_emploi.nil? && type_emploi != "" #SI EF initial 
-        @bonification_mois = BonificationEf(niveau_emploi) #bonus en entrée
+        
         if @fonctions.include?(type_emploi) == false #ne contient pas les nouvelles fonctions    
           @annee_e = ((duree_echelon-1)/12).to_i+Emploi.where(nom: type_emploi, echelon: echelon_emploi).pluck(:annee).min
           @mois_e = duree_echelon-12*((duree_echelon-1)/12).to_i
@@ -368,11 +386,21 @@ class GrillesController < ApplicationController
           if @liste_indices_emploi3.count == 0 #pas dindice sup a cet indice dans table de reclassement         
             return false
           end
+          if @liste_indices_emploi3[0] >= 741 || (@liste_indices_emploi3[0] < 741 && array_grade_reclasse[0] != 1)
+            @bonification_mois = BonificationEf(niveau_emploi) #bonus en entrée
+          else
+            @bonification_mois = 0
+          end
           @anciennete_recl = [18, duree_echelon+@bonification_mois].min #ancienete emploi max 18 mois
           @liste_indices_emploi3 = @liste_indices_emploi3[@anciennete_recl-1..@liste_indices_emploi3.length-1] #-1 car démarre à 1=0 pour mois
           @liste_indices_emploi3 = checkDim(@liste_indices_emploi3,duree_carriere)   
         else #nouvelle ef 
           @liste_indices_emploi3 = Reclassement.where(grade: @grade_reclasse).where('echelon >= ?',@echelon_reclasse).order('indice ASC').pluck(:indice)
+          if @liste_indices_emploi3[0] >= 741 || (@liste_indices_emploi3[0] < 741 && array_grade_reclasse[0] != 1)
+            @bonification_mois = BonificationEf(niveau_emploi) #bonus en entrée
+          else
+            @bonification_mois = 0
+          end
           @liste_indices_emploi3 = @liste_indices_emploi3[@anciennete+@bonification_mois..@liste_indices_emploi3.length-1] #applique anciennete + bonif
           @liste_indices_emploi3 = checkDim(@liste_indices_emploi3,duree_carriere)   
         end
@@ -426,7 +454,11 @@ class GrillesController < ApplicationController
               @liste_indices_emploi3 = Dispo(debut_dispo,fin_dispo,@liste_indices_emploi3,duree_carriere) 
             end 
           end 
-          @bonification_mois = BonificationEf(params["niveau_emploi#{i}"].to_i) #bonus en entrée
+          if @liste_indices_emploi3[@start_emploi] >= 741 || (@liste_indices_emploi3[@start_emploi] < 741 && array_grade_reclasse[@start_emploi] != 1) #pas les 6 premiers echelons du premier grade
+            @bonification_mois = BonificationEf(params["niveau_emploi#{i}"].to_i) #bonus en entrée
+          else
+            @bonification_mois = 0
+          end
           @liste_indices_emploi3 = @liste_indices_emploi3[0..@start_emploi-1] + @liste_indices_emploi3[@start_emploi+@bonification_mois..@liste_indices_emploi3.length-1]
           @liste_indices_emploi3 = checkDim(@liste_indices_emploi3,duree_carriere)
           # pendant ef             
@@ -583,7 +615,7 @@ class GrillesController < ApplicationController
               @saut_promo = true      
             end 
 
-            if @compteur == 7*12 && array_grade_reclasse[start+@compteur-counter_temps_niveau1-1] == 2 && @saut_promo3 == false  #passage au grade 3 
+            if @compteur == 7*12 && (array_grade_reclasse[start+@compteur-counter_temps_niveau1-1] == 2 || array_grade_reclasse[start+@compteur-counter_temps_niveau1-1] == 2.5) && @saut_promo3 == false  #passage au grade 3 
               @date1 = start+@compteur-counter_temps_niveau1
               array_grade_reclasse[0..duree_carriere] = array_grade_reclasse[0..@date1-1] + Array.new(duree_carriere-@date1, 3)
               liste_indice = PromoGrade3(duree_carriere, liste_indice,@date1,3) 
@@ -626,15 +658,15 @@ class GrillesController < ApplicationController
 
     def Bonification2(niveau)
       if niveau == 1
-        @bonification = 4
+        @bonif = 4
       elsif niveau == 2
-        @bonification = 2
+        @bonif = 2
       elsif niveau == 3
-        @bonification = 1
+        @bonif = 1
       else
-        @bonification = 0
+        @bonif = 0
       end 
-      return @bonification
+      return @bonif
     end
 
     def BonificationEf(niveau)
