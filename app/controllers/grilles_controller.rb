@@ -158,7 +158,7 @@ class GrillesController < ApplicationController
     @array_grade_annuel = @array_grade.select.with_index{|x,i| i%12 == 0}
     @array_ef_annuel = @array_ef.select.with_index{|x,i| i%12 == 0}
     @array_grade_reclasse_annuel = @array_grade_reclasse.select.with_index{|x,i| i%12 == 0}
-
+    @array_grade_reclasse_annuel = @array_grade_reclasse_annuel.map{|x| x == 2.5 ? 'Transitoire' : x }
   	respond_to do |format|
           format.turbo_stream do 
             render turbo_stream: [
