@@ -1,4 +1,4 @@
-/*! DSFR v1.7.2 | SPDX-License-Identifier: MIT | License-Filename: LICENSE.md | restricted use (see terms and conditions) */
+/*! DSFR v1.8.4 | SPDX-License-Identifier: MIT | License-Filename: LICENSE.md | restricted use (see terms and conditions) */
 
 class State {
   constructor () {
@@ -59,7 +59,7 @@ const config = {
   prefix: 'fr',
   namespace: 'dsfr',
   organisation: '@gouvfr',
-  version: '1.7.2'
+  version: '1.8.4'
 };
 
 class LogLevel {
@@ -990,6 +990,27 @@ class Engine {
 
 const engine = new Engine();
 
+class Colors {
+  getColor (context, use, tint, options = {}) {
+    const option = getOption(options);
+    const decision = `--${context}-${use}-${tint}${option}`;
+    return getComputedStyle(document.documentElement).getPropertyValue(decision).trim() || null;
+  }
+}
+
+const getOption = (options) => {
+  switch (true) {
+    case options.hover:
+      return '-hover';
+    case options.active:
+      return '-active';
+    default:
+      return '';
+  }
+};
+
+const colors = new Colors();
+
 const sanitize = (className) => className.charAt(0) === '.' ? className.substr(1) : className;
 
 const getClassNames = (element) => element.className ? element.className.split(' ') : [];
@@ -1010,6 +1031,27 @@ const removeClass = (element, className) => modifyClass(element, className, true
 
 const hasClass = (element, className) => getClassNames(element).indexOf(sanitize(className)) > -1;
 
+const ACTIONS = [
+  '[tabindex]:not([tabindex="-1"])',
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  'audio[controls]',
+  'video[controls]',
+  '[contenteditable]:not([contenteditable="false"])',
+  'details>summary:first-of-type',
+  'details',
+  'iframe'
+];
+
+const ACTIONS_SELECTOR = ACTIONS.join();
+
+const queryActions = (element) => {
+  return element.querySelectorAll(ACTIONS_SELECTOR);
+};
+
 const dom = {};
 
 dom.addClass = addClass;
@@ -1017,6 +1059,7 @@ dom.hasClass = hasClass;
 dom.removeClass = removeClass;
 dom.queryParentSelector = queryParentSelector;
 dom.querySelectorAllArray = querySelectorAllArray;
+dom.queryActions = queryActions;
 
 const supportLocalStorage = () => {
   try {
@@ -1137,6 +1180,7 @@ api$1.start = engine.start;
 api$1.stop = engine.stop;
 
 api$1.inspector = inspector;
+api$1.colors = colors;
 
 options.configure(window[config.namespace], api$1.start);
 
@@ -1483,6 +1527,10 @@ class Instance {
     return getClassNames(this.node);
   }
 
+  remove () {
+    this.node.parentNode.removeChild(this.node);
+  }
+
   setAttribute (attributeName, value) {
     this.node.setAttribute(attributeName, value);
   }
@@ -1509,6 +1557,22 @@ class Instance {
 
   focus () {
     this.node.focus();
+  }
+
+  focusClosest () {
+    const closest = this._focusClosest(this.node.parentNode);
+    if (closest) closest.focus();
+  }
+
+  _focusClosest (parent) {
+    if (!parent) return null;
+    const actions = [...queryActions(parent)];
+    if (actions.length <= 1) {
+      return this._focusClosest(parent.parentNode);
+    } else {
+      const index = actions.indexOf(this.node);
+      return actions[index + (index < actions.length - 1 ? 1 : -1)];
+    }
   }
 
   get hasFocus () {
@@ -2365,6 +2429,11 @@ const SchemeEmission = {
   ASK: api.internals.ns.emission('scheme', 'ask')
 };
 
+const SchemeEvent = {
+  SCHEME: api.internals.ns.event('scheme'),
+  THEME: api.internals.ns.event('theme')
+};
+
 class Scheme extends api.core.Instance {
   constructor () {
     super(false);
@@ -2470,6 +2539,7 @@ class Scheme extends api.core.Instance {
       localStorage.setItem('scheme', value);
     }
     this.setAttribute(SchemeAttribute.SCHEME, value);
+    this.dispatch(SchemeEvent.SCHEME, { scheme: this._scheme });
   }
 
   get theme () {
@@ -2484,6 +2554,7 @@ class Scheme extends api.core.Instance {
         this._theme = value;
         this.setAttribute(SchemeAttribute.THEME, value);
         this.descend(SchemeEmission.THEME, value);
+        this.dispatch(SchemeEvent.THEME, { theme: this._theme });
         break;
     }
   }
@@ -2529,7 +2600,8 @@ api.scheme = {
   SchemeValue: SchemeValue,
   SchemeSelector: SchemeSelector,
   SchemeEmission: SchemeEmission,
-  SchemeTheme: SchemeTheme
+  SchemeTheme: SchemeTheme,
+  SchemeEvent: SchemeEvent
 };
 
 api.internals.register(api.scheme.SchemeSelector.SCHEME, api.scheme.Scheme);
@@ -3098,6 +3170,136 @@ api.modal = {
 api.internals.register(api.modal.ModalSelector.MODAL, api.modal.Modal);
 api.internals.register(api.modal.ModalSelector.BODY, api.modal.ModalBody);
 api.internals.register(api.core.RootSelector.ROOT, api.modal.ModalsGroup);
+
+const PasswordEmission = {
+  TOGGLE: api.internals.ns.emission('password', 'toggle'),
+  ADJUST: api.internals.ns.emission('password', 'adjust')
+};
+
+class PasswordToggle extends api.core.Instance {
+  static get instanceClassName () {
+    return 'PasswordToggle';
+  }
+
+  init () {
+    this.listen('click', this.toggle.bind(this));
+    this.ascend(PasswordEmission.ADJUST, this.width);
+    this.isSwappingFont = true;
+    this._isChecked = this.isChecked;
+  }
+
+  get width () {
+    const style = getComputedStyle(this.node.parentNode);
+    return parseInt(style.width);
+  }
+
+  get isChecked () {
+    return this.node.checked;
+  }
+
+  set isChecked (value) {
+    this._isChecked = value;
+    this.ascend(PasswordEmission.TOGGLE, value);
+  }
+
+  toggle () {
+    this.isChecked = !this._isChecked;
+    // this.node.checked = this.isChecked;
+  }
+
+  swapFont (families) {
+    this.ascend(PasswordEmission.ADJUST, this.width);
+  }
+}
+
+class Password extends api.core.Instance {
+  static get instanceClassName () {
+    return 'Password';
+  }
+
+  init () {
+    this.addAscent(PasswordEmission.TOGGLE, this.toggle.bind(this));
+    this.addAscent(PasswordEmission.ADJUST, this.adjust.bind(this));
+  }
+
+  toggle (value) {
+    this.descend(PasswordEmission.TOGGLE, value);
+  }
+
+  adjust (value) {
+    this.descend(PasswordEmission.ADJUST, value);
+  }
+}
+
+const PasswordSelector = {
+  PASSWORD: api.internals.ns.selector('password'),
+  INPUT: api.internals.ns.selector('password__input'),
+  LABEL: api.internals.ns.selector('password__label'),
+  TOOGLE: `${api.internals.ns.selector('password__checkbox')} input[type="checkbox"]`
+};
+
+class PasswordInput extends api.core.Instance {
+  static get instanceClassName () {
+    return 'PasswordInput';
+  }
+
+  init () {
+    this.addDescent(PasswordEmission.TOGGLE, this.toggle.bind(this));
+    this._isRevealed = this.hasAttribute('type') === 'password';
+    this.listen('keydown', this.capslock.bind(this)); // for capslock enabled
+    this.listen('keyup', this.capslock.bind(this)); // for capslock desabled
+  }
+
+  toggle (value) {
+    this.isRevealed = value;
+    this.setAttribute('type', value ? 'text' : 'password');
+  }
+
+  get isRevealed () {
+    return this._isRevealed;
+  }
+
+  capslock (event) {
+    if (event.getModifierState('CapsLock')) {
+      this.node.parentNode.setAttribute(api.internals.ns.attr('capslock'), '');
+    } else {
+      this.node.parentNode.removeAttribute(api.internals.ns.attr('capslock'));
+    }
+  }
+
+  set isRevealed (value) {
+    this._isRevealed = value;
+    this.setAttribute('type', value ? 'text' : 'password');
+  }
+}
+
+class PasswordLabel extends api.core.Instance {
+  static get instanceClassName () {
+    return 'PasswordLabel';
+  }
+
+  init () {
+    this.addDescent(PasswordEmission.ADJUST, this.adjust.bind(this));
+  }
+
+  adjust (value) {
+    const valueREM = Math.ceil(value / 16);
+    this.node.style.paddingRight = valueREM + 'rem';
+  }
+}
+
+api.password = {
+  Password: Password,
+  PasswordToggle: PasswordToggle,
+  PasswordSelector: PasswordSelector,
+  PasswordInput: PasswordInput,
+  PasswordLabel: PasswordLabel
+};
+
+api.internals.register(api.password.PasswordSelector.INPUT, api.password.PasswordInput);
+api.internals.register(api.password.PasswordSelector.PASSWORD, api.password.Password);
+api.internals.register(api.password.PasswordSelector.TOOGLE, api.password.PasswordToggle);
+api.internals.register(api.password.PasswordSelector.LABEL, api.password.PasswordLabel);
 
 const NavigationSelector = {
   NAVIGATION: api.internals.ns.selector('nav'),
@@ -3693,15 +3895,54 @@ api.internals.register(api.table.TableSelector.TABLE, api.table.Table);
 api.internals.register(api.table.TableSelector.ELEMENT, api.table.TableElement);
 api.internals.register(api.table.TableSelector.CAPTION, api.table.TableCaption);
 
+const TagEvent = {
+  DISMISS: api.internals.ns.event('dismiss')
+};
+
+class TagDismissible extends api.core.Instance {
+  static get instanceClassName () {
+    return 'TagDismissible';
+  }
+
+  init () {
+    this.listen('click', this.click.bind(this));
+  }
+
+  click () {
+    this.focusClosest();
+
+    switch (api.mode) {
+      case api.Modes.ANGULAR:
+      case api.Modes.REACT:
+      case api.Modes.VUE:
+        this.request(this.verify.bind(this));
+        break;
+
+      default:
+        this.remove();
+    }
+
+    this.dispatch(TagEvent.DISMISS);
+  }
+
+  verify () {
+    if (document.body.contains(this.node)) api.inspector.warn(`a TagDismissible has just been dismissed and should be removed from the dom. In ${api.mode} mode, the api doesn't handle dom modification. An event ${TagEvent.DISMISS} is dispatched by the element to trigger the removal`);
+  }
+}
+
 const TagSelector = {
-  TAG_PRESSABLE: `${api.internals.ns.selector('tag')}[aria-pressed]`
+  PRESSABLE: `${api.internals.ns.selector('tag')}[aria-pressed]`,
+  DISMISSIBLE: `${api.internals.ns.selector('tag--dismiss')}`
 };
 
 api.tag = {
-  TagSelector: TagSelector
+  TagDismissible: TagDismissible,
+  TagSelector: TagSelector,
+  TagEvent: TagEvent
 };
 
-api.internals.register(api.tag.TagSelector.TAG_PRESSABLE, api.core.Toggle);
+api.internals.register(api.tag.TagSelector.PRESSABLE, api.core.Toggle);
+api.internals.register(api.tag.TagSelector.DISMISSIBLE, api.tag.TagDismissible);
 
 const DownloadSelector = {
   DOWNLOAD_ASSESS_FILE: `${api.internals.ns.attr.selector('assess-file')}`,
@@ -3828,13 +4069,13 @@ class HeaderLinks extends api.core.Instance {
     const header = this.queryParentSelector(HeaderSelector.HEADER);
     this.toolsLinks = header.querySelector(HeaderSelector.TOOLS_LINKS);
     this.menuLinks = header.querySelector(HeaderSelector.MENU_LINKS);
-    const copySuffix = '_copy';
+    const copySuffix = '-mobile';
 
     const toolsHtml = this.toolsLinks.innerHTML.replace(/  +/g, ' ');
     const menuHtml = this.menuLinks.innerHTML.replace(/  +/g, ' ');
     // Pour éviter de dupliquer des id, on ajoute un suffixe aux id et aria-controls duppliqués.
-    let toolsHtmlDuplicateId = toolsHtml.replace(/ id="(.*?)"/gm, ' id="$1' + copySuffix + '"');
-    toolsHtmlDuplicateId = toolsHtmlDuplicateId.replace(/ aria-controls="(.*?)"/gm, ' aria-controls="$1' + copySuffix + '"');
+    let toolsHtmlDuplicateId = toolsHtml.replace(/(<nav[.\s\S]*-translate [.\s\S]*) id="(.*?)"([.\s\S]*<\/nav>)/gm, '$1 id="$2' + copySuffix + '"$3');
+    toolsHtmlDuplicateId = toolsHtmlDuplicateId.replace(/(<nav[.\s\S]*-translate [.\s\S]*) aria-controls="(.*?)"([.\s\S]*<\/nav>)/gm, '$1 aria-controls="$2' + copySuffix + '"$3');
 
     if (toolsHtmlDuplicateId === menuHtml) return;
 
@@ -3892,7 +4133,7 @@ api.header = {
   HeaderLinks: HeaderLinks,
   HeaderModal: HeaderModal,
   HeaderSelector: HeaderSelector,
-  doc: 'https://gouvfr.atlassian.net/wiki/spaces/DB/pages/222789846/En-t+te+-+Header'
+  doc: 'https://www.systeme-de-design.gouv.fr/elements-d-interface/composants/en-tete'
 };
 
 api.internals.register(api.header.HeaderSelector.BUTTONS, api.header.HeaderLinks);

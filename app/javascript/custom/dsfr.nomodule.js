@@ -1,4 +1,4 @@
-/*! DSFR v1.7.2 | SPDX-License-Identifier: MIT | License-Filename: LICENSE.md | restricted use (see terms and conditions) */
+/*! DSFR v1.8.4 | SPDX-License-Identifier: MIT | License-Filename: LICENSE.md | restricted use (see terms and conditions) */
 
 (function () {
   'use strict';
@@ -70,7 +70,7 @@
     prefix: 'fr',
     namespace: 'dsfr',
     organisation: '@gouvfr',
-    version: '1.7.2'
+    version: '1.8.4'
   };
 
   var LogLevel = function LogLevel (level, light, dark, logger) {
@@ -1176,6 +1176,29 @@
 
   var engine = new Engine();
 
+  var Colors = function Colors () {};
+
+  Colors.prototype.getColor = function getColor (context, use, tint, options) {
+      if ( options === void 0 ) options = {};
+
+    var option = getOption(options);
+    var decision = "--" + context + "-" + use + "-" + tint + option;
+    return getComputedStyle(document.documentElement).getPropertyValue(decision).trim() || null;
+  };
+
+  var getOption = function (options) {
+    switch (true) {
+      case options.hover:
+        return '-hover';
+      case options.active:
+        return '-active';
+      default:
+        return '';
+    }
+  };
+
+  var colors = new Colors();
+
   var sanitize = function (className) { return className.charAt(0) === '.' ? className.substr(1) : className; };
 
   var getClassNames = function (element) { return element.className ? element.className.split(' ') : []; };
@@ -1196,6 +1219,27 @@
 
   var hasClass = function (element, className) { return getClassNames(element).indexOf(sanitize(className)) > -1; };
 
+  var ACTIONS = [
+    '[tabindex]:not([tabindex="-1"])',
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([disabled])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    'audio[controls]',
+    'video[controls]',
+    '[contenteditable]:not([contenteditable="false"])',
+    'details>summary:first-of-type',
+    'details',
+    'iframe'
+  ];
+
+  var ACTIONS_SELECTOR = ACTIONS.join();
+
+  var queryActions = function (element) {
+    return element.querySelectorAll(ACTIONS_SELECTOR);
+  };
+
   var dom = {};
 
   dom.addClass = addClass;
@@ -1203,6 +1247,7 @@
   dom.removeClass = removeClass;
   dom.queryParentSelector = queryParentSelector;
   dom.querySelectorAllArray = querySelectorAllArray;
+  dom.queryActions = queryActions;
 
   var supportLocalStorage = function () {
     try {
@@ -1326,6 +1371,7 @@
   api$1.stop = engine.stop;
 
   api$1.inspector = inspector;
+  api$1.colors = colors;
 
   options.configure(window[config.namespace], api$1.start);
 
@@ -1702,6 +1748,10 @@
     return getClassNames(this.node);
   };
 
+  Instance.prototype.remove = function remove () {
+    this.node.parentNode.removeChild(this.node);
+  };
+
   Instance.prototype.setAttribute = function setAttribute (attributeName, value) {
     this.node.setAttribute(attributeName, value);
   };
@@ -1728,6 +1778,22 @@
 
   Instance.prototype.focus = function focus () {
     this.node.focus();
+  };
+
+  Instance.prototype.focusClosest = function focusClosest () {
+    var closest = this._focusClosest(this.node.parentNode);
+    if (closest) { closest.focus(); }
+  };
+
+  Instance.prototype._focusClosest = function _focusClosest (parent) {
+    if (!parent) { return null; }
+    var actions = [].concat( queryActions(parent) );
+    if (actions.length <= 1) {
+      return this._focusClosest(parent.parentNode);
+    } else {
+      var index = actions.indexOf(this.node);
+      return actions[index + (index < actions.length - 1 ? 1 : -1)];
+    }
   };
 
   prototypeAccessors$1.hasFocus.get = function () {
@@ -2748,6 +2814,11 @@
     ASK: api.internals.ns.emission('scheme', 'ask')
   };
 
+  var SchemeEvent = {
+    SCHEME: api.internals.ns.event('scheme'),
+    THEME: api.internals.ns.event('theme')
+  };
+
   var Scheme = /*@__PURE__*/(function (superclass) {
     function Scheme () {
       superclass.call(this, false);
@@ -2860,6 +2931,7 @@
         localStorage.setItem('scheme', value);
       }
       this.setAttribute(SchemeAttribute.SCHEME, value);
+      this.dispatch(SchemeEvent.SCHEME, { scheme: this._scheme });
     };
 
     prototypeAccessors.theme.get = function () {
@@ -2874,6 +2946,7 @@
           this._theme = value;
           this.setAttribute(SchemeAttribute.THEME, value);
           this.descend(SchemeEmission.THEME, value);
+          this.dispatch(SchemeEvent.THEME, { theme: this._theme });
           break;
       }
     };
@@ -2924,7 +2997,8 @@
     SchemeValue: SchemeValue,
     SchemeSelector: SchemeSelector,
     SchemeEmission: SchemeEmission,
-    SchemeTheme: SchemeTheme
+    SchemeTheme: SchemeTheme,
+    SchemeEvent: SchemeEvent
   };
 
   api.internals.register(api.scheme.SchemeSelector.SCHEME, api.scheme.Scheme);
@@ -3615,6 +3689,196 @@
   api.internals.register(api.modal.ModalSelector.MODAL, api.modal.Modal);
   api.internals.register(api.modal.ModalSelector.BODY, api.modal.ModalBody);
   api.internals.register(api.core.RootSelector.ROOT, api.modal.ModalsGroup);
+
+  var PasswordEmission = {
+    TOGGLE: api.internals.ns.emission('password', 'toggle'),
+    ADJUST: api.internals.ns.emission('password', 'adjust')
+  };
+
+  var PasswordToggle = /*@__PURE__*/(function (superclass) {
+    function PasswordToggle () {
+      superclass.apply(this, arguments);
+    }
+
+    if ( superclass ) PasswordToggle.__proto__ = superclass;
+    PasswordToggle.prototype = Object.create( superclass && superclass.prototype );
+    PasswordToggle.prototype.constructor = PasswordToggle;
+
+    var prototypeAccessors = { width: { configurable: true },isChecked: { configurable: true } };
+    var staticAccessors = { instanceClassName: { configurable: true } };
+
+    staticAccessors.instanceClassName.get = function () {
+      return 'PasswordToggle';
+    };
+
+    PasswordToggle.prototype.init = function init () {
+      this.listen('click', this.toggle.bind(this));
+      this.ascend(PasswordEmission.ADJUST, this.width);
+      this.isSwappingFont = true;
+      this._isChecked = this.isChecked;
+    };
+
+    prototypeAccessors.width.get = function () {
+      var style = getComputedStyle(this.node.parentNode);
+      return parseInt(style.width);
+    };
+
+    prototypeAccessors.isChecked.get = function () {
+      return this.node.checked;
+    };
+
+    prototypeAccessors.isChecked.set = function (value) {
+      this._isChecked = value;
+      this.ascend(PasswordEmission.TOGGLE, value);
+    };
+
+    PasswordToggle.prototype.toggle = function toggle () {
+      this.isChecked = !this._isChecked;
+      // this.node.checked = this.isChecked;
+    };
+
+    PasswordToggle.prototype.swapFont = function swapFont (families) {
+      this.ascend(PasswordEmission.ADJUST, this.width);
+    };
+
+    Object.defineProperties( PasswordToggle.prototype, prototypeAccessors );
+    Object.defineProperties( PasswordToggle, staticAccessors );
+
+    return PasswordToggle;
+  }(api.core.Instance));
+
+  var Password = /*@__PURE__*/(function (superclass) {
+    function Password () {
+      superclass.apply(this, arguments);
+    }
+
+    if ( superclass ) Password.__proto__ = superclass;
+    Password.prototype = Object.create( superclass && superclass.prototype );
+    Password.prototype.constructor = Password;
+
+    var staticAccessors = { instanceClassName: { configurable: true } };
+
+    staticAccessors.instanceClassName.get = function () {
+      return 'Password';
+    };
+
+    Password.prototype.init = function init () {
+      this.addAscent(PasswordEmission.TOGGLE, this.toggle.bind(this));
+      this.addAscent(PasswordEmission.ADJUST, this.adjust.bind(this));
+    };
+
+    Password.prototype.toggle = function toggle (value) {
+      this.descend(PasswordEmission.TOGGLE, value);
+    };
+
+    Password.prototype.adjust = function adjust (value) {
+      this.descend(PasswordEmission.ADJUST, value);
+    };
+
+    Object.defineProperties( Password, staticAccessors );
+
+    return Password;
+  }(api.core.Instance));
+
+  var PasswordSelector = {
+    PASSWORD: api.internals.ns.selector('password'),
+    INPUT: api.internals.ns.selector('password__input'),
+    LABEL: api.internals.ns.selector('password__label'),
+    TOOGLE: ((api.internals.ns.selector('password__checkbox')) + " input[type=\"checkbox\"]")
+  };
+
+  var PasswordInput = /*@__PURE__*/(function (superclass) {
+    function PasswordInput () {
+      superclass.apply(this, arguments);
+    }
+
+    if ( superclass ) PasswordInput.__proto__ = superclass;
+    PasswordInput.prototype = Object.create( superclass && superclass.prototype );
+    PasswordInput.prototype.constructor = PasswordInput;
+
+    var prototypeAccessors = { isRevealed: { configurable: true } };
+    var staticAccessors = { instanceClassName: { configurable: true } };
+
+    staticAccessors.instanceClassName.get = function () {
+      return 'PasswordInput';
+    };
+
+    PasswordInput.prototype.init = function init () {
+      this.addDescent(PasswordEmission.TOGGLE, this.toggle.bind(this));
+      this._isRevealed = this.hasAttribute('type') === 'password';
+      this.listen('keydown', this.capslock.bind(this)); // for capslock enabled
+      this.listen('keyup', this.capslock.bind(this)); // for capslock desabled
+    };
+
+    PasswordInput.prototype.toggle = function toggle (value) {
+      this.isRevealed = value;
+      this.setAttribute('type', value ? 'text' : 'password');
+    };
+
+    prototypeAccessors.isRevealed.get = function () {
+      return this._isRevealed;
+    };
+
+    PasswordInput.prototype.capslock = function capslock (event) {
+      if (event.getModifierState('CapsLock')) {
+        this.node.parentNode.setAttribute(api.internals.ns.attr('capslock'), '');
+      } else {
+        this.node.parentNode.removeAttribute(api.internals.ns.attr('capslock'));
+      }
+    };
+
+    prototypeAccessors.isRevealed.set = function (value) {
+      this._isRevealed = value;
+      this.setAttribute('type', value ? 'text' : 'password');
+    };
+
+    Object.defineProperties( PasswordInput.prototype, prototypeAccessors );
+    Object.defineProperties( PasswordInput, staticAccessors );
+
+    return PasswordInput;
+  }(api.core.Instance));
+
+  var PasswordLabel = /*@__PURE__*/(function (superclass) {
+    function PasswordLabel () {
+      superclass.apply(this, arguments);
+    }
+
+    if ( superclass ) PasswordLabel.__proto__ = superclass;
+    PasswordLabel.prototype = Object.create( superclass && superclass.prototype );
+    PasswordLabel.prototype.constructor = PasswordLabel;
+
+    var staticAccessors = { instanceClassName: { configurable: true } };
+
+    staticAccessors.instanceClassName.get = function () {
+      return 'PasswordLabel';
+    };
+
+    PasswordLabel.prototype.init = function init () {
+      this.addDescent(PasswordEmission.ADJUST, this.adjust.bind(this));
+    };
+
+    PasswordLabel.prototype.adjust = function adjust (value) {
+      var valueREM = Math.ceil(value / 16);
+      this.node.style.paddingRight = valueREM + 'rem';
+    };
+
+    Object.defineProperties( PasswordLabel, staticAccessors );
+
+    return PasswordLabel;
+  }(api.core.Instance));
+
+  api.password = {
+    Password: Password,
+    PasswordToggle: PasswordToggle,
+    PasswordSelector: PasswordSelector,
+    PasswordInput: PasswordInput,
+    PasswordLabel: PasswordLabel
+  };
+
+  api.internals.register(api.password.PasswordSelector.INPUT, api.password.PasswordInput);
+  api.internals.register(api.password.PasswordSelector.PASSWORD, api.password.Password);
+  api.internals.register(api.password.PasswordSelector.TOOGLE, api.password.PasswordToggle);
+  api.internals.register(api.password.PasswordSelector.LABEL, api.password.PasswordLabel);
 
   var NavigationSelector = {
     NAVIGATION: api.internals.ns.selector('nav'),
@@ -4330,15 +4594,68 @@
   api.internals.register(api.table.TableSelector.ELEMENT, api.table.TableElement);
   api.internals.register(api.table.TableSelector.CAPTION, api.table.TableCaption);
 
+  var TagEvent = {
+    DISMISS: api.internals.ns.event('dismiss')
+  };
+
+  var TagDismissible = /*@__PURE__*/(function (superclass) {
+    function TagDismissible () {
+      superclass.apply(this, arguments);
+    }
+
+    if ( superclass ) TagDismissible.__proto__ = superclass;
+    TagDismissible.prototype = Object.create( superclass && superclass.prototype );
+    TagDismissible.prototype.constructor = TagDismissible;
+
+    var staticAccessors = { instanceClassName: { configurable: true } };
+
+    staticAccessors.instanceClassName.get = function () {
+      return 'TagDismissible';
+    };
+
+    TagDismissible.prototype.init = function init () {
+      this.listen('click', this.click.bind(this));
+    };
+
+    TagDismissible.prototype.click = function click () {
+      this.focusClosest();
+
+      switch (api.mode) {
+        case api.Modes.ANGULAR:
+        case api.Modes.REACT:
+        case api.Modes.VUE:
+          this.request(this.verify.bind(this));
+          break;
+
+        default:
+          this.remove();
+      }
+
+      this.dispatch(TagEvent.DISMISS);
+    };
+
+    TagDismissible.prototype.verify = function verify () {
+      if (document.body.contains(this.node)) { api.inspector.warn(("a TagDismissible has just been dismissed and should be removed from the dom. In " + (api.mode) + " mode, the api doesn't handle dom modification. An event " + (TagEvent.DISMISS) + " is dispatched by the element to trigger the removal")); }
+    };
+
+    Object.defineProperties( TagDismissible, staticAccessors );
+
+    return TagDismissible;
+  }(api.core.Instance));
+
   var TagSelector = {
-    TAG_PRESSABLE: ((api.internals.ns.selector('tag')) + "[aria-pressed]")
+    PRESSABLE: ((api.internals.ns.selector('tag')) + "[aria-pressed]"),
+    DISMISSIBLE: ("" + (api.internals.ns.selector('tag--dismiss')))
   };
 
   api.tag = {
-    TagSelector: TagSelector
+    TagDismissible: TagDismissible,
+    TagSelector: TagSelector,
+    TagEvent: TagEvent
   };
 
-  api.internals.register(api.tag.TagSelector.TAG_PRESSABLE, api.core.Toggle);
+  api.internals.register(api.tag.TagSelector.PRESSABLE, api.core.Toggle);
+  api.internals.register(api.tag.TagSelector.DISMISSIBLE, api.tag.TagDismissible);
 
   var DownloadSelector = {
     DOWNLOAD_ASSESS_FILE: ("" + (api.internals.ns.attr.selector('assess-file'))),
@@ -4491,13 +4808,13 @@
       var header = this.queryParentSelector(HeaderSelector.HEADER);
       this.toolsLinks = header.querySelector(HeaderSelector.TOOLS_LINKS);
       this.menuLinks = header.querySelector(HeaderSelector.MENU_LINKS);
-      var copySuffix = '_copy';
+      var copySuffix = '-mobile';
 
       var toolsHtml = this.toolsLinks.innerHTML.replace(/  +/g, ' ');
       var menuHtml = this.menuLinks.innerHTML.replace(/  +/g, ' ');
       // Pour éviter de dupliquer des id, on ajoute un suffixe aux id et aria-controls duppliqués.
-      var toolsHtmlDuplicateId = toolsHtml.replace(/ id="(.*?)"/gm, ' id="$1' + copySuffix + '"');
-      toolsHtmlDuplicateId = toolsHtmlDuplicateId.replace(/ aria-controls="(.*?)"/gm, ' aria-controls="$1' + copySuffix + '"');
+      var toolsHtmlDuplicateId = toolsHtml.replace(/(<nav[.\s\S]*-translate [.\s\S]*) id="(.*?)"([.\s\S]*<\/nav>)/gm, '$1 id="$2' + copySuffix + '"$3');
+      toolsHtmlDuplicateId = toolsHtmlDuplicateId.replace(/(<nav[.\s\S]*-translate [.\s\S]*) aria-controls="(.*?)"([.\s\S]*<\/nav>)/gm, '$1 aria-controls="$2' + copySuffix + '"$3');
 
       if (toolsHtmlDuplicateId === menuHtml) { return; }
 
@@ -4573,7 +4890,7 @@
     HeaderLinks: HeaderLinks,
     HeaderModal: HeaderModal,
     HeaderSelector: HeaderSelector,
-    doc: 'https://gouvfr.atlassian.net/wiki/spaces/DB/pages/222789846/En-t+te+-+Header'
+    doc: 'https://www.systeme-de-design.gouv.fr/elements-d-interface/composants/en-tete'
   };
 
   api.internals.register(api.header.HeaderSelector.BUTTONS, api.header.HeaderLinks);

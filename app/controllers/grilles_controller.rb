@@ -49,12 +49,10 @@ class GrillesController < ApplicationController
     @anciennete_cons_ef2 = 0
     @duree_emploi = 0
     @start_emploi = 0
-    @compteur_ef_succ = 0 
     #initialement dans un emploi fonctionnel 
     if !params[:type_emploi].nil? && params[:type_emploi] != "" && params[:niveau_emploi] != "" && params[:echelon_emploif] != "" && params[:fin_emploif] != "" && params[:duree_echelonf] != "" 
       @duree_emploi = (params[:fin_emploif].to_i - 2023)*12 #duree jusqua fin emploi 
       @array_ef[0..@duree_emploi-1] = Array.new(@duree_emploi, params[:type_emploi]) #maj array ef pour graphe   
-      @compteur_ef_succ = @duree_emploi 
       if @fonctions.include?(params[:type_emploi]) == false #ne contient pas les nouvelles fonctions 
         @annee_e = ((params[:duree_echelonf].to_i-1)/12).to_i+Emploi.where(nom: params[:type_emploi], echelon: params[:echelon_emploif].to_i).pluck(:annee).min
         @mois_e = params[:duree_echelonf].to_i-12*((params[:duree_echelonf].to_i-1)/12).to_i
@@ -71,16 +69,16 @@ class GrillesController < ApplicationController
         @liste_indices_emploi2 = EmploiFonctionnel2(@liste_indices_emploi2, @liste_indices2[0], params[:niveau_emploi].to_i, 0, @duree_emploi, @duree_carriere, 0)
         #courbe 1 = comme si pas d'ef 
       end
+      @liste_indices2[@duree_emploi..@liste_indices2.length-1].each_with_index do |indice,i|
+        if indice < @liste_indices_emploi2[@duree_emploi-1]
+          @liste_indices2[@duree_emploi+i] = @liste_indices_emploi2[@duree_emploi-1]
+        end
+      end
     end
     
     #nouvel emploi fonctionel  
     (1..6).each do |i|
       if !params["type_emploi#{i}"].nil? &&  params["type_emploi#{i}"] != "" && params["duree_emploif#{i}"] != "" && params["debut_emploif#{i}"] != "" && params["niveau_emploi#{i}"] != ""
-        if (params["debut_emploif#{i}"].to_i - 2023)*12 == @start_emploi + @duree_emploi #ef successif ceux du précédent car pas encore mis à jour 
-          @compteur_ef_succ += params["duree_emploif#{i}"].to_i*12 #on rajoute la durée de l'ef 
-        else
-          @compteur_ef_succ = params["duree_emploif#{i}"].to_i*12 #remet à jour avec durée de l'ef 
-        end
         @duree_emploi = params["duree_emploif#{i}"].to_i*12 
         @start_emploi = (params["debut_emploif#{i}"].to_i - 2023)*12
         @array_ef = @array_ef[0..@start_emploi-1]+Array.new(@duree_emploi, params["type_emploi#{i}"])+@array_ef[@start_emploi+@duree_emploi..@duree_carriere-1]
@@ -112,14 +110,12 @@ class GrillesController < ApplicationController
         end
 
 
-        #si ef consecutif de plus de 5 ANS indice dans carrriere principale bloquée à indice dernier ef pour courbe 2  
-        if @compteur_ef_succ >= 12*5
+        #indice dans carrriere principale bloquée à indice dernier ef pour courbe 2  
           @liste_indices2[@start_emploi+@duree_emploi..@liste_indices2.length-1].each_with_index do |indice,i|
             if indice < @liste_indices_emploi2[@start_emploi+@duree_emploi-1]
               @liste_indices2[@start_emploi+@duree_emploi+i] = @liste_indices_emploi2[@start_emploi+@duree_emploi-1]
             end
           end
-        end 
 
       end
     end

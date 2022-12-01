@@ -10,7 +10,7 @@ class Emploi < ApplicationRecord
 	  	xlsx.each_with_pagename do |name, sheet|
 		  	data = sheet
 		  	headers = data.row(1) # get header row
-		  	@nom_emploi = data.cell(1,7)
+		  	@nom_emploi = data.cell(1,8)
 		  	data.each_with_index do |row, idx|
 		    	next if idx == 0 # skip header
 		      	row_data = Hash[[headers, row].transpose]	      
