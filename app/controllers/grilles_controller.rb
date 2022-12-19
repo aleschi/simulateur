@@ -219,9 +219,9 @@ class GrillesController < ApplicationController
       @liste_indices2 = checkDim(@liste_indices2,duree_carriere) #dim liste indice jusqu'à fin carrière 
       @start_emploi = 0 
       @duree_emploi = 0 
-      if !type_emploi.nil? && type_emploi != ""
-        @bonification2 = Bonification2(niveau_emploi.to_i) #bonif en sortie de tout ef
-        @duree_emploi = (fin_emploi - 2023)*12        
+      if !type_emploi.nil? && type_emploi != ""        
+        @duree_emploi = (fin_emploi - 2023)*12  
+        @bonification2 = Bonification2(niveau_emploi.to_i, @duree_emploi) #bonif en sortie de tout ef      
         @liste_indices2 = CheckPromo(@liste_indices2,duree_carriere,grade2,grade3,grade4,0,@duree_emploi, corps, grade, 0,0, array_grade) #check si promo de grade avant fin de ef + pas de dispo avant ef                   
         @liste_indices2 = @liste_indices2[0..@duree_emploi-1] + @liste_indices2[@duree_emploi+@bonification2..@liste_indices2.length-1]
         @liste_indices2 = checkDim(@liste_indices2,duree_carriere) #dim liste indice jusqu'à fin carrière         
@@ -235,7 +235,7 @@ class GrillesController < ApplicationController
 
           @duree_emploi = params["duree_emploif#{i}"].to_i*12 
           @start_emploi = (params["debut_emploif#{i}"].to_i - 2023)*12
-          @bonif = Bonification2(params["niveau_emploi#{i}"].to_i)
+          @bonif = Bonification2(params["niveau_emploi#{i}"].to_i, @duree_emploi)
 
           @liste_indices2 = CheckPromo(@liste_indices2,duree_carriere,grade2,grade3,grade4,@start_emploi,@duree_emploi, corps, grade, debut_dispo,fin_dispo,array_grade) #si promo avant ef          
           @liste_indices2 = @liste_indices2[0..@duree_emploi+@start_emploi-1] + @liste_indices2[@start_emploi+@duree_emploi+@bonif..@liste_indices2.length-1]
@@ -652,13 +652,14 @@ class GrillesController < ApplicationController
         return liste_indices_emploi3
     end
 
-    def Bonification2(niveau)
+    def Bonification2(niveau, duree)
+      @annee = duree/12
       if niveau == 1
-        @bonif = 4
+        @bonif = 4*@annee
       elsif niveau == 2
-        @bonif = 2
+        @bonif = (2.5*@annee).to_i
       elsif niveau == 3
-        @bonif = 1
+        @bonif = (1.5*@annee).to_i
       else
         @bonif = 0
       end 

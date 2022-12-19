@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   devise_for :users, :path => "",
     :path_names =>  {:sign_in => "connexion", :sign_out => "logout"},
     controllers: {sessions: 'sessions'}
-  root 'pages#accueil'
+  root 'pages#index'
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

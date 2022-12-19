@@ -52,23 +52,25 @@
 
 	<div class="fr-grid-row fr-grid-row--gutters" data-filter-target='contentToggleEmploi'>
 		<div class="fr-col-12 fr-col-lg-12">
-			<div class="">
-			    <fieldset class="fr-fieldset fr-fieldset--inline">
-			        <legend class="fr-fieldset__legend fr-text--regular fr-mb-1w" id='radio-inline-legend'>
+			
+			    <fieldset class="fr-fieldset fr-mb-0">
+			        <legend class="fr-fieldset__legend--regular fr-fieldset__legend" id='radio-inline-legend'>
 			            Exercez-vous un emploi fonctionnel au 1er Janvier 2023 ? 
 			        </legend>
-			        <div class="fr-fieldset__content" >
+			        <div class="fr-fieldset__element fr-fieldset__element--inline fr-mb-0">
 			            <div class="fr-radio-group">
 			                <%= f.radio_button :emploi_i, true, id: "radio-emploi1", data: {action: 'click->filter#toggleEmploi', 'filter-target': 'radioButton'}, checked: false %>
 			                <label class="fr-label" for="radio-emploi1">Oui</label>
 			            </div>
+			        </div>
+			        <div class="fr-fieldset__element fr-fieldset__element--inline fr-mb-0">
 			            <div class="fr-radio-group">
 			                <%= f.radio_button :emploi_i, false, id:"radio-emploi2", data: {action: 'click->filter#toggleEmploi'}, checked: true%>
 			                <label class="fr-label" for="radio-emploi2">Non</label>
 			            </div>
 			        </div>			        
 			    </fieldset>
-			</div>
+			
 
 		</div>
 	</div>
@@ -143,24 +145,26 @@
 
 	<div class="fr-grid-row fr-grid-row--gutters" data-filter-target='contentToggleSimulation'>
 		<div class="fr-col-12 fr-col-lg-12">
-			<div class="">
-			    <fieldset class="fr-fieldset fr-fieldset--inline">
-			        <legend class="fr-fieldset__legend fr-text--regular fr-mb-1w" id='radio-inline-legend'>
+			
+			    <fieldset class="fr-fieldset fr-mb-0">
+			        <legend class="fr-fieldset__legend--regular fr-fieldset__legend" id='radio-inline-legend'>
 			            Souhaitez-vous effectuer une simulation ? 
 			        </legend>
-			        <div class="fr-fieldset__content" >
+			        <div class="fr-fieldset__element fr-fieldset__element--inline fr-mb-0">
 			            <div class="fr-radio-group">
 			                <%= f.radio_button :simulation, true, id: "radio-simulation1", data: {action: 'click->filter#toggleSimulation', 'filter-target': 'radioButtonSimulation',}, checked: false  %>
 			                <label class="fr-label" for="radio-simulation1">Oui</label>
 			            </div>
+			        </div>
+			        <div class="fr-fieldset__element fr-fieldset__element--inline fr-mb-0">
 			            <div class="fr-radio-group">
-			                <%= f.radio_button :simulation, false, checked: true, id:"radio-simulation2", data: {action: 'click->filter#toggleSimulation'}, checked: true  %>
+			                <%= f.radio_button :simulation, false, id:"radio-simulation2", data: {action: 'click->filter#toggleSimulation'}, checked: true  %>
 			                <label class="fr-label" for="radio-simulation2">Non</label>
 			            </div>
 			        </div>
 			        
 			    </fieldset>
-			</div>
+			
 		</div>
 	</div>
 
@@ -198,15 +202,15 @@
 			</div>
 			<% end %>
 			<div class="fr-error-text fr-hidden" data-filter-target="error" role="alert"> </div>
-			<div class="fr-my-2w" data-filter-target="bouton"><button data-action="filter#toggleEf" class="btn-plus" title="ajouter un emploi fonctionnel"> <span class="fr-fi-add-circle-fill cbleu fr-fi--sm" aria-hidden="true"></span> Ajouter un emploi fonctionnel futur</button></div>
+			<div class="fr-my-2w" data-filter-target="bouton"><button data-action="filter#toggleEf" class="fr-btn fr-icon-add-circle-fill fr-btn--icon-left fr-btn--secondary" title="ajouter un emploi fonctionnel"> Ajouter un emploi fonctionnel futur</button></div>
 			
 
-			<! -- Grades -->
+		
 			<div class="fr-my-2w fr-hidden" data-filter-target="formGrades">
 				<div class="fr-text-lg bold">Projections de promotion de grade 
 					<button class="fr-hidden bouton_i2" data-filter-target="buttonDeleteGrades" type="button" data-action="click->filter#deleteGrades" title="supprimer les promotions de grade"><span class="fr-icon-delete-line" aria-hidden="true"></span></button>
 				</div>
-				<div class="fr-my-2w" data-filter-target="buttonNewGrades"><button  data-action="filter#addGrades" class="btn-plus" title="Ajouter une promotion de grade"> <span class="fr-fi-add-circle-fill cbleu fr-fi--sm" aria-hidden="true"></span> Ajouter une promotion de grade</button></div>
+				<div class="fr-my-2w" data-filter-target="buttonNewGrades"><button  data-action="filter#addGrades" class="fr-btn fr-icon-add-circle-fill fr-btn--icon-left fr-btn--secondary" title="Ajouter une promotion de grade">Ajouter une promotion de grade</button></div>
 				<div class="fr-my-2w fr-hidden" data-filter-target="contentgrades">	
 					<div class="fr-grid-row fr-grid-row--gutters">
 						<div class="fr-col-12 fr-col-lg-3">	
@@ -235,7 +239,7 @@
 			<div class="fr-text-lg bold">Disponibilité 
 				
 			<button class="fr-hidden bouton_i2" type="button" data-filter-target="buttonDeleteDispo" data-action="click->filter#deleteDispo" title="supprimer la disponibilité"><span class="fr-icon-delete-line" aria-hidden="true"></span></button></div>
-			<div class="fr-my-2w" data-filter-target="buttonNewProjet"><button  data-action="filter#addDispo" class="btn-plus" title="ajouter une disponibilité"> <span class="fr-fi-add-circle-fill cbleu fr-fi--sm" aria-hidden="true"></span> Ajouter une disponibilité</button></div>		
+			<div class="fr-my-2w" data-filter-target="buttonNewProjet"><button  data-action="filter#addDispo" class="fr-btn fr-icon-add-circle-fill fr-btn--icon-left fr-btn--secondary" title="ajouter une disponibilité">Ajouter une disponibilité</button></div>		
 			<div class="fr-my-2w fr-hidden" data-filter-target="contentdispo" >
 				<div class="fr-grid-row fr-grid-row--gutters">
 					<div class="fr-col-12 fr-col-lg-6">
@@ -245,7 +249,7 @@
 					</div>
 					<div class="fr-col-12 fr-col-lg-6">
 						<div class="fr-select-group">				
-							<label for="finprojet" class="fr-label">Fin prévue</label><%= f.select :fin_projet, [],{prompt: "- sélectionner -"},{data: {action: 'change->filter#validateForm','filter-target': 'finProjet','filter-target': 'finProjet'},id:"finprojet", class:"fr-select"}%>
+							<label for="finprojet" class="fr-label">Fin prévue</label><%= f.select :fin_projet, [],{prompt: "- sélectionner -"},{data: {action: 'change->filter#validateForm','filter-target': 'finProjet'},id:"finprojet", class:"fr-select"}%>
 						</div>
 					</div>
 				</div>

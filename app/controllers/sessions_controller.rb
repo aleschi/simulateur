@@ -12,7 +12,7 @@ class SessionsController < Devise::SessionsController
 	    yield resource if block_given?
 	   #respond_with resource, location: after_sign_in_path_for(resource)
      respond_to do |format|
-        format.turbo_stream {redirect_to simulateur_path} 
+        format.turbo_stream {redirect_to root_path} 
       end 
 
 	  else 
@@ -33,7 +33,7 @@ class SessionsController < Devise::SessionsController
   end
  
   def after_sign_in_path_for(resource)
-      simulateur_path   
+      root_path   
   end
 
   protected

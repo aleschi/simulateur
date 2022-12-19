@@ -1,32 +1,93 @@
+<% content_for :title do %>Connexion - SIMULAE <% end %>
+<main role="main" id="content">
+    <div class="fr-container fr-container--fluid fr-mb-md-14v" data-controller="form">
+        <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
+            <div class="fr-col-12 fr-col-md-8 fr-col-lg-6">
+                <div class="fr-container fr-background-alt--grey fr-px-md-0 fr-pt-10v fr-pt-md-14v fr-pb-6v fr-pb-md-10v fr-mt-4w">
+                    <div class="fr-grid-row fr-grid-row-gutters fr-grid-row--center">
+                        <div class="fr-col-12 fr-col-md-9 fr-col-lg-8">
+                            <h4>Connexion à SIMULAE</h4>
+                            
+                            <div>
+                              <%= form_for(resource, as: resource_name, url: session_path(resource_name),data: {'form-target': "form", action: "turbo:before-fetch-request->form#submitForm turbo:submit-end->form#resultForm input->form#changeForm"}) do |f| %>
+                            
+                                    <fieldset class="fr-fieldset" id="login-1801-fieldset" aria-labelledby="login-1801-fieldset-legend login-1801-fieldset-messages">
+                                        <legend class="fr-fieldset__legend" id="login-1801-fieldset-legend">
+                                            <h5>Se connecter avec son compte</h5>
+                                        </legend>
+                                        <div class="fr-fieldset__element fr-hidden" data-form-target="error" >
+                                            <div class="fr-alert fr-alert--error fr-alert--sm">
+                                                <p>Identifiant/mot de passe incorrect</p>
+                                            </div>
+                                        </div>
+                                        <div class="fr-fieldset__element fr-hidden" data-form-target="error2" >
+                                            <div class="fr-alert fr-alert--error fr-alert--sm">
+                                                <p>Vous devez remplir tous les champs obligatoires (*)</p>
+                                            </div>
+                                        </div>
+                                        <div class="fr-fieldset__element">
+                                            <fieldset class="fr-fieldset" id="credentials" data-form-target="credentials" aria-labelledby="credentials-legend credentials-messages">
+                                                <legend class="fr-sr-only" id="credentials-legend">
+                                                    identifiants
+                                                </legend>
+                                                <div class="fr-fieldset__element">
+                                                    <div class="fr-input-group">
+                                                        <label class="fr-label" for="username-1798">
+                                                            Identifiant
+                                                            <span class="fr-hint-text">Format attendu : nom@domaine.fr</span>
+                                                        </label>
+                                                        <%= f.email_field :email,data: {'form-target': 'email' },required: true, autofocus: true, autocomplete: "email",class:"fr-input", id: "username-1798" %>
+                                                        
+                                                        <div class="fr-messages-group" id="username-1798-messages" aria-live="assertive">
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-<div class="fr-container">    
-  <div class="fr-grid-row fr-grid-row--gutters">
-    <div class="fr-col-12 fr-col-lg-6 fr-col-offset-lg-3">
-       
-      <h1 class="fr-my-5w tc">Connexion</h1>
-    
-      <%= form_for(resource, as: resource_name, url: session_path(resource_name),:html => {:id => "login"}, data: { controller: "form", 'form-target': "form", action: "turbo:submit-end->form#submitForm"}) do |f| %>
 
-        <div class="fr-input-group ">
-          <label class="fr-label" for="form-field1">Adresse mail*</label>
-          <%= f.email_field :email,required: true, autofocus: true, autocomplete: "email",class:"fr-input", id: "form-field1" %>
+                                                <div class="fr-fieldset__element">
+                                                    <div class="fr-password" id="password-1799">
+                                                        <label class="fr-label" for="password-1799-input">
+                                                            Mot de passe
+                                                        </label>
+                                                        <div class="fr-input-wrap">
+                                                            <%= f.password_field :password,data: {'form-target': 'password' },required: true, autocomplete: "current-password",class:"fr-password__input fr-input", id: "password-1799-input" %>
+                                                            
+                                                        </div>
+                                                        <div class="fr-messages-group" id="password-1799-input-messages" aria-live="assertive">
+                                                        </div>
+                                                        <div class="fr-password__checkbox fr-checkbox-group fr-checkbox-group--sm">
+                                                            <input aria-label="Afficher le mot de passe" id="password-1799-show" type="checkbox">
+                                                            <label class="fr--password__checkbox fr-label" for="password-1799-show">
+                                                                Afficher
+                                                            </label>
+                                                        </div>
+                                                        <p>
+                                                          <a class="fr-link" href="mailto:budget.lab@finances.gouv.fr?subject=Mot de passe oublié -SIMULAE" target="_blank" rel="noopener" title="Mot de passe oublié">Mot de passe oublié ?</a>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="fr-messages-group" id="credentials-messages" aria-live="assertive">
+                                                </div>
+                                            </fieldset>
+                                        </div>
+                                        <div class="fr-fieldset__element">
+                                            <ul class="fr-btns-group">
+                                                <li>
+                                                    
+                                                    <%= f.submit "Connexion", class:"fr-mt-2v fr-btn",  data: {action: 'click->form#submitForm','form-target': "submitBouton"}, aria: { label: "Valider le formulaire de connexion"} %>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        <div class="fr-messages-group" id="login-1801-fieldset-messages" aria-live="assertive">
+                                        </div>
+                                    </fieldset>
+                                <%end%>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="fr-input-group ">
-          <label class="fr-label" for="form-field2">Mot de passe*</label>
-          <%= f.password_field :password,required: true, autocomplete: "current-password",class:"fr-input", id: "form-field2" %>
-        </div>
-
-        <div data-form-target='error'></div>
-        <div class="d24"></div>
-     
-        <div class="tc fr-mb-5w">
-          <%= f.submit "Connexion", class:"fr-btn" %>
-        </div>
-
-      <% end %>
     </div>
-  </div>
-</div>
-
-
+</main>
